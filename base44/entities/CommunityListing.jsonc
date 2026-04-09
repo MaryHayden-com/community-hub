@@ -1,0 +1,98 @@
+{
+  "name": "CommunityListing",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "type": {
+      "type": "string",
+      "title": "Type",
+      "enum": [
+        "Business",
+        "Club & Group",
+        "Education",
+        "What's On"
+      ],
+      "enumNames": [
+        "Business",
+        "Club & Group",
+        "Education",
+        "What's On"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "title": "Category / Trade Type"
+    },
+    "country": {
+      "type": "string",
+      "title": "Country",
+      "default": "Ireland"
+    },
+    "county": {
+      "type": "string",
+      "title": "County"
+    },
+    "town": {
+      "type": "string",
+      "title": "Town"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "address": {
+      "type": "string",
+      "title": "Address"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "website": {
+      "type": "string",
+      "title": "Website"
+    },
+    "facebook_url": {
+      "type": "string",
+      "title": "Facebook URL"
+    },
+    "instagram_url": {
+      "type": "string",
+      "title": "Instagram URL"
+    },
+    "linkedin_url": {
+      "type": "string",
+      "title": "LinkedIn URL"
+    },
+    "contact_name": {
+      "type": "string",
+      "title": "Contact Name"
+    },
+    "meeting_info": {
+      "type": "string",
+      "title": "Meeting Info"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "title": "Is Featured",
+      "default": false
+    },
+    "image_url": {
+      "type": "string",
+      "title": "Image URL"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "county",
+    "town"
+  ]
+}

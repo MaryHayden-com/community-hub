@@ -1,0 +1,76 @@
+import { Link } from "react-router-dom";
+import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+const typeConfig = {
+  "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
+  "Club & Group": { icon: Users, color: "bg-purple-50 text-purple-700 border-purple-200" },
+  "Education": { icon: GraduationCap, color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  "What's On": { icon: Calendar, color: "bg-amber-50 text-amber-700 border-amber-200" },
+};
+
+export default function ListingCard({ listing }) {
+  const config = typeConfig[listing.type] || typeConfig["Business"];
+  const Icon = config.icon;
+
+  return (
+    <Link
+      to={`/listing/${listing.id}`}
+      className="group block bg-card rounded-xl border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden"
+    >
+      {listing.image_url && (
+        <div className="h-40 overflow-hidden">
+          <img
+            src={listing.image_url}
+            alt={listing.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+      )}
+      <div className="p-4 space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+              {listing.name}
+            </h3>
+            <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
+              <MapPin className="w-3 h-3 shrink-0" />
+              <span className="truncate">{listing.town}, {listing.county}</span>
+            </div>
+          </div>
+          {listing.is_featured && (
+            <Star className="w-4 h-4 text-accent shrink-0 fill-accent" />
+          )}
+        </div>
+
+        <Badge variant="outline" className={`text-xs ${config.color}`}>
+          <Icon className="w-3 h-3 mr-1" />
+          {listing.type}
+        </Badge>
+
+        {listing.category && (
+          <p className="text-xs text-muted-foreground">{listing.category}</p>
+        )}
+
+        {listing.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+            {listing.description}
+          </p>
+        )}
+
+        <div className="flex items-center gap-3 pt-1 text-xs text-muted-foreground">
+          {listing.phone && (
+            <span className="flex items-center gap-1">
+              <Phone className="w-3 h-3" /> Contact
+            </span>
+          )}
+          {listing.website && (
+            <span className="flex items-center gap-1">
+              <ExternalLink className="w-3 h-3" /> Website
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
