@@ -195,45 +195,49 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             <Input value={form.address} onChange={(e) => update("address", e.target.value)} />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Phone</Label>
-              <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input value={form.email} onChange={(e) => update("email", e.target.value)} />
-            </div>
-          </div>
+          {/* Contact Details Section */}
+          <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+            <p className="text-sm font-semibold text-foreground">Contact Details</p>
 
-          <div>
-            <Label>Website</Label>
-            <Input value={form.website} onChange={(e) => update("website", e.target.value)} placeholder="https://" />
-          </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Contact Name</Label>
+                <Input value={form.contact_name} onChange={(e) => update("contact_name", e.target.value)} placeholder="e.g. John Murphy" />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="e.g. 021 123 4567" />
+              </div>
+            </div>
 
-          <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label>Facebook</Label>
-              <Input value={form.facebook_url} onChange={(e) => update("facebook_url", e.target.value)} placeholder="URL" />
+              <Label>Email Address</Label>
+              <Input value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="e.g. info@example.ie" />
             </div>
-            <div>
-              <Label>Instagram</Label>
-              <Input value={form.instagram_url} onChange={(e) => update("instagram_url", e.target.value)} placeholder="URL" />
-            </div>
-            <div>
-              <Label>LinkedIn</Label>
-              <Input value={form.linkedin_url} onChange={(e) => update("linkedin_url", e.target.value)} placeholder="URL" />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Contact Name</Label>
-              <Input value={form.contact_name} onChange={(e) => update("contact_name", e.target.value)} />
+              <Label>Website</Label>
+              <Input value={form.website} onChange={(e) => update("website", e.target.value)} placeholder="https://" />
             </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label>Facebook URL</Label>
+                <Input value={form.facebook_url} onChange={(e) => update("facebook_url", e.target.value)} placeholder="https://facebook.com/..." />
+              </div>
+              <div>
+                <Label>Instagram URL</Label>
+                <Input value={form.instagram_url} onChange={(e) => update("instagram_url", e.target.value)} placeholder="https://instagram.com/..." />
+              </div>
+              <div>
+                <Label>LinkedIn URL</Label>
+                <Input value={form.linkedin_url} onChange={(e) => update("linkedin_url", e.target.value)} placeholder="https://linkedin.com/..." />
+              </div>
+            </div>
+
             <div>
               <Label>Meeting Info</Label>
-              <Input value={form.meeting_info} onChange={(e) => update("meeting_info", e.target.value)} />
+              <Input value={form.meeting_info} onChange={(e) => update("meeting_info", e.target.value)} placeholder="e.g. Every Tuesday at 7pm" />
             </div>
           </div>
 
