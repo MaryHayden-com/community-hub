@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -31,6 +31,23 @@ export default function Admin() {
   const [filterTown, setFilterTown] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
+  const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
+  const [fetchResult, setFetchResult] = useState(null);
+
+  const handleFetchWhatsOn = async () => {
+    setFetchingWhatsOn(true);
+    setFetchResult(null);
+    try {
+      const res = await base44.functions.invoke('fetchWhatsOn', {});
+      setFetchResult(res.data);
+      toast({ title: "What's On Updated", description: `Found ${res.data.found} events, added ${res.data.created} new listings.` });
+      loadListings();
+    } catch (err) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setFetchingWhatsOn(false);
+    }
+  };
 
   const toggleSelect = (l) => {
     setSelectedIds((prev) =>
@@ -157,6 +174,15 @@ export default function Admin() {
               onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
             >
               {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
+            </Button>
+          <Button
+              variant="outline"
+              size="sm"
+              onClick={handleFetchWhatsOn}
+              disabled={fetchingWhatsOn}
+            >
+              {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+              {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
             </Button>
           <ImportExport listings={listings} onImportComplete={loadListings} />
           <Button onClick={() => setEditing({})} className="gap-1.5">
