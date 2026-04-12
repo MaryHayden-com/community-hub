@@ -19,6 +19,9 @@ export default function Admin() {
   const [editing, setEditing] = useState(null); // null = closed, {} = new, {id,...} = edit
   const [deleteId, setDeleteId] = useState(null);
   const [viewMode, setViewMode] = useState("list");
+  const [filterType, setFilterType] = useState("");
+  const [filterCounty, setFilterCounty] = useState("");
+  const [filterTown, setFilterTown] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
 
@@ -58,8 +61,17 @@ export default function Admin() {
     );
   }
 
+  const allTypes = [...new Set(listings.map((l) => l.type).filter(Boolean))].sort();
+  const allCounties = [...new Set(listings.map((l) => l.county).filter(Boolean))].sort();
+  const allTowns = [...new Set(
+    listings.filter((l) => !filterCounty || l.county === filterCounty).map((l) => l.town).filter(Boolean)
+  )].sort();
+
   const filtered = listings
     .filter((l) => {
+      if (filterType && l.type !== filterType) return false;
+      if (filterCounty && l.county !== filterCounty) return false;
+      if (filterTown && l.town !== filterTown) return false;
       if (!search) return true;
       const s = search.toLowerCase();
       return (
@@ -111,14 +123,68 @@ export default function Admin() {
       </div>
 
       {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search listings..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-card"
-        />
+      <div className="space-y-3 mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search listings..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-card"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {/* Type filters */}
+          <div className="flex flex-wrap gap-1.5 items-center">
+            <span className="text-xs text-muted-foreground font-medium">Type:</span>
+            {allTypes.map((t) => (
+              <button
+                key={t}
+                onClick={() => setFilterType(filterType === t ? "" : t)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  filterType === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
+                }`}
+              >{t}</button>
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {/* County filters */}
+          <div className="flex flex-wrap gap-1.5 items-center">
+            <span className="text-xs text-muted-foreground font-medium">County:</span>
+            {allCounties.map((c) => (
+              <button
+                key={c}
+                onClick={() => { setFilterCounty(filterCounty === c ? "" : c); setFilterTown(""); }}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  filterCounty === c ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
+                }`}
+              >{c}</button>
+            ))}
+          </div>
+        </div>
+        {allTowns.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 items-center">
+              <span className="text-xs text-muted-foreground font-medium">Town:</span>
+              {allTowns.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setFilterTown(filterTown === t ? "" : t)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    filterTown === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
+                  }`}
+                >{t}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        {(filterType || filterCounty || filterTown) && (
+          <button
+            onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); }}
+            className="text-xs text-muted-foreground hover:text-foreground underline"
+          >Clear filters</button>
+        )}
       </div>
 
       {loading ? (
