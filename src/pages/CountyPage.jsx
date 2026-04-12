@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { MapPin, ChevronRight, Loader2, ArrowLeft } from "lucide-react";
+import ViewToggle from "../components/ViewToggle";
+import ListingListView from "../components/ListingListView";
 import { Button } from "@/components/ui/button";
 import ListingCard from "../components/ListingCard";
 
@@ -9,6 +11,7 @@ export default function CountyPage() {
   const { county } = useParams();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState("grid");
 
   useEffect(() => {
     base44.entities.CommunityListing.filter({ county }, "-created_date", 1000)
@@ -72,12 +75,19 @@ export default function CountyPage() {
 
       {/* All Listings */}
       <div>
-        <h2 className="font-display text-xl font-semibold mb-4">All Listings in Co. {decodeURIComponent(county)}</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {listings.map((l) => (
-            <ListingCard key={l.id} listing={l} />
-          ))}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-xl font-semibold">All Listings in Co. {decodeURIComponent(county)}</h2>
+          <ViewToggle view={view} setView={setView} />
         </div>
+        {view === "list" ? (
+          <ListingListView listings={listings} />
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {listings.map((l) => (
+              <ListingCard key={l.id} listing={l} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

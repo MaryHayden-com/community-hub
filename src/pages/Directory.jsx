@@ -5,6 +5,8 @@ import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import ListingCard from "../components/ListingCard";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2 } from "lucide-react";
+import ViewToggle from "../components/ViewToggle";
+import ListingListView from "../components/ListingListView";
 
 export default function Directory() {
   const location = useLocation();
@@ -13,6 +15,7 @@ export default function Directory() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [view, setView] = useState("grid");
   const [type, setType] = useState(params.get("type") || "");
   const [county, setCounty] = useState(params.get("county") || "");
   const [town, setTown] = useState(params.get("town") || "");
@@ -65,11 +68,14 @@ export default function Directory() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold">Directory</h1>
-        <p className="text-muted-foreground mt-1">
-          {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold">Directory</h1>
+          <p className="text-muted-foreground mt-1">
+            {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
+          </p>
+        </div>
+        <ViewToggle view={view} setView={setView} />
       </div>
 
       <SearchFilter
@@ -85,6 +91,8 @@ export default function Directory() {
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
         </div>
+      ) : view === "list" ? (
+        <div className="mt-6"><ListingListView listings={filtered} /></div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {filtered.map((l) => (

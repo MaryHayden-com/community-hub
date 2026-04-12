@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar } from "lucide-react";
+import ViewToggle from "../components/ViewToggle";
+import ListingListView from "../components/ListingListView";
 import ListingCard from "../components/ListingCard";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,6 +22,7 @@ export default function TownPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState("");
+  const [view, setView] = useState("grid");
 
   useEffect(() => {
     // Fetch all county listings, then show those whose town OR area matches
@@ -56,14 +59,17 @@ export default function TownPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Co. {decodedCounty}
       </Link>
 
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold flex items-center gap-2">
-          <MapPin className="w-7 h-7 text-primary" />
-          {decodedTown}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Co. {decodedCounty} · {listings.length} listing{listings.length !== 1 ? "s" : ""}
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold flex items-center gap-2">
+            <MapPin className="w-7 h-7 text-primary" />
+            {decodedTown}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Co. {decodedCounty} · {listings.length} listing{listings.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <ViewToggle view={view} setView={setView} />
       </div>
 
       {/* Type Filter */}
@@ -97,6 +103,8 @@ export default function TownPage() {
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
         </div>
+      ) : view === "list" ? (
+        <ListingListView listings={filtered} />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((l) => (
