@@ -18,7 +18,14 @@ export default function Admin() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState(null); // null = closed, {} = new, {id,...} = edit
   const [deleteId, setDeleteId] = useState(null);
-  const [viewMode, setViewMode] = useState("list"); // "list" or "grid"
+  const [viewMode, setViewMode] = useState("list");
+  const [sortKey, setSortKey] = useState("name");
+  const [sortDir, setSortDir] = useState("asc");
+
+  const handleSort = (key) => {
+    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  };; // "list" or "grid"
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -51,11 +58,21 @@ export default function Admin() {
     );
   }
 
-  const filtered = listings.filter((l) => {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    return (l.name || "").toLowerCase().includes(s) || (l.town || "").toLowerCase().includes(s) || (l.type || "").toLowerCase().includes(s);
-  });
+  const filtered = listings
+    .filter((l) => {
+      if (!search) return true;
+      const s = search.toLowerCase();
+      return (
+        (l.name || "").toLowerCase().includes(s) ||
+        (l.town || "").toLowerCase().includes(s) ||
+        (l.type || "").toLowerCase().includes(s)
+      );
+    })
+    .sort((a, b) => {
+      const av = (a[sortKey] || "").toLowerCase();
+      const bv = (b[sortKey] || "").toLowerCase();
+      return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -114,10 +131,14 @@ export default function Admin() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="text-left px-4 py-3 font-medium">Name</th>
-                  <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Type</th>
-                  <th className="text-left px-4 py-3 font-medium hidden md:table-cell">Town</th>
-                  <th className="text-left px-4 py-3 font-medium hidden lg:table-cell">County</th>
+                  {[["name","Name",""],["type","Type","hidden sm:table-cell"],["town","Town","hidden md:table-cell"],["county","County","hidden lg:table-cell"]].map(([key, label, cls]) => (
+                    <th key={key} className={`text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary transition-colors ${cls}`} onClick={() => handleSort(key)}>
+                      <span className="flex items-center gap-1">
+                        {label}
+                        {sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : <span className="text-muted-foreground/40"> ↕</span>}
+                      </span>
+                    </th>
+                  ))}
                   <th className="text-right px-4 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
