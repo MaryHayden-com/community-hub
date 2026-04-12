@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone, Facebook, Instagram } from "lucide-react";
+import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const typeConfig = {
@@ -36,32 +36,6 @@ export default function ListingCard({ listing }) {
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
             <Icon className="w-10 h-10 text-current opacity-20" />
-          </div>
-        )}
-        {/* External link icons overlaid on image */}
-        {(listing.website || listing.facebook_url || listing.instagram_url) && (
-          <div className="absolute bottom-2 right-2 flex gap-1.5" onClick={(e) => e.preventDefault()}>
-            {listing.website && (
-              <a href={listing.website} target="_blank" rel="noopener noreferrer"
-                className="bg-white/90 hover:bg-white text-slate-700 rounded-full p-1.5 shadow transition-all hover:scale-110"
-                title="Visit website">
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
-            {listing.facebook_url && (
-              <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer"
-                className="bg-white/90 hover:bg-white text-blue-600 rounded-full p-1.5 shadow transition-all hover:scale-110"
-                title="Facebook">
-                <Facebook className="w-3 h-3" />
-              </a>
-            )}
-            {listing.instagram_url && (
-              <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer"
-                className="bg-white/90 hover:bg-white text-pink-500 rounded-full p-1.5 shadow transition-all hover:scale-110"
-                title="Instagram">
-                <Instagram className="w-3 h-3" />
-              </a>
-            )}
           </div>
         )}
       </div>
