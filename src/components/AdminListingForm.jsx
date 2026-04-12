@@ -28,6 +28,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     instagram_url: listing?.instagram_url || "",
     linkedin_url: listing?.linkedin_url || "",
     contact_name: listing?.contact_name || "",
+    area: listing?.area || "",
     meeting_info: listing?.meeting_info || "",
     is_featured: listing?.is_featured || false,
     image_url: listing?.image_url || "",
@@ -162,18 +163,25 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label>Country</Label>
-              <Input value={form.country} onChange={(e) => update("country", e.target.value)} />
-            </div>
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>County *</Label>
               <Input value={form.county} onChange={(e) => update("county", e.target.value)} />
             </div>
             <div>
-              <Label>Town *</Label>
-              <Input value={form.town} onChange={(e) => update("town", e.target.value)} />
+              <Label>Country</Label>
+              <Input value={form.country} onChange={(e) => update("country", e.target.value)} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Townland / Village *</Label>
+              <Input value={form.town} onChange={(e) => update("town", e.target.value)} placeholder="e.g. Crossmahon, Laragh" />
+            </div>
+            <div>
+              <Label>Nearest Town / Area</Label>
+              <Input value={form.area} onChange={(e) => update("area", e.target.value)} placeholder="e.g. Bandon — shows under this area" />
             </div>
           </div>
 

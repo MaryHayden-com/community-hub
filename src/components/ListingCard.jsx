@@ -47,7 +47,11 @@ export default function ListingCard({ listing }) {
             </h3>
             <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3 shrink-0" />
-              <span className="truncate">{listing.town}, {listing.county}</span>
+              <span className="truncate">
+                {listing.town}
+                {listing.area && listing.area !== listing.town && ` · ${listing.area}`}
+                , {listing.county}
+              </span>
             </div>
           </div>
           {listing.is_featured && (

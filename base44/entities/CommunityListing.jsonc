@@ -37,7 +37,11 @@
     },
     "town": {
       "type": "string",
-      "title": "Town"
+      "title": "Townland / Village"
+    },
+    "area": {
+      "type": "string",
+      "title": "Nearest Town / Area"
     },
     "description": {
       "type": "string",

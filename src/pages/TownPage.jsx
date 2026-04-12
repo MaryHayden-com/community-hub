@@ -22,8 +22,9 @@ export default function TownPage() {
   const [activeType, setActiveType] = useState("");
 
   useEffect(() => {
-    base44.entities.CommunityListing.filter({ county: decodedCounty, town: decodedTown }, "-created_date", 1000)
-      .then(setListings)
+    // Fetch all county listings, then show those whose town OR area matches
+    base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", 1000)
+      .then((all) => setListings(all.filter((l) => l.town === decodedTown || l.area === decodedTown)))
       .finally(() => setLoading(false));
   }, [decodedCounty, decodedTown]);
 
