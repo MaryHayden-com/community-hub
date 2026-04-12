@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,47 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     image_url: listing?.image_url || "",
   });
   const [saving, setSaving] = useState(false);
+  const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
+
+  const categorySuggestions = useMemo(() => {
+    const byType = {
+      "Business": [
+        "Restaurant", "Café", "Bar & Pub", "Takeaway", "Supermarket", "Grocery",
+        "Pharmacy", "Hardware", "Clothing & Fashion", "Hair & Beauty", "Barber",
+        "Solicitor", "Accountant", "Financial Services", "Estate Agent",
+        "Garage & Motor", "Plumber", "Electrician", "Builder", "Carpenter",
+        "Painter & Decorator", "Cleaning Services", "Childcare & Crèche",
+        "Hotel", "B&B", "Gym & Fitness", "Dentist", "GP & Medical", "Veterinary",
+        "Florist", "Bakery", "Butcher", "Fishmonger", "Off Licence",
+        "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby",
+      ],
+      "Club & Group": [
+        "GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics",
+        "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian",
+        "Rowing", "Sailing", "Scouts", "Girl Guides", "Youth Club",
+        "Tidy Towns", "Community Group", "Residents Association",
+        "Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club",
+        "Walking Group", "Gardening Club", "Toastmasters", "ICA",
+        "Men's Shed", "Women's Group", "Senior Citizens", "Charity",
+      ],
+      "Education": [
+        "Primary School", "Secondary School", "Further Education",
+        "Third Level", "Youthreach", "Gaelscoil", "Gaelcholáiste",
+        "Special Education", "Montessori", "Childcare", "Crèche",
+        "Tutoring", "Language School", "Music Lessons", "Arts & Drama",
+        "Sports Coaching", "Adult Education", "Community Training",
+      ],
+      "What's On": [
+        "Festival", "Market", "Concert", "Theatre", "Exhibition",
+        "Sports Event", "Fundraiser", "Community Event", "Workshop",
+        "Talk & Lecture", "Food Event", "Outdoor Event", "Family Event",
+        "Christmas Event", "Summer Event", "Cultural Event",
+      ],
+    };
+    const list = byType[form.type] || [];
+    if (!form.category) return list;
+    return list.filter((s) => s.toLowerCase().includes(form.category.toLowerCase()));
+  }, [form.type, form.category]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -96,9 +137,29 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
           </div>
 
-          <div>
+          <div className="relative">
             <Label>Category / Trade Type</Label>
-            <Input value={form.category} onChange={(e) => update("category", e.target.value)} placeholder="e.g. Restaurant, GAA Club, Primary School" />
+            <Input
+              value={form.category}
+              onChange={(e) => { update("category", e.target.value); setShowCategorySuggestions(true); }}
+              onFocus={() => setShowCategorySuggestions(true)}
+              onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 150)}
+              placeholder="e.g. Restaurant, GAA Club, Primary School"
+            />
+            {showCategorySuggestions && categorySuggestions.length > 0 && (
+              <div className="absolute z-50 left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                {categorySuggestions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                    onMouseDown={() => { update("category", s); setShowCategorySuggestions(false); }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-3">

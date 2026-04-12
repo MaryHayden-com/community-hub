@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -18,6 +18,7 @@ export default function Admin() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState(null); // null = closed, {} = new, {id,...} = edit
   const [deleteId, setDeleteId] = useState(null);
+  const [viewMode, setViewMode] = useState("list"); // "list" or "grid"
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -67,6 +68,24 @@ export default function Admin() {
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center border rounded-lg overflow-hidden">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              className="rounded-none h-9"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              className="rounded-none h-9"
+              onClick={() => setViewMode("grid")}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+          </div>
           <ImportExport listings={listings} onImportComplete={loadListings} />
           <Button onClick={() => setEditing({})} className="gap-1.5">
             <Plus className="w-4 h-4" /> Add Listing
@@ -89,7 +108,7 @@ export default function Admin() {
         <div className="flex justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
-      ) : (
+      ) : viewMode === "list" ? (
         <div className="bg-card rounded-xl border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -104,7 +123,7 @@ export default function Admin() {
               </thead>
               <tbody>
                 {filtered.map((l) => (
-                  <tr key={l.id} className="border-b hover:bg-muted/30 transition-colors">
+                  <tr key={l.id} className="border-b hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setEditing(l)}>
                     <td className="px-4 py-3">
                       <span className="font-medium">{l.name}</span>
                       <span className="sm:hidden text-xs text-muted-foreground ml-2">({l.type})</span>
@@ -112,7 +131,7 @@ export default function Admin() {
                     <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{l.type}</td>
                     <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{l.town}</td>
                     <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">{l.county}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}>
                           <Edit className="w-3.5 h-3.5" />
@@ -129,6 +148,42 @@ export default function Admin() {
           </div>
           {filtered.length === 0 && (
             <div className="py-12 text-center text-muted-foreground">No listings found</div>
+          )}
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((l) => (
+            <div
+              key={l.id}
+              className="group bg-card border rounded-xl overflow-hidden cursor-pointer hover:border-primary/40 hover:shadow-lg transition-all"
+              onClick={() => setEditing(l)}
+            >
+              {l.image_url ? (
+                <div className="h-36 overflow-hidden">
+                  <img src={l.image_url} alt={l.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+              ) : (
+                <div className="h-36 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-primary/30" />
+                </div>
+              )}
+              <div className="p-3">
+                <p className="font-semibold text-sm truncate group-hover:text-primary transition-colors">{l.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{l.type}</p>
+                <p className="text-xs text-muted-foreground">{l.town}, {l.county}</p>
+                <div className="flex items-center justify-end gap-1 mt-2" onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditing(l)}>
+                    <Edit className="w-3 h-3" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteId(l.id)}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="col-span-full py-12 text-center text-muted-foreground">No listings found</div>
           )}
         </div>
       )}
