@@ -9,24 +9,36 @@ const typeConfig = {
   "What's On": { icon: Calendar, color: "bg-amber-50 text-amber-700 border-amber-200" },
 };
 
+const typeGradients = {
+  "Business": "from-blue-50 to-blue-100",
+  "Club & Group": "from-purple-50 to-purple-100",
+  "Education": "from-emerald-50 to-emerald-100",
+  "What's On": "from-amber-50 to-amber-100",
+};
+
 export default function ListingCard({ listing }) {
   const config = typeConfig[listing.type] || typeConfig["Business"];
   const Icon = config.icon;
+  const gradient = typeGradients[listing.type] || "from-slate-50 to-slate-100";
 
-  return (
+    return (
     <Link
       to={`/listing/${listing.id}`}
       className="group block bg-card rounded-xl border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
-      {listing.image_url && (
-        <div className="h-40 overflow-hidden">
+      <div className="h-36 overflow-hidden relative">
+        {listing.image_url ? (
           <img
             src={listing.image_url}
             alt={listing.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-        </div>
-      )}
+        ) : (
+          <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+            <Icon className="w-10 h-10 text-current opacity-20" />
+          </div>
+        )}
+      </div>
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
