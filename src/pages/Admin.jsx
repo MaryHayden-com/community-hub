@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -33,6 +34,24 @@ export default function Admin() {
   const [sortDir, setSortDir] = useState("asc");
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
   const [fetchResult, setFetchResult] = useState(null);
+  const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: false, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
+
+  const ALL_COLUMNS = [
+    { key: "name", label: "Name" },
+    { key: "type", label: "Type" },
+    { key: "category", label: "Category" },
+    { key: "county", label: "County" },
+    { key: "town", label: "Townland" },
+    { key: "area", label: "Nearest Town" },
+    { key: "address", label: "Address" },
+    { key: "phone", label: "Phone" },
+    { key: "email", label: "Email" },
+    { key: "website", label: "Website" },
+    { key: "contact_name", label: "Contact" },
+    { key: "is_featured", label: "Featured" },
+  ];
+
+  const toggleColumn = (key) => setVisibleColumns((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const handleFetchWhatsOn = async () => {
     setFetchingWhatsOn(true);
@@ -184,6 +203,29 @@ export default function Admin() {
               {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
               {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
             </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Columns3 className="w-4 h-4 mr-1" /> Columns
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-52 p-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Show Columns</p>
+              <div className="space-y-1.5">
+                {ALL_COLUMNS.map(({ key, label }) => (
+                  <label key={key} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="checkbox"
+                      checked={!!visibleColumns[key]}
+                      onChange={() => toggleColumn(key)}
+                      className="cursor-pointer"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
           <ImportExport listings={listings} onImportComplete={loadListings} />
           <Button onClick={() => setEditing({})} className="gap-1.5">
             <Plus className="w-4 h-4" /> Add Listing
@@ -281,8 +323,8 @@ export default function Admin() {
                       <input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleSelectAll} className="cursor-pointer" />
                     </th>
                   )}
-                  {[["name","Name",""],["type","Type","hidden sm:table-cell"],["town","Town","hidden md:table-cell"],["county","County","hidden lg:table-cell"]].map(([key, label, cls]) => (
-                    <th key={key} className={`text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary transition-colors ${cls}`} onClick={() => handleSort(key)}>
+                  {ALL_COLUMNS.filter(({ key }) => visibleColumns[key]).map(({ key, label }) => (
+                    <th key={key} className="text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary transition-colors" onClick={() => handleSort(key)}>
                       <span className="flex items-center gap-1">
                         {label}
                         {sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : <span className="text-muted-foreground/40"> ↕</span>}
@@ -312,13 +354,14 @@ export default function Admin() {
                         <input type="checkbox" checked={selectedIds.includes(l.id)} onChange={() => toggleSelect(l)} className="cursor-pointer" />
                       </td>
                     )}
-                    <td className="px-4 py-3">
-                      <span className="font-medium">{l.name}</span>
-                      <span className="sm:hidden text-xs text-muted-foreground ml-2">({l.type})</span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{l.type}</td>
-                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{l.town}</td>
-                    <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">{l.county}</td>
+                    {ALL_COLUMNS.filter(({ key }) => visibleColumns[key]).map(({ key }) => (
+                      <td key={key} className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
+                        {key === "name" ? <span className="font-medium text-foreground">{l.name}</span>
+                         : key === "is_featured" ? (l.is_featured ? "★" : "")
+                         : key === "website" ? (l.website ? <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{l.website}</a> : "")
+                         : (l[key] || "")}
+                      </td>
+                    ))}
                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}>
