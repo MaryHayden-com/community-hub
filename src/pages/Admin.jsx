@@ -35,7 +35,7 @@ export default function Admin() {
   const [sortDir, setSortDir] = useState("asc");
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
   const [fetchResult, setFetchResult] = useState(null);
-  const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: false, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
+  const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
 
   const ALL_COLUMNS = [
     { key: "name", label: "Name" },
