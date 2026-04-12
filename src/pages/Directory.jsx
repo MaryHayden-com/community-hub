@@ -55,7 +55,7 @@ export default function Directory() {
         );
       }
       return true;
-    });
+    }).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, [listings, search, type, county, town]);
 
   if (loading) {

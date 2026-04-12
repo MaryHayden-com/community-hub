@@ -38,8 +38,8 @@ export default function TownPage() {
   }, [listings]);
 
   const filtered = useMemo(() => {
-    if (!activeType) return listings;
-    return listings.filter((l) => l.type === activeType);
+    const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
+    return [...base].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, [listings, activeType]);
 
   if (loading) {

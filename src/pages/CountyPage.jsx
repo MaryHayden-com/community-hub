@@ -29,6 +29,11 @@ export default function CountyPage() {
     return Object.entries(map).sort((a, b) => b[1] - a[1]);
   }, [listings]);
 
+  const sortedListings = useMemo(() =>
+    [...listings].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
+    [listings]
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -81,13 +86,13 @@ export default function CountyPage() {
         </div>
         {viewMode === "grid" ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {listings.map((l) => (
+            {sortedListings.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {listings.map((l) => (
+            {sortedListings.map((l) => (
               <ListingListRow key={l.id} listing={l} />
             ))}
           </div>
