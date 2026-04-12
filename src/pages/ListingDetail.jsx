@@ -16,6 +16,16 @@ const typeConfig = {
   "What's On": { icon: Calendar, color: "bg-amber-50 text-amber-700 border-amber-200" },
 };
 
+function extractHandle(url, platform) {
+  if (!url) return platform;
+  const cleaned = url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+  const parts = cleaned.split("/");
+  if (platform === "instagram") return "@" + (parts[1] || parts[0] || "Instagram");
+  if (platform === "facebook") return parts[1] || parts[0] || "Facebook";
+  if (platform === "linkedin") return parts.slice(1).join("/") || "LinkedIn";
+  return cleaned;
+}
+
 function DetailRow({ icon: Icon, label, value, href }) {
   if (!value) return null;
   const content = (
@@ -125,26 +135,38 @@ export default function ListingDetail() {
           {(listing.facebook_url || listing.instagram_url || listing.linkedin_url) && (
             <div className="mt-6 pt-6 border-t">
               <p className="text-xs text-muted-foreground mb-3">Social Media</p>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 {listing.facebook_url && (
-                  <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="icon" className="h-9 w-9">
-                      <Facebook className="w-4 h-4" />
-                    </Button>
+                  <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 text-sm text-foreground hover:text-primary transition-colors group">
+                    <span className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+                      <Facebook className="w-4 h-4 text-blue-600" />
+                    </span>
+                    <span className="font-medium group-hover:underline">
+                      {extractHandle(listing.facebook_url, "facebook")}
+                    </span>
                   </a>
                 )}
                 {listing.instagram_url && (
-                  <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="icon" className="h-9 w-9">
-                      <Instagram className="w-4 h-4" />
-                    </Button>
+                  <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 text-sm text-foreground hover:text-primary transition-colors group">
+                    <span className="w-8 h-8 rounded-lg bg-pink-50 border border-pink-200 flex items-center justify-center shrink-0">
+                      <Instagram className="w-4 h-4 text-pink-600" />
+                    </span>
+                    <span className="font-medium group-hover:underline">
+                      {extractHandle(listing.instagram_url, "instagram")}
+                    </span>
                   </a>
                 )}
                 {listing.linkedin_url && (
-                  <a href={listing.linkedin_url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="icon" className="h-9 w-9">
-                      <Linkedin className="w-4 h-4" />
-                    </Button>
+                  <a href={listing.linkedin_url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 text-sm text-foreground hover:text-primary transition-colors group">
+                    <span className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
+                      <Linkedin className="w-4 h-4 text-sky-700" />
+                    </span>
+                    <span className="font-medium group-hover:underline">
+                      {extractHandle(listing.linkedin_url, "linkedin")}
+                    </span>
                   </a>
                 )}
               </div>
