@@ -243,11 +243,24 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
 
           <div>
             <Label>Image</Label>
-            <div className="flex items-center gap-3 mt-1">
-              <Input type="file" accept="image/*" onChange={handleImageUpload} className="flex-1" />
-              {form.image_url && (
-                <img src={form.image_url} alt="Preview" className="w-12 h-12 rounded-lg object-cover border" />
-              )}
+            <div className="space-y-2 mt-1">
+              <Input type="file" accept="image/*" onChange={handleImageUpload} />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex-1 h-px bg-border" />
+                <span>or paste a URL</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <div className="flex items-center gap-3">
+                <Input
+                  placeholder="https://example.com/image.jpg"
+                  value={form.image_url}
+                  onChange={(e) => update("image_url", e.target.value)}
+                  className="flex-1"
+                />
+                {form.image_url && (
+                  <img src={form.image_url} alt="Preview" className="w-12 h-12 rounded-lg object-cover border shrink-0" />
+                )}
+              </div>
             </div>
           </div>
 
