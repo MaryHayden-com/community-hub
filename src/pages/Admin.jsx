@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import ImportExport from "../components/ImportExport";
+import MergeListingsDialog from "../components/MergeListingsDialog";
 import AdminListingForm from "../components/AdminListingForm";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -19,11 +20,24 @@ export default function Admin() {
   const [editing, setEditing] = useState(null); // null = closed, {} = new, {id,...} = edit
   const [deleteId, setDeleteId] = useState(null);
   const [viewMode, setViewMode] = useState("list");
+  const [mergeMode, setMergeMode] = useState(false);
+  const [mergeSelected, setMergeSelected] = useState([]);
+  const [mergeListings, setMergeListings] = useState(null);
   const [filterType, setFilterType] = useState("");
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
+
+  const handleMergeSelect = (l) => {
+    if (mergeSelected.find((x) => x.id === l.id)) {
+      setMergeSelected(mergeSelected.filter((x) => x.id !== l.id));
+    } else if (mergeSelected.length < 2) {
+      const next = [...mergeSelected, l];
+      setMergeSelected(next);
+      if (next.length === 2) setMergeListings(next);
+    }
+  };
 
   const handleSort = (key) => {
     if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
@@ -115,6 +129,13 @@ export default function Admin() {
               <LayoutGrid className="w-4 h-4" />
             </Button>
           </div>
+          <Button
+              variant={mergeMode ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
+            >
+              {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
+            </Button>
           <ImportExport listings={listings} onImportComplete={loadListings} />
           <Button onClick={() => setEditing({})} className="gap-1.5">
             <Plus className="w-4 h-4" /> Add Listing
@@ -210,7 +231,13 @@ export default function Admin() {
               </thead>
               <tbody>
                 {filtered.map((l) => (
-                  <tr key={l.id} className="border-b hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setEditing(l)}>
+                  <tr
+                    key={l.id}
+                    className={`border-b hover:bg-muted/30 transition-colors cursor-pointer ${
+                      mergeMode && mergeSelected.find((x) => x.id === l.id) ? "bg-primary/10" : ""
+                    }`}
+                    onClick={() => mergeMode ? handleMergeSelect(l) : setEditing(l)}
+                  >
                     <td className="px-4 py-3">
                       <span className="font-medium">{l.name}</span>
                       <span className="sm:hidden text-xs text-muted-foreground ml-2">({l.type})</span>
@@ -273,6 +300,16 @@ export default function Admin() {
             <div className="col-span-full py-12 text-center text-muted-foreground">No listings found</div>
           )}
         </div>
+      )}
+
+      {/* Merge Dialog */}
+      {mergeListings && (
+        <MergeListingsDialog
+          listingA={mergeListings[0]}
+          listingB={mergeListings[1]}
+          onClose={() => { setMergeListings(null); setMergeSelected([]); setMergeMode(false); }}
+          onMerged={() => { setMergeListings(null); setMergeSelected([]); setMergeMode(false); loadListings(); }}
+        />
       )}
 
       {/* Edit / Create Form */}
