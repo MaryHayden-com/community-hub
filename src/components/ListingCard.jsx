@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone } from "lucide-react";
+import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone, Facebook, Instagram, Linkedin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const typeConfig = {
@@ -77,11 +77,30 @@ export default function ListingCard({ listing }) {
             </span>
           )}
           {listing.website && (
-            <span className="flex items-center gap-1">
+            <a href={listing.website} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="flex items-center gap-1 hover:text-primary">
               <ExternalLink className="w-3 h-3" /> Website
-            </span>
+            </a>
           )}
         </div>
+        {(listing.facebook_url || listing.instagram_url || listing.linkedin_url) && (
+          <div className="flex items-center gap-2 pt-1">
+            {listing.facebook_url && (
+              <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-blue-600 transition-colors">
+                <Facebook className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {listing.instagram_url && (
+              <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-pink-600 transition-colors">
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {listing.linkedin_url && (
+              <a href={listing.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-blue-700 transition-colors">
+                <Linkedin className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </Link>
   );
