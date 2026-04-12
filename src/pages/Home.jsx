@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { IRELAND_COUNTIES } from "../utils/irelandData";
 import { MapPin, Building2, Users, GraduationCap, Calendar, ArrowRight, Star, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CountyCard from "../components/CountyCard";
@@ -26,6 +27,7 @@ export default function Home() {
   const featured = useMemo(() => listings.filter((l) => l.is_featured).slice(0, 6), [listings]);
 
   const countyData = useMemo(() => {
+    // Start with all Irish counties, merge in listing counts
     const map = {};
     listings.forEach((l) => {
       if (!l.county) return;
@@ -33,9 +35,11 @@ export default function Home() {
       map[l.county].count++;
       if (l.town) map[l.county].towns.add(l.town);
     });
-    return Object.entries(map)
-      .map(([county, data]) => ({ county, count: data.count, towns: [...data.towns].sort() }))
-      .sort((a, b) => b.count - a.count);
+    return IRELAND_COUNTIES.map(({ county, towns }) => ({
+      county,
+      count: map[county]?.count || 0,
+      towns: map[county] ? [...map[county].towns].sort() : towns.slice(0, 5),
+    })).sort((a, b) => b.count - a.count || a.county.localeCompare(b.county));
   }, [listings]);
 
   const typeCounts = useMemo(() => {

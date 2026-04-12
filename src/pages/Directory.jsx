@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import ListingCard from "../components/ListingCard";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2 } from "lucide-react";
@@ -28,10 +29,12 @@ export default function Directory() {
       .finally(() => setLoading(false));
   }, []);
 
-  const counties = useMemo(() => [...new Set(listings.map((l) => l.county).filter(Boolean))].sort(), [listings]);
+  const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county), []);
   const towns = useMemo(() => {
-    const filtered = county ? listings.filter((l) => l.county === county) : listings;
-    return [...new Set(filtered.map((l) => l.town).filter(Boolean))].sort();
+    if (!county) return [];
+    const staticTowns = getTownsForCounty(county);
+    const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
+    return [...new Set([...staticTowns, ...listingTowns])].sort();
   }, [listings, county]);
 
   const filtered = useMemo(() => {
