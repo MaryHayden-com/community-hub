@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3 } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -243,9 +244,9 @@ export default function Admin() {
         />
       )}
 
-      {/* Search */}
-      <div className="space-y-3 mb-4">
-        <div className="relative">
+      {/* Search & Filters */}
+      <div className="flex flex-wrap gap-2 mb-4 items-center">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search listings..."
@@ -254,58 +255,47 @@ export default function Admin() {
             className="pl-10 bg-card"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
-          {/* Type filters */}
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-xs text-muted-foreground font-medium">Type:</span>
-            {allTypes.map((t) => (
-              <button
-                key={t}
-                onClick={() => setFilterType(filterType === t ? "" : t)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                  filterType === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
-                }`}
-              >{t}</button>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {/* County filters */}
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-xs text-muted-foreground font-medium">County:</span>
-            {allCounties.map((c) => (
-              <button
-                key={c}
-                onClick={() => { setFilterCounty(filterCounty === c ? "" : c); setFilterTown(""); }}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                  filterCounty === c ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
-                }`}
-              >{c}</button>
-            ))}
-          </div>
-        </div>
-        {allTowns.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            <div className="flex flex-wrap gap-1.5 items-center">
-              <span className="text-xs text-muted-foreground font-medium">Town:</span>
-              {allTowns.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setFilterTown(filterTown === t ? "" : t)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    filterTown === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
-                  }`}
-                >{t}</button>
-              ))}
-            </div>
-          </div>
-        )}
-        {(filterType || filterCounty || filterTown) && (
+
+        <Select value={filterType} onValueChange={(v) => setFilterType(v === "__all__" ? "" : v)}>
+          <SelectTrigger className="w-[140px] bg-card">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Types</SelectItem>
+            {allTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        <Select value={filterCounty} onValueChange={(v) => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
+          <SelectTrigger className="w-[150px] bg-card">
+            <SelectValue placeholder="All Counties" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Counties</SelectItem>
+            {allCounties.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        <Select value={filterTown} onValueChange={(v) => setFilterTown(v === "__all__" ? "" : v)} disabled={!filterCounty}>
+          <SelectTrigger className="w-[160px] bg-card">
+            <SelectValue placeholder={filterCounty ? "All Towns" : "Select county first"} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Towns</SelectItem>
+            {allTowns.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        {(filterType || filterCounty || filterTown || search) && (
           <button
-            onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); }}
-            className="text-xs text-muted-foreground hover:text-foreground underline"
-          >Clear filters</button>
+            onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); setSearch(""); }}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border rounded-md px-2 py-1.5 bg-card hover:border-primary/40 transition-colors"
+          >
+            <X className="w-3 h-3" /> Clear
+          </button>
         )}
+
+        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
       </div>
 
       {loading ? (
