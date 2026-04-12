@@ -49,13 +49,27 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
         "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby",
       ],
       "Club & Group": [
+        // Sports
         "GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics",
         "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian",
-        "Rowing", "Sailing", "Scouts", "Girl Guides", "Youth Club",
+        "Rowing", "Sailing",
+        // Youth & Community
+        "Scouts", "Girl Guides", "Youth Club",
         "Tidy Towns", "Community Group", "Residents Association",
+        // Arts & Culture
         "Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club",
         "Walking Group", "Gardening Club", "Toastmasters", "ICA",
+        // Social
         "Men's Shed", "Women's Group", "Senior Citizens", "Charity",
+        // Churches & Faith
+        "Catholic Church", "Church of Ireland", "Methodist Church",
+        "Presbyterian Church", "Baptist Church", "Evangelical Church",
+        "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue",
+        "Hindu Temple", "Buddhist Centre", "Quaker Meeting House",
+        "Faith Community",
+        // Libraries
+        "Public Library", "County Library", "Mobile Library",
+        "Community Library", "University Library", "School Library",
       ],
       "Education": [
         "Primary School", "Secondary School", "Further Education",
