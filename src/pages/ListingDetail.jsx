@@ -3,11 +3,12 @@ import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
   MapPin, Phone, Mail, Globe, Facebook, Instagram, Linkedin,
-  ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User
+  ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User, ShieldCheck, Flag
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import ClaimListingForm from "../components/ClaimListingForm";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -51,6 +52,7 @@ export default function ListingDetail() {
   const { id } = useParams();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showClaim, setShowClaim] = useState(false);
 
   useEffect(() => {
     base44.entities.CommunityListing.filter({ id })
@@ -108,6 +110,12 @@ export default function ListingDetail() {
                   <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
                     <Star className="w-3 h-3 mr-1 fill-amber-500" />
                     Featured
+                  </Badge>
+                )}
+                {listing.is_verified && (
+                  <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+                    <ShieldCheck className="w-3 h-3 mr-1" />
+                    Verified
                   </Badge>
                 )}
               </div>
@@ -172,8 +180,23 @@ export default function ListingDetail() {
               </div>
             </div>
           )}
+
+          {/* Claim Listing */}
+          {!listing.is_verified && (
+            <div className="mt-6 pt-6 border-t flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Is this your listing?</p>
+              <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
+                <Flag className="w-3.5 h-3.5 mr-1.5" />
+                Claim this listing
+              </Button>
+            </div>
+          )}
         </div>
       </div>
+
+      {showClaim && (
+        <ClaimListingForm listing={listing} onClose={() => setShowClaim(false)} />
+      )}
     </div>
   );
 }

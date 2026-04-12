@@ -1,0 +1,50 @@
+{
+  "name": "ClaimRequest",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "listing_name": {
+      "type": "string",
+      "title": "Listing Name"
+    },
+    "name": {
+      "type": "string",
+      "title": "Contact Name"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone"
+    },
+    "role": {
+      "type": "string",
+      "title": "Role / Position"
+    },
+    "message": {
+      "type": "string",
+      "title": "Message"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "listing_id",
+    "listing_name",
+    "name",
+    "email"
+  ]
+}

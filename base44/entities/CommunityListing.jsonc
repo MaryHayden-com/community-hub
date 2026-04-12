@@ -88,6 +88,15 @@
       "title": "Is Featured",
       "default": false
     },
+    "is_verified": {
+      "type": "boolean",
+      "title": "Is Verified",
+      "default": false
+    },
+    "owner_email": {
+      "type": "string",
+      "title": "Owner Email"
+    },
     "image_url": {
       "type": "string",
       "title": "Image URL"

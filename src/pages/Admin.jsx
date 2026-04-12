@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox } from "lucide-react";
+import AdminClaimRequests from "../components/AdminClaimRequests";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,8 @@ export default function Admin() {
   const [sortDir, setSortDir] = useState("asc");
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
   const [fetchResult, setFetchResult] = useState(null);
+  const [activeTab, setActiveTab] = useState("listings");
+  const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
   const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
 
   const ALL_COLUMNS = [
@@ -108,6 +111,19 @@ export default function Admin() {
 
   useEffect(() => { loadListings(); }, []);
 
+  useEffect(() => {
+    base44.entities.ClaimRequest.filter({ status: "pending" })
+      .then((r) => setPendingClaimsCount(r.length))
+      .catch(() => {});
+  }, []);
+
+  const handleToggleVerified = async (listing, e) => {
+    e.stopPropagation();
+    await base44.entities.CommunityListing.update(listing.id, { is_verified: !listing.is_verified });
+    toast({ title: listing.is_verified ? "Unverified" : "Verified", description: `${listing.name} marked as ${listing.is_verified ? "unverified" : "verified"}.` });
+    loadListings();
+  };
+
   const handleDelete = async () => {
     if (!deleteId) return;
     await base44.entities.CommunityListing.delete(deleteId);
@@ -153,7 +169,7 @@ export default function Admin() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold flex items-center gap-2">
             <Shield className="w-7 h-7 text-primary" />
@@ -161,81 +177,110 @@ export default function Admin() {
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center border rounded-lg overflow-hidden">
+        {activeTab === "listings" && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center border rounded-lg overflow-hidden">
+              <Button
+                variant={viewMode === "list" ? "secondary" : "ghost"}
+                size="sm"
+                className="rounded-none h-9"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === "grid" ? "secondary" : "ghost"}
+                size="sm"
+                className="rounded-none h-9"
+                onClick={() => setViewMode("grid")}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+            </div>
             <Button
-              variant={viewMode === "list" ? "secondary" : "ghost"}
-              size="sm"
-              className="rounded-none h-9"
-              onClick={() => setViewMode("list")}
-            >
-              <List className="w-4 h-4" />
-            </Button>
+                variant={selectMode ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => { setSelectMode(!selectMode); setSelectedIds([]); }}
+              >
+                <CheckSquare className="w-4 h-4 mr-1" />
+                {selectMode ? "Cancel Select" : "Select"}
+              </Button>
             <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="sm"
-              className="rounded-none h-9"
-              onClick={() => setViewMode("grid")}
-            >
-              <LayoutGrid className="w-4 h-4" />
+                variant={mergeMode ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
+              >
+                {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
+              </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={handleFetchWhatsOn}
+                disabled={fetchingWhatsOn}
+              >
+                {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+                {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
+              </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Columns3 className="w-4 h-4 mr-1" /> Columns
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-52 p-3">
+                <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Show Columns</p>
+                <div className="space-y-1.5">
+                  {ALL_COLUMNS.map(({ key, label }) => (
+                    <label key={key} className="flex items-center gap-2 cursor-pointer text-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!visibleColumns[key]}
+                        onChange={() => toggleColumn(key)}
+                        className="cursor-pointer"
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <ImportExport listings={listings} onImportComplete={loadListings} />
+            <Button onClick={() => setEditing({})} className="gap-1.5">
+              <Plus className="w-4 h-4" /> Add Listing
             </Button>
           </div>
-          <Button
-              variant={selectMode ? "secondary" : "outline"}
-              size="sm"
-              onClick={() => { setSelectMode(!selectMode); setSelectedIds([]); }}
-            >
-              <CheckSquare className="w-4 h-4 mr-1" />
-              {selectMode ? "Cancel Select" : "Select"}
-            </Button>
-          <Button
-              variant={mergeMode ? "secondary" : "outline"}
-              size="sm"
-              onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
-            >
-              {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
-            </Button>
-          <Button
-              variant="outline"
-              size="sm"
-              onClick={handleFetchWhatsOn}
-              disabled={fetchingWhatsOn}
-            >
-              {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
-              {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
-            </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Columns3 className="w-4 h-4 mr-1" /> Columns
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-52 p-3">
-              <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Show Columns</p>
-              <div className="space-y-1.5">
-                {ALL_COLUMNS.map(({ key, label }) => (
-                  <label key={key} className="flex items-center gap-2 cursor-pointer text-sm">
-                    <input
-                      type="checkbox"
-                      checked={!!visibleColumns[key]}
-                      onChange={() => toggleColumn(key)}
-                      className="cursor-pointer"
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-          <ImportExport listings={listings} onImportComplete={loadListings} />
-          <Button onClick={() => setEditing({})} className="gap-1.5">
-            <Plus className="w-4 h-4" /> Add Listing
-          </Button>
-        </div>
+        )}
       </div>
 
-      {/* Bulk Edit Bar */}
-      {selectMode && selectedIds.length > 0 && (
+      {/* Tab Navigation */}
+      <div className="flex gap-1 border-b mb-6">
+        <button
+          onClick={() => setActiveTab("listings")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === "listings" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Listings
+        </button>
+        <button
+          onClick={() => setActiveTab("claims")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            activeTab === "claims" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Inbox className="w-4 h-4" />
+          Claim Requests
+          {pendingClaimsCount > 0 && (
+            <span className="bg-primary text-primary-foreground text-xs rounded-full px-1.5 py-0.5 leading-none">
+              {pendingClaimsCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === "claims" && <AdminClaimRequests />}
+
+      {activeTab === "listings" && selectMode && selectedIds.length > 0 && (
         <BulkEditBar
           selected={listings.filter((l) => selectedIds.includes(l.id))}
           allListings={listings}
@@ -245,7 +290,7 @@ export default function Admin() {
       )}
 
       {/* Search & Filters */}
-      <div className="flex flex-wrap gap-2 mb-4 items-center">
+      {activeTab === "listings" && <div className="flex flex-wrap gap-2 mb-4 items-center">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -296,9 +341,9 @@ export default function Admin() {
         )}
 
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
-      </div>
+      </div>}
 
-      {loading ? (
+      {activeTab === "listings" && (loading ? (
         <div className="flex justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -354,6 +399,13 @@ export default function Admin() {
                     ))}
                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost" size="icon" className={`h-8 w-8 ${l.is_verified ? "text-emerald-600" : "text-muted-foreground"}`}
+                          onClick={(e) => handleToggleVerified(l, e)}
+                          title={l.is_verified ? "Unverify" : "Mark as Verified"}
+                        >
+                          {l.is_verified ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}>
                           <Edit className="w-3.5 h-3.5" />
                         </Button>
@@ -407,7 +459,7 @@ export default function Admin() {
             <div className="col-span-full py-12 text-center text-muted-foreground">No listings found</div>
           )}
         </div>
-      )}
+      ))}
 
       {/* Merge Dialog */}
       {mergeListings && (
