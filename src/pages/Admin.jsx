@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import ImportExport from "../components/ImportExport";
 import MergeListingsDialog from "../components/MergeListingsDialog";
 import AdminListingForm from "../components/AdminListingForm";
+import BulkEditBar from "../components/BulkEditBar";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
@@ -23,11 +24,24 @@ export default function Admin() {
   const [mergeMode, setMergeMode] = useState(false);
   const [mergeSelected, setMergeSelected] = useState([]);
   const [mergeListings, setMergeListings] = useState(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [filterType, setFilterType] = useState("");
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
+
+  const toggleSelect = (l) => {
+    setSelectedIds((prev) =>
+      prev.includes(l.id) ? prev.filter((id) => id !== l.id) : [...prev, l.id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filtered.length) setSelectedIds([]);
+    else setSelectedIds(filtered.map((l) => l.id));
+  };
 
   const handleMergeSelect = (l) => {
     if (mergeSelected.find((x) => x.id === l.id)) {
@@ -130,6 +144,14 @@ export default function Admin() {
             </Button>
           </div>
           <Button
+              variant={selectMode ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => { setSelectMode(!selectMode); setSelectedIds([]); }}
+            >
+              <CheckSquare className="w-4 h-4 mr-1" />
+              {selectMode ? "Cancel Select" : "Select"}
+            </Button>
+          <Button
               variant={mergeMode ? "secondary" : "outline"}
               size="sm"
               onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
@@ -142,6 +164,16 @@ export default function Admin() {
           </Button>
         </div>
       </div>
+
+      {/* Bulk Edit Bar */}
+      {selectMode && selectedIds.length > 0 && (
+        <BulkEditBar
+          selected={listings.filter((l) => selectedIds.includes(l.id))}
+          allListings={listings}
+          onDone={() => { setSelectedIds([]); setSelectMode(false); loadListings(); }}
+          onClearSelection={() => setSelectedIds([])}
+        />
+      )}
 
       {/* Search */}
       <div className="space-y-3 mb-4">
@@ -218,6 +250,11 @@ export default function Admin() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
+                  {selectMode && (
+                    <th className="px-4 py-3 w-10">
+                      <input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleSelectAll} className="cursor-pointer" />
+                    </th>
+                  )}
                   {[["name","Name",""],["type","Type","hidden sm:table-cell"],["town","Town","hidden md:table-cell"],["county","County","hidden lg:table-cell"]].map(([key, label, cls]) => (
                     <th key={key} className={`text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary transition-colors ${cls}`} onClick={() => handleSort(key)}>
                       <span className="flex items-center gap-1">
@@ -235,9 +272,20 @@ export default function Admin() {
                     key={l.id}
                     className={`border-b hover:bg-muted/30 transition-colors cursor-pointer ${
                       mergeMode && mergeSelected.find((x) => x.id === l.id) ? "bg-primary/10" : ""
+                    } ${
+                      selectMode && selectedIds.includes(l.id) ? "bg-primary/10" : ""
                     }`}
-                    onClick={() => mergeMode ? handleMergeSelect(l) : setEditing(l)}
+                    onClick={() => {
+                      if (mergeMode) handleMergeSelect(l);
+                      else if (selectMode) toggleSelect(l);
+                      else setEditing(l);
+                    }}
                   >
+                    {selectMode && (
+                      <td className="px-4 py-3 w-10" onClick={(e) => { e.stopPropagation(); toggleSelect(l); }}>
+                        <input type="checkbox" checked={selectedIds.includes(l.id)} onChange={() => toggleSelect(l)} className="cursor-pointer" />
+                      </td>
+                    )}
                     <td className="px-4 py-3">
                       <span className="font-medium">{l.name}</span>
                       <span className="sm:hidden text-xs text-muted-foreground ml-2">({l.type})</span>
