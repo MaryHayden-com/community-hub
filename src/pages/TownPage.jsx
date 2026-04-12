@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar } from "lucide-react";
+import ViewToggle from "../components/ViewToggle";
+import ListingListRow from "../components/ListingListRow";
 import ListingCard from "../components/ListingCard";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,6 +22,7 @@ export default function TownPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
 
   useEffect(() => {
     // Fetch all county listings, then show those whose town OR area matches
@@ -66,9 +69,10 @@ export default function TownPage() {
         </p>
       </div>
 
-      {/* Type Filter */}
-      {types.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-6">
+      {/* Type Filter + View Toggle */}
+      <div className="flex items-center justify-between mb-6">
+      {types.length > 1 ? (
+        <div className="flex flex-wrap gap-2">
           <Badge
             variant={activeType === "" ? "default" : "outline"}
             className="cursor-pointer"
@@ -91,16 +95,24 @@ export default function TownPage() {
             );
           })}
         </div>
-      )}
+      ) : <div />}
+      <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
+      </div>
 
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
         </div>
-      ) : (
+      ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((l) => (
             <ListingCard key={l.id} listing={l} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {filtered.map((l) => (
+            <ListingListRow key={l.id} listing={l} />
           ))}
         </div>
       )}

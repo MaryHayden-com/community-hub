@@ -5,6 +5,8 @@ import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import ListingCard from "../components/ListingCard";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2 } from "lucide-react";
+import ViewToggle from "../components/ViewToggle";
+import ListingListRow from "../components/ListingListRow";
 
 export default function Directory() {
   const location = useLocation();
@@ -13,6 +15,7 @@ export default function Directory() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
   const [type, setType] = useState(params.get("type") || "");
   const [county, setCounty] = useState(params.get("county") || "");
   const [town, setTown] = useState(params.get("town") || "");
@@ -65,11 +68,14 @@ export default function Directory() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold">Directory</h1>
-        <p className="text-muted-foreground mt-1">
-          {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
-        </p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="font-display text-3xl font-bold">Directory</h1>
+          <p className="text-muted-foreground mt-1">
+            {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
+          </p>
+        </div>
+        <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
       </div>
 
       <SearchFilter
@@ -85,10 +91,16 @@ export default function Directory() {
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
         </div>
-      ) : (
+      ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {filtered.map((l) => (
             <ListingCard key={l.id} listing={l} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 mt-6">
+          {filtered.map((l) => (
+            <ListingListRow key={l.id} listing={l} />
           ))}
         </div>
       )}
