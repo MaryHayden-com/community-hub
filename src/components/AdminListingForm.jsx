@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -169,6 +169,22 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   });
   const [saving, setSaving] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
+
+  // Auto-fetch image when a URL is added and no image exists yet
+  useEffect(() => {
+    const urls = [form.website, form.facebook_url, form.instagram_url].filter(Boolean);
+    if (!urls.length || form.image_url || fetchingImage) return;
+    const timer = setTimeout(async () => {
+      setFetchingImage(true);
+      try {
+        const res = await base44.functions.invoke('fetchOgImage', { urls });
+        if (res.data?.image_url) setForm(prev => ({ ...prev, image_url: res.data.image_url }));
+      } finally {
+        setFetchingImage(false);
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [form.website, form.facebook_url, form.instagram_url]);
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
   const categorySuggestions = useMemo(() => {
