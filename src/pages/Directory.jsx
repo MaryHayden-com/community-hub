@@ -82,7 +82,11 @@ export default function Directory() {
       }
     });
 
-    expanded.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    expanded.sort((a, b) => {
+      const dateComp = a.sortKey.localeCompare(b.sortKey);
+      if (dateComp !== 0) return dateComp;
+      return (a.listing.event_time || "").localeCompare(b.listing.event_time || "");
+    });
 
     // Filter by date range
     return expanded.filter((entry) => {
