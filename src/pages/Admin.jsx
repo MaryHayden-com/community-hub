@@ -41,12 +41,14 @@ export default function Admin() {
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("listings");
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
-  const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
+  const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
+
 
   const ALL_COLUMNS = [
     { key: "image", label: "Image" },
     { key: "name", label: "Name" },
     { key: "type", label: "Type" },
+    { key: "subcategory_group", label: "Group" },
     { key: "category", label: "Category" },
     { key: "county", label: "County" },
     { key: "town", label: "Townland" },
