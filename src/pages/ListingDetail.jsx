@@ -93,8 +93,8 @@ export default function ListingDetail() {
 
       <div className="bg-card rounded-xl border overflow-hidden">
         {listing.image_url && (
-          <div className="h-56 sm:h-72">
-            <img src={listing.image_url} alt={listing.name} className="w-full h-full object-cover" />
+          <div className="h-56 sm:h-72 bg-white flex items-center justify-center">
+            <img src={listing.image_url} alt={listing.name} className="w-full h-full object-contain" />
           </div>
         )}
 

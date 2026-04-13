@@ -31,7 +31,7 @@ export default function ListingCard({ listing }) {
           <img
             src={listing.image_url}
             alt={listing.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
