@@ -18,6 +18,7 @@ export default function Directory() {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [type, setType] = useState(params.get("type") || "");
+  const [category, setCategory] = useState(params.get("category") || "");
   const [county, setCounty] = useState(params.get("county") || "");
   const [town, setTown] = useState(params.get("town") || "");
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -26,6 +27,7 @@ export default function Directory() {
 
   useEffect(() => {
     setType(params.get("type") || "");
+    setCategory(params.get("category") || "");
     setCounty(params.get("county") || "");
     setTown(params.get("town") || "");
   }, [location.search]);
@@ -85,6 +87,7 @@ export default function Directory() {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
       if (type && l.type !== type) return false;
+      if (category && l.category !== category) return false;
       if (county && l.county !== county) return false;
       if (town && l.town !== town) return false;
       if (search) {
@@ -134,7 +137,7 @@ export default function Directory() {
       if (dateTo && key > dateTo) return false;
       return true;
     });
-  }, [listings, search, type, county, town]);
+  }, [listings, search, type, category, county, town]);
 
   if (loading) {
     return (
@@ -159,6 +162,7 @@ export default function Directory() {
       <SearchFilter
         search={search} setSearch={setSearch}
         type={type} setType={setType}
+        category={category} setCategory={setCategory}
         county={county} setCounty={setCounty}
         town={town} setTown={setTown}
         counties={counties} towns={towns}
