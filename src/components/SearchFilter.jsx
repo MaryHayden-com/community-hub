@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CATEGORY_MAP = {
-  "Business": ["Restaurant", "Café", "Bar & Pub", "Takeaway", "Supermarket", "Grocery", "Pharmacy", "Hardware", "Clothing & Fashion", "Hair & Beauty", "Barber", "Solicitor", "Accountant", "Financial Services", "Estate Agent", "Garage & Motor", "Plumber", "Electrician", "Builder", "Carpenter", "Painter & Decorator", "Cleaning Services", "Childcare & Crèche", "Hotel", "B&B", "Gym & Fitness", "Dentist", "GP & Medical", "Veterinary", "Florist", "Bakery", "Butcher", "Fishmonger", "Off Licence", "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby"],
-  "Club & Group": ["GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics", "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian", "Rowing", "Sailing", "Scouts", "Girl Guides", "Youth Club", "Tidy Towns", "Community Group", "Residents Association", "Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club", "Walking Group", "Gardening Club", "Toastmasters", "ICA", "Men's Shed", "Women's Group", "Senior Citizens", "Charity", "Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community", "Public Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
-  "Education": ["Primary School", "Secondary School", "Further Education", "Third Level", "Youthreach", "Gaelscoil", "Gaelcholáiste", "Special Education", "Montessori", "Childcare", "Crèche", "Tutoring", "Language School", "Music Lessons", "Arts & Drama", "Sports Coaching", "Adult Education", "Community Training"],
-  "What's On": ["Festival", "Market", "Concert", "Theatre", "Exhibition", "Sports Event", "Fundraiser", "Community Event", "Workshop", "Talk & Lecture", "Food Event", "Outdoor Event", "Family Event", "Christmas Event", "Summer Event", "Cultural Event"]
+  "Business": ["Accountant", "B&B", "Bakery", "Barber", "Bar & Pub", "Butcher", "Café", "Carpenter", "Childcare & Crèche", "Cleaning Services", "Clothing & Fashion", "Craft & Hobby", "Dentist", "Electrician", "Estate Agent", "Financial Services", "Fishmonger", "Florist", "Garage & Motor", "Gift Shop", "GP & Medical", "Grocery", "Gym & Fitness", "Hair & Beauty", "Hardware", "Hotel", "Newsagent", "Off Licence", "Pharmacy", "Plumber", "Restaurant", "Solicitor", "Supermarket", "Takeaway", "Veterinary", "Bookshop", "Painter & Decorator", "Builder"],
+  "Club & Group": ["Athletics", "Art & Craft", "Baptist Church", "Book Club", "Boxing", "Buddhist Centre", "Catholic Church", "Charity", "Church of Ireland", "Community Group", "Community Library", "County Library", "Cycling", "Dance", "Drama & Theatre", "Equestrian", "Evangelical Church", "Faith Community", "Gardening Club", "GAA", "Girl Guides", "Golf", "Hindu Temple", "Islamic Centre / Mosque", "ICA", "Jewish Synagogue", "Martial Arts", "Men's Shed", "Methodist Church", "Mobile Library", "Music", "Presbyterian Church", "Public Library", "Quaker Meeting House", "Residents Association", "Rowing", "Rugby", "Sailing", "School Library", "Scouts", "Senior Citizens", "Soccer / Football", "Swimming", "Tennis", "Tidy Towns", "To astmasters", "University Library", "Women's Group", "Youth Club"],
+  "Education": ["Adult Education", "Arts & Drama", "Childcare", "Community Training", "Crèche", "Further Education", "Gaelcholáiste", "Gaelscoil", "Language School", "Montessori", "Music Lessons", "Primary School", "Secondary School", "Special Education", "Sports Coaching", "Third Level", "Tutoring", "Youthreach"],
+  "What's On": ["Christmas Event", "Community Event", "Concert", "Cultural Event", "Exhibition", "Family Event", "Festival", "Food Event", "Fundraiser", "Market", "Outdoor Event", "Sports Event", "Summer Event", "Talk & Lecture", "Theatre", "Workshop"]
 };
 
 export default function SearchFilter({ search, setSearch, type, setType, category, setCategory, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr }) {
@@ -61,7 +61,7 @@ export default function SearchFilter({ search, setSearch, type, setType, categor
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Counties</SelectItem>
-            {counties.map((c) => (
+            {[...counties].sort().map((c) => (
               <SelectItem key={c} value={c}>{c}</SelectItem>
             ))}
           </SelectContent>
@@ -73,7 +73,7 @@ export default function SearchFilter({ search, setSearch, type, setType, categor
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Towns</SelectItem>
-            {towns.map((t) => (
+            {[...towns].sort().map((t) => (
               <SelectItem key={t} value={t}>{t}</SelectItem>
             ))}
           </SelectContent>
