@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, CalendarDays } from "lucide-react";
+import WhatsOnAdmin from "../components/WhatsOnAdmin";
 import AdminClaimRequests from "../components/AdminClaimRequests";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -38,6 +39,7 @@ export default function Admin() {
   const [fetchResult, setFetchResult] = useState(null);
   const [activeTab, setActiveTab] = useState("listings");
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
+  const [whatsOnCount, setWhatsOnCount] = useState(0);
   const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
 
   const ALL_COLUMNS = [
@@ -263,6 +265,18 @@ export default function Admin() {
           Listings
         </button>
         <button
+          onClick={() => setActiveTab("whatson")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            activeTab === "whatson" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <CalendarDays className="w-4 h-4" />
+          What's On
+          {whatsOnCount > 0 && (
+            <span className="bg-amber-100 text-amber-700 text-xs rounded-full px-1.5 py-0.5 leading-none">{whatsOnCount}</span>
+          )}
+        </button>
+        <button
           onClick={() => setActiveTab("claims")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === "claims" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -279,6 +293,7 @@ export default function Admin() {
       </div>
 
       {activeTab === "claims" && <AdminClaimRequests />}
+      {activeTab === "whatson" && <WhatsOnAdmin onCountChange={setWhatsOnCount} />}
 
       {activeTab === "listings" && selectMode && selectedIds.length > 0 && (
         <BulkEditBar

@@ -30,6 +30,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     contact_name: listing?.contact_name || "",
     area: listing?.area || "",
     meeting_info: listing?.meeting_info || "",
+    event_date: listing?.event_date || "",
+    event_time: listing?.event_time || "",
     is_featured: listing?.is_featured || false,
     image_url: listing?.image_url || "",
   });
@@ -254,6 +256,22 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
               <Input value={form.meeting_info} onChange={(e) => update("meeting_info", e.target.value)} placeholder="e.g. Every Tuesday at 7pm" />
             </div>
           </div>
+
+          {form.type === "What's On" && (
+            <div className="border rounded-lg p-4 space-y-3 bg-amber-50/50">
+              <p className="text-sm font-semibold text-amber-800">Event Date & Time</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Event Date</Label>
+                  <Input type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                </div>
+                <div>
+                  <Label>Event Time</Label>
+                  <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 7:30pm" />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div>
             <Label>Image</Label>
