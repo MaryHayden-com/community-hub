@@ -142,6 +142,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const [form, setForm] = useState({
     name: listing?.name || "",
     type: listing?.type || "Business",
+    subcategory_group: listing?.subcategory_group || "",
     category: listing?.category || "",
     country: listing?.country || "Ireland",
     county: listing?.county || "",
@@ -186,6 +187,49 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     return () => clearTimeout(timer);
   }, [form.website, form.facebook_url, form.instagram_url]);
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
+
+  const GROUP_MAP = {
+    "Business": ["Accommodation", "Food & Beverage", "Retail", "Professional Services", "Personal Services", "Healthcare", "Trades & Construction"],
+    "Club & Group": ["Sports & Recreation", "Youth & Community", "Arts & Culture", "Faith & Religious", "Libraries", "Leisure & Community", "Charity & Welfare"],
+    "Education": ["Schools", "Higher Education", "Childcare", "Training & Skills"],
+    "What's On": ["Festivals & Markets", "Entertainment", "Community Activities", "Seasonal & Themed"]
+  };
+
+  const CATEGORY_BY_GROUP = {
+    "Business": {
+      "Accommodation": ["Hotels", "B&B", "Airbnb", "Room to Let", "Guesthouses"],
+      "Food & Beverage": ["Restaurant", "Café", "Bar & Pub", "Takeaway", "Bakery"],
+      "Retail": ["Supermarket", "Grocery", "Newsagent", "Bookshop", "Hardware", "Clothing & Fashion", "Gift Shop", "Craft & Hobby", "Florist", "Butcher", "Fishmonger", "Off Licence"],
+      "Professional Services": ["Solicitor", "Accountant", "Financial Services", "Estate Agent"],
+      "Personal Services": ["Hair & Beauty", "Barber", "Gym & Fitness", "Cleaning Services", "Childcare & Crèche"],
+      "Healthcare": ["Dentist", "GP & Medical", "Veterinary", "Pharmacy"],
+      "Trades & Construction": ["Plumber", "Electrician", "Builder", "Carpenter", "Painter & Decorator"]
+    },
+    "Club & Group": {
+      "Sports & Recreation": ["GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics", "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian", "Rowing", "Sailing"],
+      "Youth & Community": ["Scouts", "Girl Guides", "Youth Club", "Tidy Towns", "Community Group", "Residents Association"],
+      "Arts & Culture": ["Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club"],
+      "Faith & Religious": ["Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community"],
+      "Libraries": ["Public Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
+      "Leisure & Community": ["Walking Group", "Gardening Club", "Toastmasters", "ICA", "Men's Shed", "Women's Group", "Senior Citizens"],
+      "Charity & Welfare": ["Charity"]
+    },
+    "Education": {
+      "Schools": ["Primary School", "Secondary School", "Gaelscoil", "Gaelcholáiste", "Special Education"],
+      "Higher Education": ["Third Level", "Further Education"],
+      "Childcare": ["Montessori", "Childcare", "Crèche"],
+      "Training & Skills": ["Language School", "Music Lessons", "Arts & Drama", "Sports Coaching", "Adult Education", "Tutoring", "Community Training", "Youthreach"]
+    },
+    "What's On": {
+      "Festivals & Markets": ["Festival", "Market"],
+      "Entertainment": ["Concert", "Theatre", "Exhibition"],
+      "Community Activities": ["Community Event", "Workshop", "Talk & Lecture", "Fundraiser", "Family Event"],
+      "Seasonal & Themed": ["Christmas Event", "Summer Event", "Food Event", "Sports Event", "Cultural Event"]
+    }
+  };
+
+  const groupOptions = form.type ? GROUP_MAP[form.type] || [] : [];
+  const categoryOptions = form.subcategory_group && CATEGORY_BY_GROUP[form.type]?.[form.subcategory_group] ? CATEGORY_BY_GROUP[form.type][form.subcategory_group] : [];
 
   const categorySuggestions = useMemo(() => {
     const byType = {
@@ -307,7 +351,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
             <div>
               <Label>Type *</Label>
-              <Select value={form.type} onValueChange={(v) => update("type", v)}>
+              <Select value={form.type} onValueChange={(v) => { update("type", v); update("subcategory_group", ""); update("category", ""); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Business">Business</SelectItem>
@@ -319,30 +363,36 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
           </div>
 
-          <div className="relative">
-            <Label>Category / Trade Type</Label>
-            <Input
-              value={form.category}
-              onChange={(e) => { update("category", e.target.value); setShowCategorySuggestions(true); }}
-              onFocus={() => setShowCategorySuggestions(true)}
-              onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 150)}
-              placeholder="e.g. Restaurant, GAA Club, Primary School"
-            />
-            {showCategorySuggestions && categorySuggestions.length > 0 && (
-              <div className="absolute z-50 left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                {categorySuggestions.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
-                    onMouseDown={() => { update("category", s); setShowCategorySuggestions(false); }}
-                  >
-                    {s}
-                  </button>
-                ))}
+          {groupOptions.length > 0 && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Group</Label>
+                <Select value={form.subcategory_group} onValueChange={(v) => { update("subcategory_group", v); update("category", ""); }}>
+                  <SelectTrigger><SelectValue placeholder="Select group" /></SelectTrigger>
+                  <SelectContent>
+                    {groupOptions.map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </div>
+              {categoryOptions.length > 0 && (
+                <div>
+                  <Label>Category</Label>
+                  <Select value={form.category} onValueChange={(v) => update("category", v)}>
+                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                    <SelectContent>
+                      {categoryOptions.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          )}
+
+
 
           <div className="grid grid-cols-2 gap-3">
             <div>

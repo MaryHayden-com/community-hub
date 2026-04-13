@@ -22,6 +22,10 @@
         "What's On"
       ]
     },
+    "subcategory_group": {
+      "type": "string",
+      "title": "Group"
+    },
     "category": {
       "type": "string",
       "title": "Category / Trade Type"

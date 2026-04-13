@@ -3,9 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function SearchFilter({ search, setSearch, type, setType, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr }) {
+export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr }) {
   const isWhatsOn = type === "What's On";
-  const hasFilters = search || type || category || county || town || (dateFrom && dateFrom !== todayStr) || dateTo;
+  const hasFilters = search || type || group || category || county || town || (dateFrom && dateFrom !== todayStr) || dateTo;
 
   return (
     <div className="space-y-3">
@@ -20,7 +20,7 @@ export default function SearchFilter({ search, setSearch, type, setType, categor
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setCategory(""); }}>
+        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup(""); setCategory(""); }}>
           <SelectTrigger className="w-[160px] h-9 bg-card">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
@@ -33,7 +33,21 @@ export default function SearchFilter({ search, setSearch, type, setType, categor
           </SelectContent>
         </Select>
 
-        {type && categories && categories.length > 0 && (
+        {type && groups && groups.length > 0 && (
+          <Select value={group || "all"} onValueChange={(v) => { setGroup(v === "all" ? "" : v); setCategory(""); }}>
+            <SelectTrigger className="w-[160px] h-9 bg-card">
+              <SelectValue placeholder="All Groups" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Groups</SelectItem>
+              {groups.map((g) => (
+                <SelectItem key={g} value={g}>{g}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {type && group && categories && categories.length > 0 && (
           <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
             <SelectTrigger className="w-[160px] h-9 bg-card">
               <SelectValue placeholder="All Categories" />
@@ -95,7 +109,7 @@ export default function SearchFilter({ search, setSearch, type, setType, categor
         )}
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setCategory(""); setCounty(""); setTown(""); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup(""); setCategory(""); setCounty(""); setTown(""); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}
