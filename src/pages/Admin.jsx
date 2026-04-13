@@ -35,6 +35,8 @@ export default function Admin() {
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
+  const [bulkFetchingImages, setBulkFetchingImages] = useState(false);
+  const [bulkFetchProgress, setBulkFetchProgress] = useState(null);
   const [fetchResult, setFetchResult] = useState(null);
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("listings");
@@ -57,6 +59,33 @@ export default function Admin() {
   ];
 
   const toggleColumn = (key) => setVisibleColumns((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const handleBulkFetchImages = async () => {
+    const needsImage = listings.filter((l) => !l.image_url && (l.website || l.facebook_url || l.instagram_url));
+    if (!needsImage.length) {
+      toast({ title: "Nothing to fetch", description: "All listings with URLs already have images." });
+      return;
+    }
+    setBulkFetchingImages(true);
+    setBulkFetchProgress({ done: 0, total: needsImage.length, updated: 0 });
+    let updated = 0;
+    for (let i = 0; i < needsImage.length; i++) {
+      const l = needsImage[i];
+      const urls = [l.website, l.facebook_url, l.instagram_url].filter(Boolean);
+      try {
+        const res = await base44.functions.invoke('fetchOgImage', { urls });
+        if (res.data?.image_url) {
+          await base44.entities.CommunityListing.update(l.id, { image_url: res.data.image_url });
+          updated++;
+        }
+      } catch {}
+      setBulkFetchProgress({ done: i + 1, total: needsImage.length, updated });
+    }
+    setBulkFetchingImages(false);
+    setBulkFetchProgress(null);
+    toast({ title: "Bulk image fetch complete", description: `Updated ${updated} of ${needsImage.length} listings.` });
+    loadListings();
+  };
 
   const handleFetchWhatsOn = async () => {
     setFetchingWhatsOn(true);
@@ -285,6 +314,16 @@ export default function Admin() {
                 </div>
               </PopoverContent>
             </Popover>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBulkFetchImages}
+              disabled={bulkFetchingImages}
+            >
+              {bulkFetchingImages
+                ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" />{bulkFetchProgress ? `${bulkFetchProgress.done}/${bulkFetchProgress.total}` : "Fetching…"}</>
+                : "Bulk Fetch Images"}
+            </Button>
             <ImportExport listings={listings} onImportComplete={loadListings} />
             <Button onClick={() => setEditing({})} className="gap-1.5">
               <Plus className="w-4 h-4" /> Add Listing
