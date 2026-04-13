@@ -10,6 +10,116 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const WEEKS = ["1st","2nd","3rd","4th","Last"];
+
+function RecurringFields({ form, update }) {
+  const t = form.recurring_type || "weekly";
+  return (
+    <div className="space-y-3">
+      <div>
+        <Label>Recurring Pattern</Label>
+        <Select value={t} onValueChange={(v) => { update("recurring_type", v); update("recurring_day", ""); }}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="daily">Daily</SelectItem>
+            <SelectItem value="weekly">Weekly</SelectItem>
+            <SelectItem value="fortnightly">Fortnightly</SelectItem>
+            <SelectItem value="monthly_date">Monthly — on a specific date</SelectItem>
+            <SelectItem value="twice_monthly">Twice a month</SelectItem>
+            <SelectItem value="monthly_weekday">Monthly — by weekday (e.g. 1st Monday)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {t === "daily" && (
+        <div>
+          <Label>Time</Label>
+          <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+        </div>
+      )}
+
+      {(t === "weekly" || t === "fortnightly") && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label>Day of Week</Label>
+            <Select value={form.recurring_day} onValueChange={(v) => update("recurring_day", v)}>
+              <SelectTrigger><SelectValue placeholder="Select day" /></SelectTrigger>
+              <SelectContent>{DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Time</Label>
+            <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {t === "monthly_date" && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label>Day of Month (1–31)</Label>
+            <Input
+              type="number" min={1} max={31}
+              value={form.recurring_day}
+              onChange={(e) => update("recurring_day", e.target.value)}
+              placeholder="e.g. 15"
+            />
+          </div>
+          <div>
+            <Label>Time</Label>
+            <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {t === "twice_monthly" && (
+        <div className="space-y-2">
+          <Label>Days of Month (e.g. "1, 15")</Label>
+          <Input
+            value={form.recurring_day}
+            onChange={(e) => update("recurring_day", e.target.value)}
+            placeholder="e.g. 1, 15"
+          />
+          <div>
+            <Label>Time</Label>
+            <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {t === "monthly_weekday" && (
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <Label>Which</Label>
+            <Select
+              value={form.recurring_day?.split(" ")[0] || ""}
+              onValueChange={(v) => update("recurring_day", `${v} ${form.recurring_day?.split(" ")[1] || ""}`.trim())}
+            >
+              <SelectTrigger><SelectValue placeholder="e.g. 1st" /></SelectTrigger>
+              <SelectContent>{WEEKS.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Day</Label>
+            <Select
+              value={form.recurring_day?.split(" ")[1] || ""}
+              onValueChange={(v) => update("recurring_day", `${form.recurring_day?.split(" ")[0] || ""} ${v}`.trim())}
+            >
+              <SelectTrigger><SelectValue placeholder="e.g. Monday" /></SelectTrigger>
+              <SelectContent>{DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Time</Label>
+            <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminListingForm({ listing, onClose, onSave }) {
   const isNew = !listing?.id;
   const [form, setForm] = useState({
@@ -34,6 +144,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     event_date_end: listing?.event_date_end || "",
     event_time: listing?.event_time || "",
     is_recurring: listing?.is_recurring || false,
+    recurring_type: listing?.recurring_type || "weekly",
     recurring_day: listing?.recurring_day || "",
     is_free: listing?.is_free ?? null,
     is_featured: listing?.is_featured || false,
@@ -262,27 +373,11 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
 
               <div className="flex items-center gap-3">
                 <Switch checked={form.is_recurring} onCheckedChange={(v) => update("is_recurring", v)} />
-                <Label className="cursor-pointer">Recurring weekly event</Label>
+                <Label className="cursor-pointer">Recurring event</Label>
               </div>
 
               {form.is_recurring ? (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label>Day of Week</Label>
-                    <Select value={form.recurring_day} onValueChange={(v) => update("recurring_day", v)}>
-                      <SelectTrigger><SelectValue placeholder="Select day" /></SelectTrigger>
-                      <SelectContent>
-                        {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d => (
-                          <SelectItem key={d} value={d}>{d}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Time</Label>
-                    <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
-                  </div>
-                </div>
+                <RecurringFields form={form} update={update} />
               ) : (
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-3">

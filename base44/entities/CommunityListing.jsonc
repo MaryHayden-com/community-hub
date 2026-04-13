@@ -97,12 +97,32 @@
     },
     "is_recurring": {
       "type": "boolean",
-      "title": "Is Recurring Weekly?",
+      "title": "Is Recurring?",
       "default": false
+    },
+    "recurring_type": {
+      "type": "string",
+      "title": "Recurring Type",
+      "enum": [
+        "daily",
+        "weekly",
+        "fortnightly",
+        "monthly_date",
+        "twice_monthly",
+        "monthly_weekday"
+      ],
+      "enumNames": [
+        "Daily",
+        "Weekly",
+        "Fortnightly",
+        "Monthly on a date",
+        "Twice a month",
+        "Monthly by weekday (e.g. 1st Monday)"
+      ]
     },
     "recurring_day": {
       "type": "string",
-      "title": "Recurring Day of Week"
+      "title": "Recurring Schedule Detail"
     },
     "is_free": {
       "type": "boolean",

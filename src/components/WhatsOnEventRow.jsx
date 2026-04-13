@@ -3,6 +3,18 @@ import { Clock, MapPin, Star, RefreshCw, CalendarPlus } from "lucide-react";
 
 const DAY_MAP = { Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6, Sunday:0 };
 
+function recurringLabel(listing) {
+  const t = listing.recurring_type || "weekly";
+  const d = listing.recurring_day || "";
+  if (t === "daily") return "Daily";
+  if (t === "weekly") return `Every ${d}`;
+  if (t === "fortnightly") return `Every 2nd ${d}`;
+  if (t === "monthly_date") return `Monthly on the ${d}${["11","12","13"].includes(d) ? "th" : d.endsWith("1") ? "st" : d.endsWith("2") ? "nd" : d.endsWith("3") ? "rd" : "th"}`;
+  if (t === "twice_monthly") return `Twice monthly (${d})`;
+  if (t === "monthly_weekday") return `${d} of each month`;
+  return d || "Recurring";
+}
+
 function nextOccurrence(dayName) {
   const target = DAY_MAP[dayName];
   if (target === undefined) return null;
@@ -106,8 +118,13 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
   let dateObj = overrideDate || null;
 
   if (!dateObj) {
-    if (listing.is_recurring && listing.recurring_day) {
-      dateObj = nextOccurrence(listing.recurring_day);
+    if (listing.is_recurring) {
+      const t = listing.recurring_type || "weekly";
+      const d = listing.recurring_day || "";
+      if ((t === "weekly" || t === "fortnightly") && DAY_MAP[d] !== undefined) {
+        dateObj = nextOccurrence(d);
+      }
+      // For other types, leave dateObj null — no single "next" date we can pin down simply
     } else if (listing.event_date) {
       dateObj = new Date(listing.event_date + "T12:00:00");
     }
@@ -157,7 +174,7 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
             {listing.is_recurring && (
               <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-blue-700 border-blue-200 bg-blue-50 whitespace-nowrap">
                 <RefreshCw className="w-3 h-3" />
-                Every {listing.recurring_day}
+                {recurringLabel(listing)}
               </span>
             )}
             {isMultiDay && (
