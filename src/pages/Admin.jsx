@@ -41,9 +41,10 @@ export default function Admin() {
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("listings");
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
-  const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
+  const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
 
   const ALL_COLUMNS = [
+    { key: "image", label: "Image" },
     { key: "name", label: "Name" },
     { key: "type", label: "Type" },
     { key: "category", label: "Category" },
@@ -526,13 +527,19 @@ export default function Admin() {
                       </td>
                     )}
                     {ALL_COLUMNS.filter(({ key }) => visibleColumns[key]).map(({ key }) => (
-                      <td key={key} className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
-                        {key === "name" ? <span className="font-medium text-foreground">{l.name}</span>
-                         : key === "is_featured" ? (l.is_featured ? "★" : "")
-                         : key === "website" ? (l.website ? <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{l.website}</a> : "")
-                         : (l[key] || "")}
-                      </td>
-                    ))}
+                       <td key={key} className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
+                         {key === "image" ? (
+                           l.image_url ? (
+                             <img src={l.image_url} alt={l.name} className="h-8 w-8 rounded object-cover" />
+                           ) : (
+                             <span className="text-xs text-muted-foreground">—</span>
+                           )
+                         ) : key === "name" ? <span className="font-medium text-foreground">{l.name}</span>
+                          : key === "is_featured" ? (l.is_featured ? "★" : "")
+                          : key === "website" ? (l.website ? <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{l.website}</a> : "")
+                          : (l[key] || "")}
+                       </td>
+                     ))
                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button
