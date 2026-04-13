@@ -39,6 +39,11 @@ export default function Directory() {
   }, []);
 
   const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county), []);
+  const categories = useMemo(() => {
+    if (!type) return [];
+    const cats = listings.filter((l) => l.type === type).map((l) => l.category).filter(Boolean);
+    return [...new Set(cats)].sort();
+  }, [listings, type]);
   const towns = useMemo(() => {
     if (!county) return [];
     const staticTowns = getTownsForCounty(county);
@@ -163,6 +168,7 @@ export default function Directory() {
         search={search} setSearch={setSearch}
         type={type} setType={setType}
         category={category} setCategory={setCategory}
+        categories={categories}
         county={county} setCounty={setCounty}
         town={town} setTown={setTown}
         counties={counties} towns={towns}

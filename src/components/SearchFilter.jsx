@@ -3,17 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const CATEGORY_MAP = {
-  "Business": ["Accountant", "B&B", "Bakery", "Barber", "Bar & Pub", "Butcher", "Café", "Carpenter", "Childcare & Crèche", "Cleaning Services", "Clothing & Fashion", "Craft & Hobby", "Dentist", "Electrician", "Estate Agent", "Financial Services", "Fishmonger", "Florist", "Garage & Motor", "Gift Shop", "GP & Medical", "Grocery", "Gym & Fitness", "Hair & Beauty", "Hardware", "Hotel", "Newsagent", "Off Licence", "Pharmacy", "Plumber", "Restaurant", "Solicitor", "Supermarket", "Takeaway", "Veterinary", "Bookshop", "Painter & Decorator", "Builder"],
-  "Club & Group": ["Athletics", "Art & Craft", "Baptist Church", "Book Club", "Boxing", "Buddhist Centre", "Catholic Church", "Charity", "Church of Ireland", "Community Group", "Community Library", "County Library", "Cycling", "Dance", "Drama & Theatre", "Equestrian", "Evangelical Church", "Faith Community", "Gardening Club", "GAA", "Girl Guides", "Golf", "Hindu Temple", "Islamic Centre / Mosque", "ICA", "Jewish Synagogue", "Martial Arts", "Men's Shed", "Methodist Church", "Mobile Library", "Music", "Presbyterian Church", "Public Library", "Quaker Meeting House", "Residents Association", "Rowing", "Rugby", "Sailing", "School Library", "Scouts", "Senior Citizens", "Soccer / Football", "Swimming", "Tennis", "Tidy Towns", "To astmasters", "University Library", "Women's Group", "Youth Club"],
-  "Education": ["Adult Education", "Arts & Drama", "Childcare", "Community Training", "Crèche", "Further Education", "Gaelcholáiste", "Gaelscoil", "Language School", "Montessori", "Music Lessons", "Primary School", "Secondary School", "Special Education", "Sports Coaching", "Third Level", "Tutoring", "Youthreach"],
-  "What's On": ["Christmas Event", "Community Event", "Concert", "Cultural Event", "Exhibition", "Family Event", "Festival", "Food Event", "Fundraiser", "Market", "Outdoor Event", "Sports Event", "Summer Event", "Talk & Lecture", "Theatre", "Workshop"]
-};
-
-export default function SearchFilter({ search, setSearch, type, setType, category, setCategory, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr }) {
+export default function SearchFilter({ search, setSearch, type, setType, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr }) {
   const isWhatsOn = type === "What's On";
   const hasFilters = search || type || category || county || town || (dateFrom && dateFrom !== todayStr) || dateTo;
-  const categoryOptions = type ? CATEGORY_MAP[type] || [] : [];
 
   return (
     <div className="space-y-3">
@@ -41,14 +33,14 @@ export default function SearchFilter({ search, setSearch, type, setType, categor
           </SelectContent>
         </Select>
 
-        {type && categoryOptions.length > 0 && (
+        {type && categories && categories.length > 0 && (
           <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
             <SelectTrigger className="w-[160px] h-9 bg-card">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {categoryOptions.map((cat) => (
+              {categories.map((cat) => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
             </SelectContent>
