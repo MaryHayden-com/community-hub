@@ -544,8 +544,8 @@ export default function Admin() {
                            {content}
                          </td>
                        );
-                     })
-                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                     })}
+                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost" size="icon" className={`h-8 w-8 ${l.is_verified ? "text-emerald-600" : "text-muted-foreground"}`}
