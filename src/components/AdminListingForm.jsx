@@ -32,6 +32,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     meeting_info: listing?.meeting_info || "",
     event_date: listing?.event_date || "",
     event_time: listing?.event_time || "",
+    is_recurring: listing?.is_recurring || false,
+    recurring_day: listing?.recurring_day || "",
     is_free: listing?.is_free ?? null,
     is_featured: listing?.is_featured || false,
     image_url: listing?.image_url || "",
@@ -256,16 +258,43 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
           {form.type === "What's On" && (
             <div className="border rounded-lg p-4 space-y-3 bg-amber-50/50 border-amber-200">
               <p className="text-sm font-semibold text-amber-800">Event Details</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Event Date</Label>
-                  <Input type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Event Time (e.g. 7:30pm)</Label>
-                  <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 9:00pm" />
-                </div>
+
+              <div className="flex items-center gap-3">
+                <Switch checked={form.is_recurring} onCheckedChange={(v) => update("is_recurring", v)} />
+                <Label className="cursor-pointer">Recurring weekly event</Label>
               </div>
+
+              {form.is_recurring ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Day of Week</Label>
+                    <Select value={form.recurring_day} onValueChange={(v) => update("recurring_day", v)}>
+                      <SelectTrigger><SelectValue placeholder="Select day" /></SelectTrigger>
+                      <SelectContent>
+                        {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d => (
+                          <SelectItem key={d} value={d}>{d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Time</Label>
+                    <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 9:00pm" />
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Event Date</Label>
+                    <Input type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Time</Label>
+                    <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 9:00pm" />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Label>Entry</Label>
                 <Select

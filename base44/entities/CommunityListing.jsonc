@@ -91,6 +91,15 @@
       "type": "string",
       "title": "Event Time (e.g. 7:30pm)"
     },
+    "is_recurring": {
+      "type": "boolean",
+      "title": "Is Recurring Weekly?",
+      "default": false
+    },
+    "recurring_day": {
+      "type": "string",
+      "title": "Recurring Day of Week"
+    },
     "is_free": {
       "type": "boolean",
       "title": "Is Free Entry?"

@@ -1,8 +1,26 @@
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Star } from "lucide-react";
+import { Clock, MapPin, Star, RefreshCw } from "lucide-react";
+
+const DAY_MAP = { Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6, Sunday:0 };
+
+function nextOccurrence(dayName) {
+  const target = DAY_MAP[dayName];
+  if (target === undefined) return null;
+  const today = new Date();
+  const diff = (target - today.getDay() + 7) % 7 || 7;
+  const next = new Date(today);
+  next.setDate(today.getDate() + diff);
+  return next;
+}
 
 export default function WhatsOnEventRow({ listing }) {
-  const dateObj = listing.event_date ? new Date(listing.event_date + "T12:00:00") : null;
+  let dateObj = null;
+
+  if (listing.is_recurring && listing.recurring_day) {
+    dateObj = nextOccurrence(listing.recurring_day);
+  } else if (listing.event_date) {
+    dateObj = new Date(listing.event_date + "T12:00:00");
+  }
 
   const month = dateObj ? dateObj.toLocaleDateString("en-IE", { month: "short" }).toUpperCase() : null;
   const day = dateObj ? dateObj.getDate() : null;
@@ -24,7 +42,7 @@ export default function WhatsOnEventRow({ listing }) {
             <span className="text-xs text-muted-foreground mt-0.5">{weekday}</span>
           </>
         ) : (
-          <span className="text-xs text-muted-foreground">TBC</span>
+          <span className="text-xs text-muted-foreground px-1">Date TBC</span>
         )}
       </div>
 
@@ -41,12 +59,20 @@ export default function WhatsOnEventRow({ listing }) {
               </p>
             )}
           </div>
-          {listing.is_featured && (
-            <span className="shrink-0 flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-amber-700 border-amber-200 bg-amber-50 whitespace-nowrap">
-              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-              Featured
-            </span>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {listing.is_recurring && (
+              <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-blue-700 border-blue-200 bg-blue-50 whitespace-nowrap">
+                <RefreshCw className="w-3 h-3" />
+                Every {listing.recurring_day}
+              </span>
+            )}
+            {listing.is_featured && (
+              <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-amber-700 border-amber-200 bg-amber-50 whitespace-nowrap">
+                <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                Featured
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
