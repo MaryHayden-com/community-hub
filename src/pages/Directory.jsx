@@ -44,6 +44,23 @@ export default function Directory() {
     return [...new Set([...staticTowns, ...listingTowns])].sort();
   }, [listings, county]);
 
+  function getNextOccurrence(listing) {
+    const t = listing.recurring_type || "weekly";
+    const d = listing.recurring_day || "";
+    const DAY_MAP = { Sunday:0, Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6 };
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    if (t === "weekly" || t === "fortnightly") {
+      const target = DAY_MAP[d];
+      if (target === undefined) return todayStr;
+      const diff = (target - today.getDay() + 7) % 7;
+      const next = new Date(today);
+      next.setDate(today.getDate() + (diff === 0 ? 0 : diff));
+      return next.toISOString().slice(0, 10);
+    }
+    return todayStr;
+  }
+
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
@@ -76,7 +93,8 @@ export default function Directory() {
           expanded.push({ listing: l, date: new Date(d), sortKey: d.toISOString().slice(0, 10) });
         }
       } else if (l.is_recurring) {
-        expanded.push({ listing: l, date: null, sortKey: todayStr });
+        const nextDate = getNextOccurrence(l);
+        expanded.push({ listing: l, date: null, sortKey: nextDate });
       } else {
         expanded.push({ listing: l, date: null, sortKey: l.event_date || "9999" });
       }
