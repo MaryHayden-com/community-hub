@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Star, RefreshCw } from "lucide-react";
+import { Clock, MapPin, Star, RefreshCw, CalendarPlus } from "lucide-react";
 
 const DAY_MAP = { Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6, Sunday:0 };
 
@@ -27,8 +27,53 @@ function formatTime(t) {
   return t; // fallback for old free-text values
 }
 
+function addToCalendar(e, listing, dateObj) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const toIcsDate = (d, time) => {
+    const y = d.getFullYear();
+    const m = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    if (time) {
+      const [h, min] = time.split(":");
+      return `${y}${m}${day}T${pad(h)}${pad(min)}00`;
+    }
+    return `${y}${m}${day}`;
+  };
+
+  const start = dateObj || (listing.event_date ? new Date(listing.event_date + "T12:00:00") : new Date());
+  const end = listing.event_date_end ? new Date(listing.event_date_end + "T12:00:00") : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  const dtStart = toIcsDate(start, listing.event_time);
+  const dtEnd = toIcsDate(end, listing.event_time);
+  const location = listing.address || (listing.town ? `${listing.town}, Co. ${listing.county}` : "");
+
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//IrishDirectory//EN",
+    "BEGIN:VEVENT",
+    `SUMMARY:${listing.name}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `DESCRIPTION:${(listing.description || "").replace(/\n/g, "\\n")}`,
+    `LOCATION:${location}`,
+    `URL:${listing.website || window.location.origin + "/listing/" + listing.id}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const blob = new Blob([ics], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${listing.name.replace(/[^a-z0-9]/gi, "_")}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function WhatsOnEventRow({ listing, overrideDate }) {
-  // overrideDate: a Date object used when expanding multi-day events
   let dateObj = overrideDate || null;
 
   if (!dateObj) {
@@ -97,6 +142,14 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
                 Featured
               </span>
             )}
+            <button
+              onClick={(e) => addToCalendar(e, listing, dateObj)}
+              title="Add to Calendar"
+              className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors whitespace-nowrap"
+            >
+              <CalendarPlus className="w-3 h-3" />
+              Add to Calendar
+            </button>
           </div>
         </div>
 
