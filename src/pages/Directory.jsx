@@ -7,6 +7,7 @@ import SearchFilter from "../components/SearchFilter";
 import { Loader2 } from "lucide-react";
 import ViewToggle from "../components/ViewToggle";
 import ListingListRow from "../components/ListingListRow";
+import WhatsOnEventRow from "../components/WhatsOnEventRow";
 
 export default function Directory() {
   const location = useLocation();
@@ -41,6 +42,7 @@ export default function Directory() {
   }, [listings, county]);
 
   const filtered = useMemo(() => {
+    const isWhatsOn = type === "What's On";
     return listings.filter((l) => {
       if (type && l.type !== type) return false;
       if (county && l.county !== county) return false;
@@ -55,7 +57,14 @@ export default function Directory() {
         );
       }
       return true;
-    }).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    }).sort((a, b) => {
+      if (isWhatsOn) {
+        const da = a.event_date || "9999";
+        const db = b.event_date || "9999";
+        return da.localeCompare(db);
+      }
+      return (a.name || "").localeCompare(b.name || "");
+    });
   }, [listings, search, type, county, town]);
 
   if (loading) {
@@ -90,6 +99,12 @@ export default function Directory() {
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
+        </div>
+      ) : type === "What's On" ? (
+        <div className="flex flex-col gap-3 mt-6">
+          {filtered.map((l) => (
+            <WhatsOnEventRow key={l.id} listing={l} />
+          ))}
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
