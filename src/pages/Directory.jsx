@@ -49,17 +49,14 @@ export default function Directory() {
       if (town && e.town !== town) return false;
       if (search) {
         const s = search.toLowerCase();
-        return (
-          (e.name || "").toLowerCase().includes(s) ||
-          (e.description || "").toLowerCase().includes(s) ||
-          (e.town || "").toLowerCase().includes(s)
-        );
+        return (e.name || "").toLowerCase().includes(s) || (e.description || "").toLowerCase().includes(s) || (e.town || "").toLowerCase().includes(s);
       }
       return true;
     });
   }, [events, search, county, town]);
 
   const filtered = useMemo(() => {
+    const isWhatsOn = type === "What's On";
     return listings.filter((l) => {
       if (type && l.type !== type) return false;
       if (county && l.county !== county) return false;
@@ -74,7 +71,14 @@ export default function Directory() {
         );
       }
       return true;
-    }).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    }).sort((a, b) => {
+      if (isWhatsOn) {
+        const da = a.event_date || "9999";
+        const db = b.event_date || "9999";
+        return da.localeCompare(db);
+      }
+      return (a.name || "").localeCompare(b.name || "");
+    });
   }, [listings, search, type, county, town]);
 
   if (loading) {
@@ -85,16 +89,13 @@ export default function Directory() {
     );
   }
 
-  const isWhatsOn = type === "What's On";
-  const resultCount = isWhatsOn ? filteredEvents.length : filtered.length;
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold">Directory</h1>
           <p className="text-muted-foreground mt-1">
-            {resultCount} {isWhatsOn ? "event" : "listing"}{resultCount !== 1 ? "s" : ""} found
+            {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
           </p>
         </div>
         <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -108,23 +109,19 @@ export default function Directory() {
         counties={counties} towns={towns}
       />
 
-      {isWhatsOn ? (
-        filteredEvents.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground">
-            <p className="text-lg">No events found</p>
-            <p className="text-sm mt-1">Try adjusting your search or filters</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3 mt-6">
-            {filteredEvents.map((e) => (
-              <WhatsOnEventRow key={e.id} event={e} />
-            ))}
-          </div>
-        )
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
+        </div>
+      ) : type === "What's On" ? (
+        <div className="flex flex-col gap-3 mt-6">
+          {filteredEvents.map((e) => (
+            <WhatsOnEventRow key={e.id} event={e} />
+          ))}
+          {filteredEvents.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">No events found</div>
+          )}
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
