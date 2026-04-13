@@ -75,6 +75,8 @@ export default function Directory() {
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
           expanded.push({ listing: l, date: new Date(d), sortKey: d.toISOString().slice(0, 10) });
         }
+      } else if (l.is_recurring) {
+        expanded.push({ listing: l, date: null, sortKey: todayStr });
       } else {
         expanded.push({ listing: l, date: null, sortKey: l.event_date || "9999" });
       }
