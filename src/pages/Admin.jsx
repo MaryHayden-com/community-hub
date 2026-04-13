@@ -111,12 +111,13 @@ export default function Admin() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadListings(); }, []);
-
   useEffect(() => {
-    base44.entities.ClaimRequest.filter({ status: "pending" })
-      .then((r) => setPendingClaimsCount(r.length))
-      .catch(() => {});
+    loadListings();
+    setTimeout(() => {
+      base44.entities.ClaimRequest.filter({ status: "pending" })
+        .then((r) => setPendingClaimsCount(r.length))
+        .catch(() => {});
+    }, 800);
   }, []);
 
   const handleToggleVerified = async (listing, e) => {
