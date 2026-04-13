@@ -1,10 +1,11 @@
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, X, CalendarRange } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function SearchFilter({ search, setSearch, type, setType, county, setCounty, town, setTown, counties, towns }) {
-  const hasFilters = search || type || county || town;
+export default function SearchFilter({ search, setSearch, type, setType, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr }) {
+  const isWhatsOn = type === "What's On";
+  const hasFilters = search || type || county || town || (dateFrom && dateFrom !== todayStr) || dateTo;
 
   return (
     <div className="space-y-3">
@@ -56,8 +57,31 @@ export default function SearchFilter({ search, setSearch, type, setType, county,
           </SelectContent>
         </Select>
 
+        {isWhatsOn && setDateFrom && (
+          <div className="flex items-center gap-2 bg-card border rounded-md px-3 h-9">
+            <CalendarRange className="w-4 h-4 text-muted-foreground shrink-0" />
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="bg-transparent text-sm outline-none w-[130px]"
+              title="From date"
+            />
+            <span className="text-muted-foreground text-xs">–</span>
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="bg-transparent text-sm outline-none w-[130px]"
+              placeholder="End date"
+              title="To date"
+            />
+          </div>
+        )}
+
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setCounty(""); setTown(""); }}>
+          <Button variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setCounty(""); setTown(""); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}
