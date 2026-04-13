@@ -151,6 +151,7 @@ export default function Admin() {
 
   const filtered = listings
     .filter((l) => {
+      if (l.type === "What's On") return false; // excluded from main listings tab
       if (filterType && l.type !== filterType) return false;
       if (filterCounty && l.county !== filterCounty) return false;
       if (filterTown && l.town !== filterTown) return false;
@@ -160,6 +161,25 @@ export default function Admin() {
         (l.name || "").toLowerCase().includes(s) ||
         (l.town || "").toLowerCase().includes(s) ||
         (l.type || "").toLowerCase().includes(s)
+      );
+    })
+    .sort((a, b) => {
+      const av = (a[sortKey] || "").toLowerCase();
+      const bv = (b[sortKey] || "").toLowerCase();
+      return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+
+  const filteredWhatsOn = listings
+    .filter((l) => {
+      if (l.type !== "What's On") return false;
+      if (filterCounty && l.county !== filterCounty) return false;
+      if (filterTown && l.town !== filterTown) return false;
+      if (!search) return true;
+      const s = search.toLowerCase();
+      return (
+        (l.name || "").toLowerCase().includes(s) ||
+        (l.town || "").toLowerCase().includes(s) ||
+        (l.description || "").toLowerCase().includes(s)
       );
     })
     .sort((a, b) => {
@@ -178,7 +198,7 @@ export default function Admin() {
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
-        {activeTab === "listings" && (
+        {(activeTab === "listings" || activeTab === "whatson") && (
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center border rounded-lg overflow-hidden">
               <Button
@@ -213,7 +233,7 @@ export default function Admin() {
               >
                 {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
               </Button>
-            <Button
+            {activeTab === "whatson" && <Button
                 variant="outline"
                 size="sm"
                 onClick={async () => {
@@ -232,8 +252,8 @@ export default function Admin() {
               >
                 {expandingRecurring ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
                 {expandingRecurring ? "Expanding…" : "Expand Recurring"}
-              </Button>
-            <Button
+              </Button>}
+            {activeTab === "whatson" && <Button
                 variant="outline"
                 size="sm"
                 onClick={handleFetchWhatsOn}
@@ -241,7 +261,7 @@ export default function Admin() {
               >
                 {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
                 {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
-              </Button>
+              </Button>}
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -284,6 +304,14 @@ export default function Admin() {
           Listings
         </button>
         <button
+          onClick={() => setActiveTab("whatson")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === "whatson" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          What's On
+        </button>
+        <button
           onClick={() => setActiveTab("claims")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === "claims" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -310,8 +338,7 @@ export default function Admin() {
         />
       )}
 
-      {/* Search & Filters */}
-      {activeTab === "listings" && <div className="flex flex-wrap gap-2 mb-4 items-center">
+      {(activeTab === "listings" || activeTab === "whatson") && <div className="flex flex-wrap gap-2 mb-4 items-center">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -322,7 +349,7 @@ export default function Admin() {
           />
         </div>
 
-        <Select value={filterType} onValueChange={(v) => setFilterType(v === "__all__" ? "" : v)}>
+        {activeTab === "listings" && <Select value={filterType} onValueChange={(v) => setFilterType(v === "__all__" ? "" : v)}>
           <SelectTrigger className="w-[140px] bg-card">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
@@ -330,7 +357,7 @@ export default function Admin() {
             <SelectItem value="__all__">All Types</SelectItem>
             {allTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
           </SelectContent>
-        </Select>
+        </Select>}
 
         <Select value={filterCounty} onValueChange={(v) => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
           <SelectTrigger className="w-[150px] bg-card">
@@ -361,8 +388,57 @@ export default function Admin() {
           </button>
         )}
 
-        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
+        <span className="text-xs text-muted-foreground ml-auto">{activeTab === "whatson" ? filteredWhatsOn.length : filtered.length} results</span>
       </div>}
+
+      {activeTab === "whatson" && (loading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="bg-card rounded-xl border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary" onClick={() => handleSort("name")}>Name {sortKey === "name" ? (sortDir === "asc" ? "↑" : "↓") : <span className="text-muted-foreground/40">↕</span>}</th>
+                  <th className="text-left px-4 py-3 font-medium">Date / Schedule</th>
+                  <th className="text-left px-4 py-3 font-medium">Category</th>
+                  <th className="text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary" onClick={() => handleSort("county")}>County {sortKey === "county" ? (sortDir === "asc" ? "↑" : "↓") : <span className="text-muted-foreground/40">↕</span>}</th>
+                  <th className="text-left px-4 py-3 font-medium">Town</th>
+                  <th className="text-right px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredWhatsOn.map((l) => (
+                  <tr key={l.id} className="border-b hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setEditing(l)}>
+                    <td className="px-4 py-3 font-medium">{l.name}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                      {l.is_recurring
+                        ? `Every ${l.recurring_day}${l.event_time ? ` at ${l.event_time}` : ""}`
+                        : l.event_date
+                          ? `${l.event_date}${l.event_date_end && l.event_date_end !== l.event_date ? ` → ${l.event_date_end}` : ""}${l.event_time ? ` at ${l.event_time}` : ""}`
+                          : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{l.category || "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{l.county}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{l.town}</td>
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}><Edit className="w-3.5 h-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(l.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filteredWhatsOn.length === 0 && (
+            <div className="py-12 text-center text-muted-foreground">No What's On events found</div>
+          )}
+        </div>
+      ))}
 
       {activeTab === "listings" && (loading ? (
         <div className="flex justify-center py-20">
