@@ -2,34 +2,34 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const CATEGORY_BY_GROUP = {
   "Business": {
-    "Accommodation": ["Hotels", "B&B", "Airbnb", "Room to Let", "Guesthouses"],
-    "Food & Beverage": ["Restaurant", "Café", "Bar & Pub", "Takeaway", "Bakery"],
-    "Retail": ["Supermarket", "Grocery", "Newsagent", "Bookshop", "Hardware", "Clothing & Fashion", "Gift Shop", "Craft & Hobby", "Florist", "Butcher", "Fishmonger", "Off Licence"],
-    "Professional Services": ["Solicitor", "Accountant", "Financial Services", "Estate Agent"],
-    "Personal Services": ["Hair & Beauty", "Barber", "Gym & Fitness", "Cleaning Services", "Childcare & Crèche"],
-    "Healthcare": ["Dentist", "GP & Medical", "Veterinary", "Pharmacy"],
-    "Trades & Construction": ["Plumber", "Electrician", "Builder", "Carpenter", "Painter & Decorator"]
+    "Accommodation": ["Hotels", "Hotel", "B&B", "Bed & Breakfast", "Airbnb", "Room to Let", "Guesthouses", "Guest House", "Hostel", "Holiday Home"],
+    "Food & Beverage": ["Restaurant", "Café", "Coffee", "Bar & Pub", "Pub", "Bar", "Takeaway", "Take Away", "Bakery", "Deli", "Fish & Chips"],
+    "Retail": ["Supermarket", "Grocery", "Newsagent", "Bookshop", "Book Shop", "Hardware", "DIY", "Clothing & Fashion", "Clothes", "Fashion", "Gift Shop", "Gifts", "Craft & Hobby", "Craft", "Hobby", "Florist", "Butcher", "Fishmonger", "Off Licence", "Off License", "Wine", "Shoe", "Shoes", "Sport", "Sports"],
+    "Professional Services": ["Solicitor", "Solicitors", "Accountant", "Accountants", "Financial Services", "Finance", "Estate Agent", "Estate Agents", "Lawyer", "Law"],
+    "Personal Services": ["Hair & Beauty", "Hair", "Beauty", "Salon", "Barber", "Gym & Fitness", "Gym", "Fitness", "Personal Trainer", "Cleaning Services", "Cleaning", "Childcare & Crèche", "Childcare", "Crèche"],
+    "Healthcare": ["Dentist", "Dentistry", "Dental", "GP & Medical", "GP", "Doctor", "Medical", "Health Centre", "Health Center", "Veterinary", "Vet", "Pharmacy", "Chemist"],
+    "Trades & Construction": ["Plumber", "Plumbing", "Electrician", "Electrical", "Builder", "Building", "Carpenter", "Carpentry", "Painter & Decorator", "Painter", "Decorator", "Roofer", "Roofing", "Joinery", "Joiner"]
   },
   "Club & Group": {
-    "Sports & Recreation": ["GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics", "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian", "Rowing", "Sailing"],
-    "Youth & Community": ["Scouts", "Girl Guides", "Youth Club", "Tidy Towns", "Community Group", "Residents Association"],
-    "Arts & Culture": ["Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club"],
-    "Faith & Religious": ["Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community"],
-    "Libraries": ["Public Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
-    "Leisure & Community": ["Walking Group", "Gardening Club", "Toastmasters", "ICA", "Men's Shed", "Women's Group", "Senior Citizens"],
-    "Charity & Welfare": ["Charity"]
+    "Sports & Recreation": ["GAA", "Soccer", "Soccer / Football", "Football", "Rugby", "Tennis", "Golf", "Athletics", "Swimming", "Swim", "Cycling", "Cycle", "Boxing", "Martial Arts", "Martial Art", "Karate", "Judo", "Equestrian", "Horse", "Horses", "Rowing", "Sailing", "Badminton", "Squash", "Table Tennis", "Volleyball", "Basketball"],
+    "Youth & Community": ["Scouts", "Girl Guides", "Guides", "Youth Club", "Youth", "Tidy Towns", "Community Group", "Community", "Community Organisation", "Residents Association", "Residents"],
+    "Arts & Culture": ["Drama & Theatre", "Drama", "Theatre", "Theater", "Music", "Band", "Orchestra", "Dance", "Art & Craft", "Art", "Craft", "Gallery", "Book Club", "Writing"],
+    "Faith & Religious": ["Catholic Church", "Catholic", "Church of Ireland", "Methodist Church", "Methodist", "Presbyterian Church", "Presbyterian", "Baptist Church", "Baptist", "Evangelical Church", "Evangelical", "Orthodox Church", "Orthodox", "Islamic Centre / Mosque", "Islamic", "Mosque", "Jewish Synagogue", "Synagogue", "Hindu Temple", "Hindu", "Temple", "Buddhist Centre", "Buddhist", "Quaker Meeting House", "Quaker", "Faith Community", "Church"],
+    "Libraries": ["Public Library", "Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
+    "Leisure & Community": ["Walking Group", "Walking", "Gardening Club", "Gardening", "Toastmasters", "ICA", "Men's Shed", "Mens Shed", "Women's Group", "Womens Group", "Senior Citizens", "Seniors", "Over 55s"],
+    "Charity & Welfare": ["Charity", "Charities", "Welfare", "Non-Profit", "Non Profit", "NGO"]
   },
   "Education": {
-    "Schools": ["Primary School", "Secondary School", "Gaelscoil", "Gaelchóláiste", "Special Education"],
-    "Higher Education": ["Third Level", "Further Education"],
-    "Childcare": ["Montessori", "Childcare", "Crèche"],
-    "Training & Skills": ["Language School", "Music Lessons", "Arts & Drama", "Sports Coaching", "Adult Education", "Tutoring", "Community Training", "Youthreach"]
+    "Schools": ["Primary School", "Primary", "Secondary School", "Secondary", "Gaelscoil", "Gaelchóláiste", "Special Education", "Special School"],
+    "Higher Education": ["Third Level", "University", "College", "Further Education", "FE College"],
+    "Childcare": ["Montessori", "Childcare", "Child Care", "Crèche", "Creche", "Pre-School", "Preschool", "Nursery"],
+    "Training & Skills": ["Language School", "Language", "Music Lessons", "Music", "Arts & Drama", "Arts", "Sports Coaching", "Coaching", "Adult Education", "Adult", "Tutoring", "Tuition", "Community Training", "Training", "Youthreach"]
   },
   "What's On": {
-    "Festivals & Markets": ["Festival", "Market"],
-    "Entertainment": ["Concert", "Theatre", "Exhibition"],
-    "Community Activities": ["Community Event", "Workshop", "Talk & Lecture", "Fundraiser", "Family Event"],
-    "Seasonal & Themed": ["Christmas Event", "Summer Event", "Food Event", "Sports Event", "Cultural Event"]
+    "Festivals & Markets": ["Festival", "Festivals", "Market", "Markets", "Fair", "Fairs"],
+    "Entertainment": ["Concert", "Concerts", "Theatre", "Theater", "Exhibition", "Exhibitions", "Show", "Shows", "Comedy", "Comedy Club"],
+    "Community Activities": ["Community Event", "Community Activities", "Event", "Workshop", "Workshops", "Talk & Lecture", "Talk", "Lecture", "Talks", "Fundraiser", "Fundraising", "Family Event", "Family"],
+    "Seasonal & Themed": ["Christmas Event", "Christmas", "Summer Event", "Summer", "Food Event", "Food", "Sports Event", "Sports", "Cultural Event", "Cultural", "Halloween", "Easter", "New Year"]
   }
 };
 
