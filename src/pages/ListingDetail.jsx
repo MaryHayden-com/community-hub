@@ -53,15 +53,11 @@ export default function ListingDetail() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
-  const [linkedEvents, setLinkedEvents] = useState([]);
 
   useEffect(() => {
     base44.entities.CommunityListing.filter({ id })
       .then((results) => setListing(results[0] || null))
       .finally(() => setLoading(false));
-    base44.entities.Event.filter({ parent_listing_id: id })
-      .then(setLinkedEvents)
-      .catch(() => {});
   }, [id]);
 
   if (loading) {
@@ -193,31 +189,6 @@ export default function ListingDetail() {
                     </span>
                   </a>
                 )}
-              </div>
-            </div>
-          )}
-
-          {/* Linked Events */}
-          {linkedEvents.length > 0 && (
-            <div className="mt-6 pt-6 border-t">
-              <p className="text-sm font-semibold mb-3">Upcoming Events</p>
-              <div className="flex flex-col gap-2">
-                {linkedEvents.map((e) => (
-                  <Link
-                    key={e.id}
-                    to={`/event/${e.id}`}
-                    className="flex items-center gap-3 p-3 rounded-lg border hover:border-primary/30 hover:bg-muted/30 transition-colors"
-                  >
-                    <Calendar className="w-4 h-4 text-amber-600 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm">{e.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {e.is_recurring ? `Every ${e.recurring_day}` : e.event_date || ""}
-                        {e.event_time ? ` · ${e.event_time}` : ""}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
               </div>
             </div>
           )}

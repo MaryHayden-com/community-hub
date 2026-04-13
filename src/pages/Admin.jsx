@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox } from "lucide-react";
 import AdminClaimRequests from "../components/AdminClaimRequests";
-import AdminEventForm from "../components/AdminEventForm";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -40,10 +39,6 @@ export default function Admin() {
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("listings");
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
-  const [events, setEvents] = useState([]);
-  const [editingEvent, setEditingEvent] = useState(null);
-  const [deleteEventId, setDeleteEventId] = useState(null);
-  const [eventSearch, setEventSearch] = useState("");
   const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
 
   const ALL_COLUMNS = [
@@ -115,19 +110,7 @@ export default function Admin() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadListings(); loadEvents(); }, []);
-
-  const loadEvents = () => {
-    base44.entities.Event.list("-created_date", 500).then(setEvents).catch(() => {});
-  };
-
-  const handleDeleteEvent = async () => {
-    if (!deleteEventId) return;
-    await base44.entities.Event.delete(deleteEventId);
-    toast({ title: "Deleted", description: "Event removed." });
-    setDeleteEventId(null);
-    loadEvents();
-  };
+  useEffect(() => { loadListings(); }, []);
 
   useEffect(() => {
     base44.entities.ClaimRequest.filter({ status: "pending" })
@@ -301,14 +284,6 @@ export default function Admin() {
           Listings
         </button>
         <button
-          onClick={() => setActiveTab("events")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === "events" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          What's On Events
-        </button>
-        <button
           onClick={() => setActiveTab("claims")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === "claims" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -325,86 +300,6 @@ export default function Admin() {
       </div>
 
       {activeTab === "claims" && <AdminClaimRequests />}
-
-      {activeTab === "events" && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search events..." value={eventSearch} onChange={(e) => setEventSearch(e.target.value)} className="pl-10" />
-            </div>
-            <Button onClick={() => setEditingEvent({})} className="gap-1.5 ml-3">
-              <Plus className="w-4 h-4" /> Add Event
-            </Button>
-          </div>
-          <div className="bg-card rounded-xl border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="text-left px-4 py-3 font-medium">Event</th>
-                  <th className="text-left px-4 py-3 font-medium">Date</th>
-                  <th className="text-left px-4 py-3 font-medium">Location</th>
-                  <th className="text-left px-4 py-3 font-medium">Linked To</th>
-                  <th className="text-right px-4 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events
-                  .filter((e) => !eventSearch || (e.name || "").toLowerCase().includes(eventSearch.toLowerCase()))
-                  .map((e) => (
-                    <tr key={e.id} className="border-b hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="font-medium">{e.name}</p>
-                        {e.category && <p className="text-xs text-muted-foreground">{e.category}</p>}
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground text-xs">
-                        {e.is_recurring ? `Every ${e.recurring_day}` : e.event_date || "—"}
-                        {e.event_time ? ` · ${e.event_time}` : ""}
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground text-xs">{e.town}, {e.county}</td>
-                      <td className="px-4 py-3 text-xs">
-                        {e.parent_listing_name ? (
-                          <span className="text-primary">{e.parent_listing_name}</span>
-                        ) : <span className="text-muted-foreground">—</span>}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingEvent(e)}>
-                            <Edit className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteEventId(e.id)}>
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-            {events.length === 0 && <div className="py-12 text-center text-muted-foreground">No events yet</div>}
-          </div>
-          {editingEvent !== null && (
-            <AdminEventForm
-              event={editingEvent}
-              allListings={listings}
-              onClose={() => setEditingEvent(null)}
-              onSave={() => { setEditingEvent(null); loadEvents(); }}
-            />
-          )}
-          <AlertDialog open={!!deleteEventId} onOpenChange={() => setDeleteEventId(null)}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Event?</AlertDialogTitle>
-                <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteEvent} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      )}
 
       {activeTab === "listings" && selectMode && selectedIds.length > 0 && (
         <BulkEditBar

@@ -14,7 +14,6 @@ export default function Directory() {
   const params = new URLSearchParams(location.search);
 
   const [listings, setListings] = useState([]);
-  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState("grid");
@@ -29,10 +28,9 @@ export default function Directory() {
   }, [location.search]);
 
   useEffect(() => {
-    Promise.all([
-      base44.entities.CommunityListing.list("-created_date", 1000),
-      base44.entities.Event.list("-created_date", 500),
-    ]).then(([l, e]) => { setListings(l); setEvents(e); }).finally(() => setLoading(false));
+    base44.entities.CommunityListing.list("-created_date", 1000)
+      .then(setListings)
+      .finally(() => setLoading(false));
   }, []);
 
   const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county), []);
@@ -42,18 +40,6 @@ export default function Directory() {
     const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
     return [...new Set([...staticTowns, ...listingTowns])].sort();
   }, [listings, county]);
-
-  const filteredEvents = useMemo(() => {
-    return events.filter((e) => {
-      if (county && e.county !== county) return false;
-      if (town && e.town !== town) return false;
-      if (search) {
-        const s = search.toLowerCase();
-        return (e.name || "").toLowerCase().includes(s) || (e.description || "").toLowerCase().includes(s) || (e.town || "").toLowerCase().includes(s);
-      }
-      return true;
-    });
-  }, [events, search, county, town]);
 
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
@@ -116,12 +102,9 @@ export default function Directory() {
         </div>
       ) : type === "What's On" ? (
         <div className="flex flex-col gap-3 mt-6">
-          {filteredEvents.map((e) => (
-            <WhatsOnEventRow key={e.id} event={e} />
+          {filtered.map((l) => (
+            <WhatsOnEventRow key={l.id} listing={l} />
           ))}
-          {filteredEvents.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">No events found</div>
-          )}
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">

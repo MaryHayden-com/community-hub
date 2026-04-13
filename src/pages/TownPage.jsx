@@ -21,28 +21,22 @@ export default function TownPage() {
   const decodedTown = decodeURIComponent(town);
 
   const [listings, setListings] = useState([]);
-  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState("");
   const [viewMode, setViewMode] = useState("grid");
 
   useEffect(() => {
     // Fetch all county listings, then show those whose town OR area matches
-    Promise.all([
-      base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", 1000),
-      base44.entities.Event.filter({ county: decodedCounty }, "-created_date", 200),
-    ]).then(([all, evts]) => {
-      setListings(all.filter((l) => l.town === decodedTown || l.area === decodedTown));
-      setEvents(evts.filter((e) => e.town === decodedTown || e.area === decodedTown));
-    }).finally(() => setLoading(false));
+    base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", 1000)
+      .then((all) => setListings(all.filter((l) => l.town === decodedTown || l.area === decodedTown)))
+      .finally(() => setLoading(false));
   }, [decodedCounty, decodedTown]);
 
   const types = useMemo(() => {
     const counts = {};
-    listings.forEach((l) => { if (l.type !== "What's On") counts[l.type] = (counts[l.type] || 0) + 1; });
-    if (events.length > 0) counts["What's On"] = events.length;
+    listings.forEach((l) => { counts[l.type] = (counts[l.type] || 0) + 1; });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [listings, events]);
+  }, [listings]);
 
   const filtered = useMemo(() => {
     const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
@@ -119,10 +113,9 @@ export default function TownPage() {
         </div>
       ) : activeType === "What's On" ? (
         <div className="flex flex-col gap-3">
-          {events.map((e) => (
-            <WhatsOnEventRow key={e.id} event={e} />
+          {filtered.map((l) => (
+            <WhatsOnEventRow key={l.id} listing={l} />
           ))}
-          {events.length === 0 && <div className="text-center py-12 text-muted-foreground">No events found</div>}
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
