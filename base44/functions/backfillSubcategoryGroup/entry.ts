@@ -63,6 +63,28 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Helper function to find group by fuzzy matching
+    const findGroupByCategory = (type, category) => {
+      const exact = categoryToGroup[`${type}|${category}`];
+      if (exact) return exact;
+
+      const typeMap = CATEGORY_BY_GROUP[type];
+      if (!typeMap) return null;
+
+      const catLower = category.toLowerCase().trim();
+      for (const [group, categories] of Object.entries(typeMap)) {
+        for (const mappedCat of categories) {
+          const mappedLower = mappedCat.toLowerCase();
+          // Match if: substring match, first word match, or contains key terms
+          if (mappedLower.includes(catLower) || catLower.includes(mappedLower) || 
+              mappedLower.split(/[\s&]/)[0] === catLower.split(/[\s&]/)[0]) {
+            return group;
+          }
+        }
+      }
+      return null;
+    }
+
     // Collect updates sequentially with small delays
     for (const listing of listings) {
       if (!listing.type || !listing.category) {
@@ -70,8 +92,11 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const key = `${listing.type}|${listing.category}`;
-      const group = categoryToGroup[key];
+      let group = categoryToGroup[`${listing.type}|${listing.category}`];
+      if (!group) {
+        // Try fuzzy matching if exact match fails
+        group = findGroupByCategory(listing.type, listing.category);
+      }
 
       if (group && !listing.subcategory_group) {
         await base44.entities.CommunityListing.update(listing.id, { subcategory_group: group });
