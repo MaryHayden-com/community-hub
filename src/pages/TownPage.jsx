@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar } from "lucide-react";
+import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ViewToggle from "../components/ViewToggle";
 import ListingListRow from "../components/ListingListRow";
 import ListingCard from "../components/ListingCard";
@@ -39,7 +40,14 @@ export default function TownPage() {
 
   const filtered = useMemo(() => {
     const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
-    return [...base].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    return [...base].sort((a, b) => {
+      if (activeType === "What's On" || (!activeType && a.type === "What's On" && b.type === "What's On")) {
+        const da = a.event_date || '9999';
+        const db = b.event_date || '9999';
+        return da.localeCompare(db);
+      }
+      return (a.name || '').localeCompare(b.name || '');
+    });
   }, [listings, activeType]);
 
   if (loading) {
@@ -102,6 +110,12 @@ export default function TownPage() {
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
+        </div>
+      ) : activeType === "What's On" ? (
+        <div className="flex flex-col gap-3">
+          {filtered.map((l) => (
+            <WhatsOnEventRow key={l.id} listing={l} />
+          ))}
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -36,6 +36,7 @@ export default function Admin() {
   const [sortDir, setSortDir] = useState("asc");
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
   const [fetchResult, setFetchResult] = useState(null);
+  const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("listings");
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
   const [visibleColumns, setVisibleColumns] = useState({ name: true, type: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
@@ -211,6 +212,26 @@ export default function Admin() {
                 onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
               >
                 {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
+              </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  setExpandingRecurring(true);
+                  try {
+                    const res = await base44.functions.invoke('expandRecurringEvents', {});
+                    toast({ title: "Recurring Events Expanded", description: res.data.message });
+                    loadListings();
+                  } catch (err) {
+                    toast({ title: "Error", description: err.message, variant: "destructive" });
+                  } finally {
+                    setExpandingRecurring(false);
+                  }
+                }}
+                disabled={expandingRecurring}
+              >
+                {expandingRecurring ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+                {expandingRecurring ? "Expanding…" : "Expand Recurring"}
               </Button>
             <Button
                 variant="outline"
