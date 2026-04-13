@@ -32,45 +32,74 @@ function addToCalendar(e, listing, dateObj) {
   e.stopPropagation();
 
   const pad = (n) => String(n).padStart(2, "0");
-  const toIcsDate = (d, time) => {
-    const y = d.getFullYear();
-    const m = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    if (time) {
-      const [h, min] = time.split(":");
-      return `${y}${m}${day}T${pad(h)}${pad(min)}00`;
-    }
-    return `${y}${m}${day}`;
+  const fmtDate = (d) => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const fmtDateTime = (d, time) => {
+    const [h, min] = (time || "12:00").split(":");
+    return `${fmtDate(d)}T${pad(parseInt(h))}${pad(parseInt(min))}00`;
   };
 
   const start = dateObj || (listing.event_date ? new Date(listing.event_date + "T12:00:00") : new Date());
-  const end = listing.event_date_end ? new Date(listing.event_date_end + "T12:00:00") : new Date(start.getTime() + 2 * 60 * 60 * 1000);
-  const dtStart = toIcsDate(start, listing.event_time);
-  const dtEnd = toIcsDate(end, listing.event_time);
+  const hasTime = !!listing.event_time;
   const location = listing.address || (listing.town ? `${listing.town}, Co. ${listing.county}` : "");
+  const uid = `${listing.id}-${fmtDate(start)}@irishdirectory`;
+  const now = new Date();
+  const dtstamp = fmtDateTime(now, `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}`) + "Z";
 
-  const ics = [
+  const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//IrishDirectory//EN",
+    "PRODID:-//IrishDirectory//Events//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
     "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTAMP:${dtstamp}`,
     `SUMMARY:${listing.name}`,
-    `DTSTART:${dtStart}`,
-    `DTEND:${dtEnd}`,
-    `DESCRIPTION:${(listing.description || "").replace(/\n/g, "\\n")}`,
-    `LOCATION:${location}`,
-    `URL:${listing.website || window.location.origin + "/listing/" + listing.id}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+  ];
 
-  const blob = new Blob([ics], { type: "text/calendar" });
+  if (hasTime) {
+    const dtStart = fmtDateTime(start, listing.event_time);
+    const endDate = listing.event_date_end ? new Date(listing.event_date_end + "T12:00:00") : start;
+    const dtEnd = fmtDateTime(endDate, listing.event_time);
+    // If start == end add 2 hours
+    if (dtStart === dtEnd) {
+      const endTime = new Date(start);
+      const [h, m] = listing.event_time.split(":");
+      endTime.setHours(parseInt(h) + 2, parseInt(m));
+      lines.push(`DTSTART:${dtStart}`);
+      lines.push(`DTEND:${fmtDateTime(endTime, `${pad(endTime.getHours())}:${pad(endTime.getMinutes())}`)}`);
+    } else {
+      lines.push(`DTSTART:${dtStart}`);
+      lines.push(`DTEND:${dtEnd}`);
+    }
+  } else {
+    // All-day event
+    const endDate = listing.event_date_end ? new Date(listing.event_date_end + "T12:00:00") : start;
+    const dayAfterEnd = new Date(endDate);
+    dayAfterEnd.setDate(dayAfterEnd.getDate() + 1);
+    lines.push(`DTSTART;VALUE=DATE:${fmtDate(start)}`);
+    lines.push(`DTEND;VALUE=DATE:${fmtDate(dayAfterEnd)}`);
+  }
+
+  if (listing.description) {
+    lines.push(`DESCRIPTION:${listing.description.replace(/[\r\n]+/g, " ")}`);
+  }
+  if (location) lines.push(`LOCATION:${location}`);
+  const eventUrl = listing.website || `${window.location.origin}/listing/${listing.id}`;
+  lines.push(`URL:${eventUrl}`);
+  lines.push("END:VEVENT");
+  lines.push("END:VCALENDAR");
+
+  const icsContent = lines.join("\r\n");
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = `${listing.name.replace(/[^a-z0-9]/gi, "_")}.ics`;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
 export default function WhatsOnEventRow({ listing, overrideDate }) {
