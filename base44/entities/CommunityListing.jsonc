@@ -91,6 +91,10 @@
       "type": "string",
       "title": "Event Time (e.g. 7:30pm)"
     },
+    "is_free": {
+      "type": "boolean",
+      "title": "Is Free Entry?"
+    },
     "is_featured": {
       "type": "boolean",
       "title": "Is Featured",

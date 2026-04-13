@@ -4,13 +4,11 @@ import { Clock, MapPin, Star } from "lucide-react";
 export default function WhatsOnEventRow({ listing }) {
   const dateObj = listing.event_date ? new Date(listing.event_date + "T12:00:00") : null;
 
-  const month = dateObj
-    ? dateObj.toLocaleDateString("en-IE", { month: "short" }).toUpperCase()
-    : null;
+  const month = dateObj ? dateObj.toLocaleDateString("en-IE", { month: "short" }).toUpperCase() : null;
   const day = dateObj ? dateObj.getDate() : null;
-  const weekday = dateObj
-    ? dateObj.toLocaleDateString("en-IE", { weekday: "short" })
-    : null;
+  const weekday = dateObj ? dateObj.toLocaleDateString("en-IE", { weekday: "short" }) : null;
+
+  const location = listing.address || (listing.town ? `${listing.town}, Co. ${listing.county}` : null);
 
   return (
     <Link
@@ -44,28 +42,31 @@ export default function WhatsOnEventRow({ listing }) {
             )}
           </div>
           {listing.is_featured && (
-            <span className="shrink-0 flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-amber-700 border-amber-200 bg-amber-50">
+            <span className="shrink-0 flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-amber-700 border-amber-200 bg-amber-50 whitespace-nowrap">
               <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
               Featured
             </span>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
           {listing.event_time && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {listing.event_time}
             </span>
           )}
-          {(listing.address || listing.town) && (
+          {location && (
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              {listing.address || `${listing.town}, Co. ${listing.county}`}
+              {location}
             </span>
           )}
-          {listing.category && (
-            <span className="border rounded px-1.5 py-0.5 text-xs">{listing.category}</span>
+          {listing.is_free === true && (
+            <span className="border rounded px-2 py-0.5 text-xs border-emerald-300 text-emerald-700 bg-emerald-50">Free</span>
+          )}
+          {listing.is_free === false && (
+            <span className="border rounded px-2 py-0.5 text-xs border-slate-300 text-slate-600 bg-slate-50">Paid</span>
           )}
         </div>
       </div>
