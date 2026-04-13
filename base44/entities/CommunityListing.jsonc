@@ -85,11 +85,15 @@
     },
     "event_date": {
       "type": "string",
-      "title": "Event Date (YYYY-MM-DD)"
+      "title": "Event Start Date (YYYY-MM-DD)"
+    },
+    "event_date_end": {
+      "type": "string",
+      "title": "Event End Date (YYYY-MM-DD)"
     },
     "event_time": {
       "type": "string",
-      "title": "Event Time (e.g. 7:30pm)"
+      "title": "Event Time (HH:MM)"
     },
     "is_recurring": {
       "type": "boolean",

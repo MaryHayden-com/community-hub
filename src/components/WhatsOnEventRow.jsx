@@ -13,20 +13,40 @@ function nextOccurrence(dayName) {
   return next;
 }
 
-export default function WhatsOnEventRow({ listing }) {
-  let dateObj = null;
-
-  if (listing.is_recurring && listing.recurring_day) {
-    dateObj = nextOccurrence(listing.recurring_day);
-  } else if (listing.event_date) {
-    dateObj = new Date(listing.event_date + "T12:00:00");
+function formatTime(t) {
+  if (!t) return null;
+  // Handle HH:MM 24h format
+  const match = t.match(/^(\d{1,2}):(\d{2})$/);
+  if (match) {
+    const h = parseInt(match[1]);
+    const m = match[2];
+    const ampm = h >= 12 ? "pm" : "am";
+    const h12 = h % 12 || 12;
+    return m === "00" ? `${h12}${ampm}` : `${h12}:${m}${ampm}`;
   }
+  return t; // fallback for old free-text values
+}
+
+export default function WhatsOnEventRow({ listing, overrideDate }) {
+  // overrideDate: a Date object used when expanding multi-day events
+  let dateObj = overrideDate || null;
+
+  if (!dateObj) {
+    if (listing.is_recurring && listing.recurring_day) {
+      dateObj = nextOccurrence(listing.recurring_day);
+    } else if (listing.event_date) {
+      dateObj = new Date(listing.event_date + "T12:00:00");
+    }
+  }
+
+  const isMultiDay = !listing.is_recurring && listing.event_date && listing.event_date_end && listing.event_date_end > listing.event_date;
 
   const month = dateObj ? dateObj.toLocaleDateString("en-IE", { month: "short" }).toUpperCase() : null;
   const day = dateObj ? dateObj.getDate() : null;
   const weekday = dateObj ? dateObj.toLocaleDateString("en-IE", { weekday: "short" }) : null;
 
   const location = listing.address || (listing.town ? `${listing.town}, Co. ${listing.county}` : null);
+  const displayTime = formatTime(listing.event_time);
 
   return (
     <Link
@@ -59,11 +79,16 @@ export default function WhatsOnEventRow({ listing }) {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
             {listing.is_recurring && (
               <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-blue-700 border-blue-200 bg-blue-50 whitespace-nowrap">
                 <RefreshCw className="w-3 h-3" />
                 Every {listing.recurring_day}
+              </span>
+            )}
+            {isMultiDay && (
+              <span className="text-xs border rounded-md px-2 py-0.5 text-purple-700 border-purple-200 bg-purple-50 whitespace-nowrap">
+                Multi-day event
               </span>
             )}
             {listing.is_featured && (
@@ -76,10 +101,10 @@ export default function WhatsOnEventRow({ listing }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
-          {listing.event_time && (
+          {displayTime && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {listing.event_time}
+              {displayTime}
             </span>
           )}
           {location && (

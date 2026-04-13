@@ -31,6 +31,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     area: listing?.area || "",
     meeting_info: listing?.meeting_info || "",
     event_date: listing?.event_date || "",
+    event_date_end: listing?.event_date_end || "",
     event_time: listing?.event_time || "",
     is_recurring: listing?.is_recurring || false,
     recurring_day: listing?.recurring_day || "",
@@ -279,19 +280,30 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
                   </div>
                   <div>
                     <Label>Time</Label>
-                    <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 9:00pm" />
+                    <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label>Event Date</Label>
-                    <Input type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label>Start Date</Label>
+                      <Input type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>End Date <span className="text-xs text-muted-foreground">(multi-day)</span></Label>
+                      <Input type="date" value={form.event_date_end} onChange={(e) => update("event_date_end", e.target.value)} min={form.event_date} />
+                    </div>
+                    <div>
+                      <Label>Time</Label>
+                      <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Time</Label>
-                    <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 9:00pm" />
-                  </div>
+                  {form.event_date && form.event_date_end && form.event_date_end > form.event_date && (
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+                      📅 This event will appear on What's On for every day from {new Date(form.event_date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})} to {new Date(form.event_date_end + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}.
+                    </p>
+                  )}
                 </div>
               )}
 

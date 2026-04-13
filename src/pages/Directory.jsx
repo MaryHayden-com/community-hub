@@ -43,7 +43,7 @@ export default function Directory() {
 
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
-    return listings.filter((l) => {
+    const base = listings.filter((l) => {
       if (type && l.type !== type) return false;
       if (county && l.county !== county) return false;
       if (town && l.town !== town) return false;
@@ -57,14 +57,28 @@ export default function Directory() {
         );
       }
       return true;
-    }).sort((a, b) => {
-      if (isWhatsOn) {
-        const da = a.event_date || "9999";
-        const db = b.event_date || "9999";
-        return da.localeCompare(db);
-      }
-      return (a.name || "").localeCompare(b.name || "");
     });
+
+    if (!isWhatsOn) {
+      return base.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    }
+
+    // Expand multi-day events into individual day entries
+    const expanded = [];
+    base.forEach((l) => {
+      if (!l.is_recurring && l.event_date && l.event_date_end && l.event_date_end > l.event_date) {
+        const start = new Date(l.event_date + "T12:00:00");
+        const end = new Date(l.event_date_end + "T12:00:00");
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          expanded.push({ listing: l, date: new Date(d), sortKey: d.toISOString().slice(0, 10) });
+        }
+      } else {
+        expanded.push({ listing: l, date: null, sortKey: l.event_date || "9999" });
+      }
+    });
+
+    expanded.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    return expanded;
   }, [listings, search, type, county, town]);
 
   if (loading) {
@@ -102,8 +116,12 @@ export default function Directory() {
         </div>
       ) : type === "What's On" ? (
         <div className="flex flex-col gap-3 mt-6">
-          {filtered.map((l) => (
-            <WhatsOnEventRow key={l.id} listing={l} />
+          {filtered.map((entry, i) => (
+            <WhatsOnEventRow
+              key={entry.listing.id + (entry.sortKey || i)}
+              listing={entry.listing}
+              overrideDate={entry.date}
+            />
           ))}
         </div>
       ) : viewMode === "grid" ? (
