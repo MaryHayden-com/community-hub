@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Loader2 } from "lucide-react";
+import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
@@ -168,6 +168,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     image_url: listing?.image_url || "",
   });
   const [saving, setSaving] = useState(false);
+  const [fetchingImage, setFetchingImage] = useState(false);
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
   const categorySuggestions = useMemo(() => {
@@ -239,6 +240,28 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFetchImage = async () => {
+    const urls = [form.website, form.facebook_url, form.instagram_url].filter(Boolean);
+    if (!urls.length) {
+      toast({ title: "No links", description: "Add a website or social link first.", variant: "destructive" });
+      return;
+    }
+    setFetchingImage(true);
+    try {
+      const res = await base44.functions.invoke('fetchOgImage', { urls });
+      if (res.data?.image_url) {
+        update("image_url", res.data.image_url);
+        toast({ title: "Image found!", description: "Image URL has been populated." });
+      } else {
+        toast({ title: "No image found", description: "Couldn't find an image from the provided links.", variant: "destructive" });
+      }
+    } catch (err) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setFetchingImage(false);
     }
   };
 
@@ -455,6 +478,10 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
                   <img src={form.image_url} alt="Preview" className="w-12 h-12 rounded-lg object-cover border shrink-0" />
                 )}
               </div>
+              <Button type="button" variant="outline" size="sm" onClick={handleFetchImage} disabled={fetchingImage} className="gap-1.5 w-full">
+                {fetchingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
+                Auto-fetch image from website / social links
+              </Button>
             </div>
           </div>
 
