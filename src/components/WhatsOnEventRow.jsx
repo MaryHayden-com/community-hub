@@ -26,6 +26,29 @@ function nextOccurrence(dayName) {
   return next;
 }
 
+function next2ndOr4thWeekday(dayName) {
+  const target = DAY_MAP[dayName];
+  if (target === undefined) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  // Find all 2nd and 4th occurrences in current and next month
+  const candidates = [];
+  for (let monthOffset = 0; monthOffset <= 1; monthOffset++) {
+    const year = today.getFullYear();
+    const month = today.getMonth() + monthOffset;
+    const d = new Date(year, month, 1);
+    const occurrences = [];
+    while (d.getMonth() === month % 12 || (month >= 12 && d.getMonth() === month - 12)) {
+      if (d.getDay() === target) occurrences.push(new Date(d));
+      d.setDate(d.getDate() + 1);
+      if (d.getMonth() !== (new Date(year, month, 1)).getMonth()) break;
+    }
+    if (occurrences[1]) candidates.push(occurrences[1]); // 2nd
+    if (occurrences[3]) candidates.push(occurrences[3]); // 4th
+  }
+  return candidates.find(c => c >= today) || null;
+}
+
 function formatTime(t) {
   if (!t) return null;
   // Handle HH:MM 24h format
@@ -124,6 +147,8 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
       const d = listing.recurring_day || "";
       if ((t === "weekly" || t === "fortnightly") && DAY_MAP[d] !== undefined) {
         dateObj = nextOccurrence(d);
+      } else if (t === "2nd_4th_weekday" && DAY_MAP[d] !== undefined) {
+        dateObj = next2ndOr4thWeekday(d);
       }
       // For other types, leave dateObj null — no single "next" date we can pin down simply
     } else if (listing.event_date) {

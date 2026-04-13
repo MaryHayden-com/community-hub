@@ -58,6 +58,26 @@ export default function Directory() {
       next.setDate(today.getDate() + (diff === 0 ? 0 : diff));
       return next.toISOString().slice(0, 10);
     }
+    if (t === "2nd_4th_weekday") {
+      const target = DAY_MAP[d];
+      if (target === undefined) return todayStr;
+      const candidates = [];
+      for (let monthOffset = 0; monthOffset <= 1; monthOffset++) {
+        const year = today.getFullYear();
+        const month = today.getMonth() + monthOffset;
+        const base = new Date(year, month, 1);
+        const occurrences = [];
+        const cur = new Date(base);
+        while (cur.getMonth() === base.getMonth()) {
+          if (cur.getDay() === target) occurrences.push(new Date(cur));
+          cur.setDate(cur.getDate() + 1);
+        }
+        if (occurrences[1]) candidates.push(occurrences[1]);
+        if (occurrences[3]) candidates.push(occurrences[3]);
+      }
+      const next = candidates.find(c => c >= today);
+      return next ? next.toISOString().slice(0, 10) : todayStr;
+    }
     return todayStr;
   }
 
