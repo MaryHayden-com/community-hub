@@ -1,5 +1,19 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// Returns next N occurrences of a given weekday (0=Sun...6=Sat) starting from today
+function nextWeeklyDates(weekday, count = 4) {
+  const dates = [];
+  const today = new Date();
+  for (let i = 0; i < 28 && dates.length < count; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    if (d.getDay() === weekday) dates.push(d.toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+const DAY_NAMES = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
   const user = await base44.auth.me();
@@ -7,31 +21,28 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'Admin access required' }, { status: 403 });
   }
 
-  // Get existing listings to know which counties/towns to search
   const existing = await base44.asServiceRole.entities.CommunityListing.list('-created_date', 2000);
   const counties = [...new Set(existing.map(l => l.county).filter(Boolean))];
   const towns = [...new Set(existing.map(l => l.town).filter(Boolean))];
-
-  // Also get existing clubs/businesses to search their websites
   const businesses = existing.filter(l => l.type === 'Business' || l.type === 'Club & Group').slice(0, 30);
   const businessNames = businesses.map(b => b.name).join(', ');
-
   const locationList = towns.slice(0, 20).join(', ') + (counties.length ? ` (Counties: ${counties.slice(0, 10).join(', ')})` : '');
+  const today = new Date().toISOString().slice(0, 10);
 
   const prompt = `Search the web and find upcoming events, festivals, markets, concerts, sports events, community gatherings and other "What's On" listings for the following locations in Ireland: ${locationList}.
 
 Also search for events from these local businesses and clubs: ${businessNames}.
 
-Search Facebook events, local council websites, community websites, club websites, and any relevant local Irish event listings.
+Today's date is ${today}.
 
-Return a list of events with as much detail as possible.
+For each event return:
+- name, description, town, county, category, address, website, facebook_url, contact_name, phone, email
+- event_date: the specific date in YYYY-MM-DD format (required if it's a one-off or the next occurrence)
+- event_time: the time e.g. "7:30pm"
+- is_recurring: true if the event repeats weekly
+- recurrence_day: the English weekday name (e.g. "tuesday") if is_recurring is true
 
-Important rules:
-- Only include real, specific upcoming events (not generic descriptions)
-- Include the exact town and county in Ireland
-- Include dates where available
-- Include website or Facebook URLs where found
-- Do NOT duplicate events that are clearly the same
+Only include real, specific upcoming events. Include dates wherever possible.
 
 Return as a JSON array of event objects.`;
 
@@ -55,10 +66,13 @@ Return as a JSON array of event objects.`;
               address: { type: 'string' },
               website: { type: 'string' },
               facebook_url: { type: 'string' },
-              meeting_info: { type: 'string' },
               contact_name: { type: 'string' },
               phone: { type: 'string' },
               email: { type: 'string' },
+              event_date: { type: 'string' },
+              event_time: { type: 'string' },
+              is_recurring: { type: 'boolean' },
+              recurrence_day: { type: 'string' },
             }
           }
         }
@@ -67,30 +81,43 @@ Return as a JSON array of event objects.`;
   });
 
   const events = result?.events || [];
+  const toCreate = [];
 
-  // Get existing What's On names to avoid duplicates
-  const existingWhatsOn = existing.filter(l => l.type === "What's On").map(l => l.name.toLowerCase());
+  for (const e of events) {
+    if (!e.name || !e.town || !e.county) continue;
 
-  const toCreate = events.filter(e =>
-    e.name && e.town && e.county &&
-    !existingWhatsOn.includes(e.name.toLowerCase())
-  ).map(e => ({
-    name: e.name,
-    type: "What's On",
-    category: e.category || 'Community Event',
-    county: e.county,
-    town: e.town,
-    country: 'Ireland',
-    description: e.description || '',
-    address: e.address || '',
-    website: e.website || '',
-    facebook_url: e.facebook_url || '',
-    meeting_info: e.meeting_info || '',
-    contact_name: e.contact_name || '',
-    phone: e.phone || '',
-    email: e.email || '',
-    is_featured: false,
-  }));
+    const base = {
+      name: e.name,
+      type: "What's On",
+      category: e.category || 'Community Event',
+      county: e.county,
+      town: e.town,
+      country: 'Ireland',
+      description: e.description || '',
+      address: e.address || '',
+      website: e.website || '',
+      facebook_url: e.facebook_url || '',
+      contact_name: e.contact_name || '',
+      phone: e.phone || '',
+      email: e.email || '',
+      event_time: e.event_time || '',
+      is_featured: false,
+    };
+
+    if (e.is_recurring && e.recurrence_day) {
+      const dayIndex = DAY_NAMES.indexOf(e.recurrence_day.toLowerCase());
+      if (dayIndex !== -1) {
+        const dates = nextWeeklyDates(dayIndex, 4);
+        for (const date of dates) {
+          toCreate.push({ ...base, name: `${e.name} — ${date}`, event_date: date });
+        }
+        continue;
+      }
+    }
+
+    // One-off event
+    toCreate.push({ ...base, event_date: e.event_date || '' });
+  }
 
   if (toCreate.length > 0) {
     await base44.asServiceRole.entities.CommunityListing.bulkCreate(toCreate);

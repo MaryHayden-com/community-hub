@@ -59,10 +59,18 @@ export default function ListingCard({ listing }) {
           )}
         </div>
 
-        <Badge variant="outline" className={`text-xs ${config.color}`}>
-          <Icon className="w-3 h-3 mr-1" />
-          {listing.type}
-        </Badge>
+        <div className="flex items-center justify-between gap-2">
+          <Badge variant="outline" className={`text-xs ${config.color}`}>
+            <Icon className="w-3 h-3 mr-1" />
+            {listing.type}
+          </Badge>
+          {listing.type === "What's On" && listing.event_date && (
+            <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
+              {new Date(listing.event_date + 'T12:00:00').toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' })}
+              {listing.event_time ? ` · ${listing.event_time}` : ''}
+            </span>
+          )}
+        </div>
 
         {listing.category && (
           <p className="text-xs text-muted-foreground">{listing.category}</p>

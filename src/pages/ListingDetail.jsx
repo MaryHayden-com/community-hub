@@ -131,6 +131,18 @@ export default function ListingDetail() {
           )}
 
           <div className="mt-8 space-y-1 divide-y">
+            {listing.type === "What's On" && listing.event_date && (
+              <div className="flex items-center gap-3 py-2.5 px-2 -mx-2 bg-amber-50 rounded-lg mb-2">
+                <Calendar className="w-4 h-4 text-amber-600 shrink-0" />
+                <div>
+                  <p className="text-xs text-amber-600">Event Date</p>
+                  <p className="text-sm font-semibold text-amber-800">
+                    {new Date(listing.event_date + 'T12:00:00').toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    {listing.event_time ? ` at ${listing.event_time}` : ''}
+                  </p>
+                </div>
+              </div>
+            )}
             <DetailRow icon={MapPin} label="Address" value={listing.address || `${listing.town}, Co. ${listing.county}`} />
             <DetailRow icon={Phone} label="Phone" value={listing.phone} href={listing.phone ? `tel:${listing.phone}` : undefined} />
             <DetailRow icon={Mail} label="Email" value={listing.email} href={listing.email ? `mailto:${listing.email}` : undefined} />

@@ -83,6 +83,14 @@
       "type": "string",
       "title": "Meeting Info"
     },
+    "event_date": {
+      "type": "string",
+      "title": "Event Date (YYYY-MM-DD)"
+    },
+    "event_time": {
+      "type": "string",
+      "title": "Event Time (e.g. 7:30pm)"
+    },
     "is_featured": {
       "type": "boolean",
       "title": "Is Featured",
