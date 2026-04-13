@@ -109,7 +109,8 @@
         "fortnightly",
         "monthly_date",
         "twice_monthly",
-        "monthly_weekday"
+        "monthly_weekday",
+        "2nd_4th_weekday"
       ],
       "enumNames": [
         "Daily",
@@ -117,7 +118,8 @@
         "Fortnightly",
         "Monthly on a date",
         "Twice a month",
-        "Monthly by weekday (e.g. 1st Monday)"
+        "Monthly by weekday (e.g. 1st Monday)",
+        "2nd & 4th weekday of month (e.g. Toastmasters)"
       ]
     },
     "recurring_day": {

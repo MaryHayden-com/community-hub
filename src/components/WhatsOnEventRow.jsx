@@ -12,6 +12,7 @@ function recurringLabel(listing) {
   if (t === "monthly_date") return `Monthly on the ${d}${["11","12","13"].includes(d) ? "th" : d.endsWith("1") ? "st" : d.endsWith("2") ? "nd" : d.endsWith("3") ? "rd" : "th"}`;
   if (t === "twice_monthly") return `Twice monthly (${d})`;
   if (t === "monthly_weekday") return `${d} of each month`;
+  if (t === "2nd_4th_weekday") return `2nd & 4th ${d}`;
   return d || "Recurring";
 }
 

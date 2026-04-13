@@ -28,6 +28,7 @@ function RecurringFields({ form, update }) {
             <SelectItem value="monthly_date">Monthly — on a specific date</SelectItem>
             <SelectItem value="twice_monthly">Twice a month</SelectItem>
             <SelectItem value="monthly_weekday">Monthly — by weekday (e.g. 1st Monday)</SelectItem>
+            <SelectItem value="2nd_4th_weekday">2nd & 4th weekday of month (e.g. Toastmasters)</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -107,6 +108,22 @@ function RecurringFields({ form, update }) {
               onValueChange={(v) => update("recurring_day", `${form.recurring_day?.split(" ")[0] || ""} ${v}`.trim())}
             >
               <SelectTrigger><SelectValue placeholder="e.g. Monday" /></SelectTrigger>
+              <SelectContent>{DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Time</Label>
+            <Input type="time" value={form.event_time} onChange={(e) => update("event_time", e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {t === "2nd_4th_weekday" && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label>Day of Week</Label>
+            <Select value={form.recurring_day} onValueChange={(v) => update("recurring_day", v)}>
+              <SelectTrigger><SelectValue placeholder="e.g. Thursday" /></SelectTrigger>
               <SelectContent>{DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
             </Select>
           </div>
