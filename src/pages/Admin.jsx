@@ -526,20 +526,25 @@ export default function Admin() {
                         <input type="checkbox" checked={selectedIds.includes(l.id)} onChange={() => toggleSelect(l)} className="cursor-pointer" />
                       </td>
                     )}
-                    {ALL_COLUMNS.filter(({ key }) => visibleColumns[key]).map(({ key }) => (
-                       <td key={key} className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
-                         {key === "image" ? (
-                           l.image_url ? (
-                             <img src={l.image_url} alt={l.name} className="h-8 w-8 rounded object-cover" />
-                           ) : (
-                             <span className="text-xs text-muted-foreground">—</span>
-                           )
-                         ) : key === "name" ? <span className="font-medium text-foreground">{l.name}</span>
-                          : key === "is_featured" ? (l.is_featured ? "★" : "")
-                          : key === "website" ? (l.website ? <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{l.website}</a> : "")
-                          : (l[key] || "")}
-                       </td>
-                     ))
+                    {ALL_COLUMNS.filter(({ key }) => visibleColumns[key]).map(({ key }) => {
+                       let content;
+                       if (key === "image") {
+                         content = l.image_url ? <img src={l.image_url} alt={l.name} className="h-8 w-8 rounded object-cover" /> : <span className="text-xs text-muted-foreground">—</span>;
+                       } else if (key === "name") {
+                         content = <span className="font-medium text-foreground">{l.name}</span>;
+                       } else if (key === "is_featured") {
+                         content = l.is_featured ? "★" : "";
+                       } else if (key === "website") {
+                         content = l.website ? <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{l.website}</a> : "";
+                       } else {
+                         content = l[key] || "";
+                       }
+                       return (
+                         <td key={key} className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
+                           {content}
+                         </td>
+                       );
+                     })
                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button
