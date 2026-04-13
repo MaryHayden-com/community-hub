@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { X, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function AdminListingForm({ listing, onClose, onSave }) {
@@ -30,6 +30,9 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     contact_name: listing?.contact_name || "",
     area: listing?.area || "",
     meeting_info: listing?.meeting_info || "",
+    event_date: listing?.event_date || "",
+    event_time: listing?.event_time || "",
+    is_free: listing?.is_free ?? null,
     is_featured: listing?.is_featured || false,
     image_url: listing?.image_url || "",
   });
@@ -49,25 +52,19 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
         "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby",
       ],
       "Club & Group": [
-        // Sports
         "GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics",
         "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian",
         "Rowing", "Sailing",
-        // Youth & Community
         "Scouts", "Girl Guides", "Youth Club",
         "Tidy Towns", "Community Group", "Residents Association",
-        // Arts & Culture
         "Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club",
         "Walking Group", "Gardening Club", "Toastmasters", "ICA",
-        // Social
         "Men's Shed", "Women's Group", "Senior Citizens", "Charity",
-        // Churches & Faith
         "Catholic Church", "Church of Ireland", "Methodist Church",
         "Presbyterian Church", "Baptist Church", "Evangelical Church",
         "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue",
         "Hindu Temple", "Buddhist Centre", "Quaker Meeting House",
         "Faith Community",
-        // Libraries
         "Public Library", "County Library", "Mobile Library",
         "Community Library", "University Library", "School Library",
       ],
@@ -254,6 +251,36 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
               <Input value={form.meeting_info} onChange={(e) => update("meeting_info", e.target.value)} placeholder="e.g. Every Tuesday at 7pm" />
             </div>
           </div>
+
+          {/* What's On Event Details */}
+          {form.type === "What's On" && (
+            <div className="border rounded-lg p-4 space-y-3 bg-amber-50/50 border-amber-200">
+              <p className="text-sm font-semibold text-amber-800">Event Details</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Event Date</Label>
+                  <Input type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                </div>
+                <div>
+                  <Label>Event Time (e.g. 7:30pm)</Label>
+                  <Input value={form.event_time} onChange={(e) => update("event_time", e.target.value)} placeholder="e.g. 9:00pm" />
+                </div>
+              </div>
+              <div>
+                <Label>Entry</Label>
+                <Select
+                  value={form.is_free === true ? "free" : form.is_free === false ? "paid" : ""}
+                  onValueChange={(v) => update("is_free", v === "free" ? true : v === "paid" ? false : null)}
+                >
+                  <SelectTrigger><SelectValue placeholder="Free or Paid?" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="free">Free</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
 
           <div>
             <Label>Image</Label>
