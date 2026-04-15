@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
   MapPin, Phone, Mail, Globe, Facebook, Instagram, Linkedin,
-  ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User, ShieldCheck, Flag
+  ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User, ShieldCheck, Flag,
+  Megaphone, HandHeart, Briefcase, Bell
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,10 +56,30 @@ export default function ListingDetail() {
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
   const [showRemoval, setShowRemoval] = useState(false);
+  const [notices, setNotices] = useState([]);
+
+  const trackEvent = useCallback((listingId, ownerEmail, eventType) => {
+    base44.entities.ListingEngagement.create({
+      listing_id: listingId,
+      event_type: eventType,
+      listing_owner_email: ownerEmail || "",
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     base44.entities.CommunityListing.filter({ id })
-      .then((results) => setListing(results[0] || null))
+      .then((results) => {
+        const l = results[0] || null;
+        setListing(l);
+        if (l) {
+          trackEvent(l.id, l.owner_email, "view");
+          if (l.plan === "premium") {
+            base44.entities.ListingNotice.filter({ listing_id: l.id })
+              .then((all) => setNotices(all.filter((n) => n.is_active && (!n.expires_on || n.expires_on >= new Date().toISOString().slice(0, 10)))))
+              .catch(() => {});
+          }
+        }
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -148,9 +169,30 @@ export default function ListingDetail() {
               </div>
             )}
             {isVisible("address") && <DetailRow icon={MapPin} label="Address" value={listing.address || `${listing.town}, Co. ${listing.county}`} />}
-            {isVisible("phone") && <DetailRow icon={Phone} label="Phone" value={listing.phone} href={listing.phone ? `tel:${listing.phone}` : undefined} />}
-            {isVisible("email") && <DetailRow icon={Mail} label="Email" value={listing.email} href={listing.email ? `mailto:${listing.email}` : undefined} />}
-            {isVisible("website") && <DetailRow icon={Globe} label="Website" value={listing.website} href={listing.website} />}
+            {isVisible("phone") && listing.phone && (
+              <a href={`tel:${listing.phone}`} onClick={() => trackEvent(listing.id, listing.owner_email, "phone_click")} className="block hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors">
+                <div className="flex items-start gap-3 py-2.5">
+                  <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <div><p className="text-xs text-muted-foreground">Phone</p><p className="text-sm font-medium">{listing.phone}</p></div>
+                </div>
+              </a>
+            )}
+            {isVisible("email") && listing.email && (
+              <a href={`mailto:${listing.email}`} onClick={() => trackEvent(listing.id, listing.owner_email, "email_click")} className="block hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors">
+                <div className="flex items-start gap-3 py-2.5">
+                  <Mail className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <div><p className="text-xs text-muted-foreground">Email</p><p className="text-sm font-medium">{listing.email}</p></div>
+                </div>
+              </a>
+            )}
+            {isVisible("website") && listing.website && (
+              <a href={listing.website} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent(listing.id, listing.owner_email, "website_click")} className="block hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors">
+                <div className="flex items-start gap-3 py-2.5">
+                  <Globe className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <div><p className="text-xs text-muted-foreground">Website</p><p className="text-sm font-medium">{listing.website}</p></div>
+                </div>
+              </a>
+            )}
             {isVisible("contact_name") && <DetailRow icon={User} label="Contact" value={listing.contact_name} />}
             {isVisible("meeting_info") && <DetailRow icon={Clock} label="Meeting Info" value={listing.meeting_info} />}
           </div>
@@ -193,6 +235,42 @@ export default function ListingDetail() {
                     </span>
                   </a>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Notice Board */}
+          {notices.length > 0 && (
+            <div className="mt-6 pt-6 border-t">
+              <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
+                <Megaphone className="w-3.5 h-3.5" /> Notice Board
+              </p>
+              <div className="space-y-3">
+                {notices.map((notice) => {
+                  const noticeIcons = { volunteers_wanted: HandHeart, job: Briefcase, announcement: Megaphone, event: Calendar, other: Bell };
+                  const NoticeIcon = noticeIcons[notice.notice_type] || Bell;
+                  const noticeColors = {
+                    volunteers_wanted: "bg-emerald-50 border-emerald-200 text-emerald-900",
+                    job: "bg-blue-50 border-blue-200 text-blue-900",
+                    announcement: "bg-amber-50 border-amber-200 text-amber-900",
+                    event: "bg-violet-50 border-violet-200 text-violet-900",
+                    other: "bg-gray-50 border-gray-200 text-gray-900",
+                  };
+                  const noticeTypeLabels = { volunteers_wanted: "Volunteers Wanted", job: "Job / Employment", announcement: "Announcement", event: "Event", other: "Other" };
+                  return (
+                    <div key={notice.id} className={`rounded-xl border p-4 ${noticeColors[notice.notice_type] || noticeColors.other}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <NoticeIcon className="w-4 h-4 shrink-0" />
+                        <span className="text-xs font-semibold uppercase tracking-wide opacity-70">{noticeTypeLabels[notice.notice_type]}</span>
+                      </div>
+                      <p className="font-semibold text-sm">{notice.title}</p>
+                      <p className="text-sm mt-1 opacity-80 leading-relaxed">{notice.body}</p>
+                      {notice.expires_on && (
+                        <p className="text-xs mt-2 opacity-60">Closes {new Date(notice.expires_on + "T12:00:00").toLocaleDateString("en-IE", { day: "numeric", month: "long" })}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

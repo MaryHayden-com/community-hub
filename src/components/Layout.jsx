@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Home, MapPin, Building2, Users, GraduationCap, Calendar, Shield, Menu, X, ChevronRight, CreditCard } from "lucide-react";
+import { Home, MapPin, Building2, Users, GraduationCap, Calendar, Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -27,6 +27,15 @@ export default function Layout() {
   }, [location.pathname, location.search]);
 
   const isAdmin = user?.role === "admin";
+  const [hasClaimedListing, setHasClaimedListing] = useState(false);
+
+  useEffect(() => {
+    if (user?.email) {
+      base44.entities.CommunityListing.filter({ owner_email: user.email })
+        .then((results) => setHasClaimedListing(results.length > 0))
+        .catch(() => {});
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -60,6 +69,17 @@ export default function Layout() {
                 </Link>
               );
             })}
+            {user && hasClaimedListing && (
+              <Link
+                to="/dashboard"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  location.pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                My Dashboard
+              </Link>
+            )}
             {user && (
               <Link
                 to="/billing"
@@ -114,6 +134,16 @@ export default function Layout() {
                 </Link>
               );
             })}
+            {user && hasClaimedListing && (
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4 text-muted-foreground" />
+                My Dashboard
+                <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
+              </Link>
+            )}
             {user && (
               <Link
                 to="/billing"

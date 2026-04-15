@@ -1,0 +1,31 @@
+{
+  "name": "ListingEngagement",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "event_type": {
+      "type": "string",
+      "title": "Event Type",
+      "enum": [
+        "view",
+        "phone_click",
+        "website_click",
+        "email_click",
+        "facebook_click",
+        "instagram_click",
+        "linkedin_click"
+      ]
+    },
+    "listing_owner_email": {
+      "type": "string",
+      "title": "Listing Owner Email"
+    }
+  },
+  "required": [
+    "listing_id",
+    "event_type"
+  ]
+}

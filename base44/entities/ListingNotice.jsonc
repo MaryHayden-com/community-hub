@@ -1,0 +1,55 @@
+{
+  "name": "ListingNotice",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "listing_owner_email": {
+      "type": "string",
+      "title": "Listing Owner Email"
+    },
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "body": {
+      "type": "string",
+      "title": "Body"
+    },
+    "notice_type": {
+      "type": "string",
+      "title": "Notice Type",
+      "enum": [
+        "volunteers_wanted",
+        "job",
+        "announcement",
+        "event",
+        "other"
+      ],
+      "enumNames": [
+        "Volunteers Wanted",
+        "Job / Employment",
+        "Announcement",
+        "Event",
+        "Other"
+      ]
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Active",
+      "default": true
+    },
+    "expires_on": {
+      "type": "string",
+      "title": "Expires On (YYYY-MM-DD)"
+    }
+  },
+  "required": [
+    "listing_id",
+    "title",
+    "body",
+    "notice_type"
+  ]
+}
