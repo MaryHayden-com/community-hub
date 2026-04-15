@@ -83,6 +83,8 @@ export default function ListingDetail() {
 
   const config = typeConfig[listing.type] || typeConfig["Business"];
   const TypeIcon = config.icon;
+  const hidden = listing.hidden_fields || [];
+  const isVisible = (field) => !hidden.includes(field);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -128,7 +130,7 @@ export default function ListingDetail() {
             </div>
           </div>
 
-          {listing.description && (
+          {isVisible("description") && listing.description && (
             <p className="mt-6 text-muted-foreground leading-relaxed">{listing.description}</p>
           )}
 
@@ -145,20 +147,20 @@ export default function ListingDetail() {
                 </div>
               </div>
             )}
-            <DetailRow icon={MapPin} label="Address" value={listing.address || `${listing.town}, Co. ${listing.county}`} />
-            <DetailRow icon={Phone} label="Phone" value={listing.phone} href={listing.phone ? `tel:${listing.phone}` : undefined} />
-            <DetailRow icon={Mail} label="Email" value={listing.email} href={listing.email ? `mailto:${listing.email}` : undefined} />
-            <DetailRow icon={Globe} label="Website" value={listing.website} href={listing.website} />
-            <DetailRow icon={User} label="Contact" value={listing.contact_name} />
-            <DetailRow icon={Clock} label="Meeting Info" value={listing.meeting_info} />
+            {isVisible("address") && <DetailRow icon={MapPin} label="Address" value={listing.address || `${listing.town}, Co. ${listing.county}`} />}
+            {isVisible("phone") && <DetailRow icon={Phone} label="Phone" value={listing.phone} href={listing.phone ? `tel:${listing.phone}` : undefined} />}
+            {isVisible("email") && <DetailRow icon={Mail} label="Email" value={listing.email} href={listing.email ? `mailto:${listing.email}` : undefined} />}
+            {isVisible("website") && <DetailRow icon={Globe} label="Website" value={listing.website} href={listing.website} />}
+            {isVisible("contact_name") && <DetailRow icon={User} label="Contact" value={listing.contact_name} />}
+            {isVisible("meeting_info") && <DetailRow icon={Clock} label="Meeting Info" value={listing.meeting_info} />}
           </div>
 
           {/* Social Links */}
-          {(listing.facebook_url || listing.instagram_url || listing.linkedin_url) && (
+          {(isVisible("facebook_url") && listing.facebook_url || isVisible("instagram_url") && listing.instagram_url || isVisible("linkedin_url") && listing.linkedin_url) && (
             <div className="mt-6 pt-6 border-t">
               <p className="text-xs text-muted-foreground mb-3">Social Media</p>
               <div className="flex flex-col gap-2">
-                {listing.facebook_url && (
+                {isVisible("facebook_url") && listing.facebook_url && (
                   <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2.5 text-sm text-foreground hover:text-primary transition-colors group">
                     <span className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
@@ -169,7 +171,7 @@ export default function ListingDetail() {
                     </span>
                   </a>
                 )}
-                {listing.instagram_url && (
+                {isVisible("instagram_url") && listing.instagram_url && (
                   <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2.5 text-sm text-foreground hover:text-primary transition-colors group">
                     <span className="w-8 h-8 rounded-lg bg-pink-50 border border-pink-200 flex items-center justify-center shrink-0">
@@ -180,7 +182,7 @@ export default function ListingDetail() {
                     </span>
                   </a>
                 )}
-                {listing.linkedin_url && (
+                {isVisible("linkedin_url") && listing.linkedin_url && (
                   <a href={listing.linkedin_url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2.5 text-sm text-foreground hover:text-primary transition-colors group">
                     <span className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">

@@ -10,6 +10,22 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
+function FieldRow({ label, field, isHidden, toggleHidden, children }) {
+  const hidden = isHidden(field);
+  return (
+    <div className={`space-y-1 rounded-lg p-2 -mx-2 transition-colors ${hidden ? "opacity-50" : ""}`}>
+      <div className="flex items-center justify-between">
+        <Label className="text-xs">{label}</Label>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">{hidden ? "Hidden" : "Visible"}</span>
+          <Switch checked={!hidden} onCheckedChange={() => toggleHidden(field)} />
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const WEEKS = ["1st","2nd","3rd","4th","Last"];
 
@@ -167,7 +183,19 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     is_free: listing?.is_free ?? null,
     is_featured: listing?.is_featured || false,
     image_url: listing?.image_url || "",
+    hidden_fields: listing?.hidden_fields || [],
   });
+
+  const toggleHidden = (field) => {
+    setForm(prev => {
+      const hidden = prev.hidden_fields || [];
+      return {
+        ...prev,
+        hidden_fields: hidden.includes(field) ? hidden.filter(f => f !== field) : [...hidden, field]
+      };
+    });
+  };
+  const isHidden = (field) => (form.hidden_fields || []).includes(field);
   const [saving, setSaving] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
 
@@ -416,60 +444,52 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
           </div>
 
-          <div>
-            <Label>Description</Label>
-            <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} />
-          </div>
-
-          <div>
-            <Label>Address</Label>
-            <Input value={form.address} onChange={(e) => update("address", e.target.value)} />
-          </div>
-
           {/* Contact Details Section */}
           <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
-            <p className="text-sm font-semibold text-foreground">Contact Details</p>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Contact Name</Label>
-                <Input value={form.contact_name} onChange={(e) => update("contact_name", e.target.value)} placeholder="e.g. John Murphy" />
-              </div>
-              <div>
-                <Label>Phone</Label>
-                <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="e.g. 021 123 4567" />
-              </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-foreground">Contact Details</p>
+              <p className="text-xs text-muted-foreground">Toggle = show publicly</p>
             </div>
 
-            <div>
-              <Label>Email Address</Label>
+            <FieldRow label="Contact Name" field="contact_name" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Input value={form.contact_name} onChange={(e) => update("contact_name", e.target.value)} placeholder="e.g. John Murphy" />
+            </FieldRow>
+
+            <FieldRow label="Phone" field="phone" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="e.g. 021 123 4567" />
+            </FieldRow>
+
+            <FieldRow label="Email Address" field="email" isHidden={isHidden} toggleHidden={toggleHidden}>
               <Input value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="e.g. info@example.ie" />
-            </div>
+            </FieldRow>
 
-            <div>
-              <Label>Website</Label>
+            <FieldRow label="Website" field="website" isHidden={isHidden} toggleHidden={toggleHidden}>
               <Input value={form.website} onChange={(e) => update("website", e.target.value)} placeholder="https://" />
-            </div>
+            </FieldRow>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label>Facebook URL</Label>
-                <Input value={form.facebook_url} onChange={(e) => update("facebook_url", e.target.value)} placeholder="https://facebook.com/..." />
-              </div>
-              <div>
-                <Label>Instagram URL</Label>
-                <Input value={form.instagram_url} onChange={(e) => update("instagram_url", e.target.value)} placeholder="https://instagram.com/..." />
-              </div>
-              <div>
-                <Label>LinkedIn URL</Label>
-                <Input value={form.linkedin_url} onChange={(e) => update("linkedin_url", e.target.value)} placeholder="https://linkedin.com/..." />
-              </div>
-            </div>
+            <FieldRow label="Facebook URL" field="facebook_url" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Input value={form.facebook_url} onChange={(e) => update("facebook_url", e.target.value)} placeholder="https://facebook.com/..." />
+            </FieldRow>
 
-            <div>
-              <Label>Meeting Info</Label>
+            <FieldRow label="Instagram URL" field="instagram_url" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Input value={form.instagram_url} onChange={(e) => update("instagram_url", e.target.value)} placeholder="https://instagram.com/..." />
+            </FieldRow>
+
+            <FieldRow label="LinkedIn URL" field="linkedin_url" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Input value={form.linkedin_url} onChange={(e) => update("linkedin_url", e.target.value)} placeholder="https://linkedin.com/..." />
+            </FieldRow>
+
+            <FieldRow label="Meeting Info" field="meeting_info" isHidden={isHidden} toggleHidden={toggleHidden}>
               <Input value={form.meeting_info} onChange={(e) => update("meeting_info", e.target.value)} placeholder="e.g. Every Tuesday at 7pm" />
-            </div>
+            </FieldRow>
+
+            <FieldRow label="Address" field="address" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Input value={form.address} onChange={(e) => update("address", e.target.value)} />
+            </FieldRow>
+
+            <FieldRow label="Description" field="description" isHidden={isHidden} toggleHidden={toggleHidden}>
+              <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} />
+            </FieldRow>
           </div>
 
           {/* What's On Event Details */}

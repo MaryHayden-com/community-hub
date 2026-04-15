@@ -151,6 +151,14 @@
     "image_url": {
       "type": "string",
       "title": "Image URL"
+    },
+    "hidden_fields": {
+      "type": "array",
+      "title": "Hidden Fields",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of field names hidden from public view"
     }
   },
   "required": [
