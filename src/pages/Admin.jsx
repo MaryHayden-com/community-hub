@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox } from "lucide-react";
 import AdminClaimRequests from "../components/AdminClaimRequests";
+import AdminOverview from "../components/AdminOverview";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,8 @@ export default function Admin() {
   const [bulkFetchProgress, setBulkFetchProgress] = useState(null);
   const [fetchResult, setFetchResult] = useState(null);
   const [expandingRecurring, setExpandingRecurring] = useState(false);
-  const [activeTab, setActiveTab] = useState("listings");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [triggerImport, setTriggerImport] = useState(false);
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
   const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
 
@@ -230,7 +232,7 @@ export default function Admin() {
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
-        {(activeTab === "listings" || activeTab === "whatson") && (
+        {(activeTab === "listings" || activeTab === "whatson") && activeTab !== "overview" && (
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center border rounded-lg overflow-hidden">
               <Button
@@ -336,10 +338,18 @@ export default function Admin() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 border-b mb-6">
+      <div className="flex gap-1 border-b mb-6 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === "overview" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Overview
+        </button>
         <button
           onClick={() => setActiveTab("listings")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
             activeTab === "listings" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -368,6 +378,17 @@ export default function Admin() {
           )}
         </button>
       </div>
+
+      {activeTab === "overview" && (
+        <AdminOverview
+          listings={listings}
+          pendingClaimsCount={pendingClaimsCount}
+          onAddListing={() => { setEditing({}); }}
+          onAddEvent={() => { setEditing({ type: "What's On" }); }}
+          onGoToTab={(tab) => setActiveTab(tab)}
+          onImport={() => setTriggerImport(true)}
+        />
+      )}
 
       {activeTab === "claims" && <AdminClaimRequests />}
 
