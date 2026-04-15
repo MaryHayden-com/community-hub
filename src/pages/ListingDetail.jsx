@@ -196,22 +196,17 @@ export default function ListingDetail() {
           )}
 
           {/* Claim / Removal */}
-          <div className="mt-6 pt-6 border-t flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="mt-6 pt-6 border-t flex flex-wrap gap-3">
             {!listing.is_verified && (
-              <div className="flex items-center justify-between w-full sm:w-auto gap-3">
-                <p className="text-xs text-muted-foreground">Is this your listing?</p>
-                <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
-                  <Flag className="w-3.5 h-3.5 mr-1.5" />
-                  Claim this listing
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
+                <Flag className="w-3.5 h-3.5" />
+                Claim this listing
+              </Button>
             )}
-            <button
-              onClick={() => setShowRemoval(true)}
-              className="text-xs text-muted-foreground hover:text-destructive transition-colors underline underline-offset-2 ml-auto"
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowRemoval(true)}>
+              <ShieldCheck className="w-3.5 h-3.5" />
               Request removal (GDPR)
-            </button>
+            </Button>
           </div>
         </div>
       </div>
