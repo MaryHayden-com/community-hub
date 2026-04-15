@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import ClaimListingForm from "../components/ClaimListingForm";
+import RemovalRequestForm from "../components/RemovalRequestForm";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -53,6 +54,7 @@ export default function ListingDetail() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
+  const [showRemoval, setShowRemoval] = useState(false);
 
   useEffect(() => {
     base44.entities.CommunityListing.filter({ id })
@@ -193,21 +195,32 @@ export default function ListingDetail() {
             </div>
           )}
 
-          {/* Claim Listing */}
-          {!listing.is_verified && (
-            <div className="mt-6 pt-6 border-t flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">Is this your listing?</p>
-              <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
-                <Flag className="w-3.5 h-3.5 mr-1.5" />
-                Claim this listing
-              </Button>
-            </div>
-          )}
+          {/* Claim / Removal */}
+          <div className="mt-6 pt-6 border-t flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            {!listing.is_verified && (
+              <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+                <p className="text-xs text-muted-foreground">Is this your listing?</p>
+                <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
+                  <Flag className="w-3.5 h-3.5 mr-1.5" />
+                  Claim this listing
+                </Button>
+              </div>
+            )}
+            <button
+              onClick={() => setShowRemoval(true)}
+              className="text-xs text-muted-foreground hover:text-destructive transition-colors underline underline-offset-2 ml-auto"
+            >
+              Request removal (GDPR)
+            </button>
+          </div>
         </div>
       </div>
 
       {showClaim && (
         <ClaimListingForm listing={listing} onClose={() => setShowClaim(false)} />
+      )}
+      {showRemoval && (
+        <RemovalRequestForm listing={listing} onClose={() => setShowRemoval(false)} />
       )}
     </div>
   );

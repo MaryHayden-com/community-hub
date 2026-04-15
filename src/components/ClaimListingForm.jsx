@@ -12,12 +12,17 @@ export default function ClaimListingForm({ listing, onClose }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", role: "", message: "" });
   const [saving, setSaving] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [consented, setConsented] = useState(false);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleSubmit = async () => {
     if (!form.name || !form.email) {
       toast({ title: "Required", description: "Name and email are required.", variant: "destructive" });
+      return;
+    }
+    if (!consented) {
+      toast({ title: "Consent required", description: "Please confirm you agree to our Privacy Policy.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -84,9 +89,23 @@ export default function ClaimListingForm({ listing, onClose }) {
               />
             </div>
 
+            <div className="flex items-start gap-2 p-3 bg-muted rounded-lg">
+              <input
+                type="checkbox"
+                id="gdpr-consent"
+                checked={consented}
+                onChange={(e) => setConsented(e.target.checked)}
+                className="mt-0.5 cursor-pointer shrink-0"
+              />
+              <label htmlFor="gdpr-consent" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                I confirm I have the right to claim this listing and consent to my contact information being stored and used to process this request, in accordance with the{" "}
+                <a href="/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</a>.
+              </label>
+            </div>
+
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={onClose}>Cancel</Button>
-              <Button onClick={handleSubmit} disabled={saving}>
+              <Button onClick={handleSubmit} disabled={saving || !consented}>
                 {saving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                 Submit Claim
               </Button>

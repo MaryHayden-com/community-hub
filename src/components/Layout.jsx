@@ -126,6 +126,11 @@ export default function Layout() {
       <footer className="border-t bg-card mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-center text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Community Hub. Connecting communities across Ireland.</p>
+          <p className="mt-2">
+            <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
+            {" · "}
+            <a href="mailto:privacy@communityhub.ie" className="hover:text-foreground underline underline-offset-2 transition-colors">privacy@communityhub.ie</a>
+          </p>
         </div>
       </footer>
     </div>

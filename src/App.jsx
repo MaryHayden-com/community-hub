@@ -12,6 +12,7 @@ import CountyPage from './pages/CountyPage';
 import TownPage from './pages/TownPage';
 import ListingDetail from './pages/ListingDetail';
 import Admin from './pages/Admin';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -46,6 +47,7 @@ const AuthenticatedApp = () => {
         <Route path="/town/:county/:town" element={<TownPage />} />
         <Route path="/listing/:id" element={<ListingDetail />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
