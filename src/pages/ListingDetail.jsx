@@ -205,7 +205,7 @@ export default function ListingDetail() {
             )}
             <Button variant="outline" size="sm" onClick={() => setShowRemoval(true)}>
               <ShieldCheck className="w-3.5 h-3.5" />
-              Request removal (GDPR)
+              Request removal
             </Button>
           </div>
         </div>
