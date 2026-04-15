@@ -159,6 +159,43 @@
         "type": "string"
       },
       "description": "List of field names hidden from public view"
+    },
+    "plan": {
+      "type": "string",
+      "title": "Plan",
+      "enum": [
+        "basic",
+        "standard",
+        "premium"
+      ],
+      "enumNames": [
+        "Basic (Free)",
+        "Standard (\u20ac49/yr)",
+        "Premium (\u20ac99/yr)"
+      ],
+      "default": "basic"
+    },
+    "plan_status": {
+      "type": "string",
+      "title": "Plan Status",
+      "enum": [
+        "active",
+        "cancelled",
+        "past_due"
+      ],
+      "default": "active"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "title": "Stripe Subscription ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "title": "Stripe Customer ID"
+    },
+    "plan_renewal_date": {
+      "type": "string",
+      "title": "Plan Renewal Date"
     }
   },
   "required": [

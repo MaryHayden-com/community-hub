@@ -13,6 +13,7 @@ import TownPage from './pages/TownPage';
 import ListingDetail from './pages/ListingDetail';
 import Admin from './pages/Admin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Billing from './pages/Billing';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
         <Route path="/listing/:id" element={<ListingDetail />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/billing" element={<Billing />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

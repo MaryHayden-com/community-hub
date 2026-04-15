@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Home, MapPin, Building2, Users, GraduationCap, Calendar, Shield, Menu, X, ChevronRight } from "lucide-react";
+import { Home, MapPin, Building2, Users, GraduationCap, Calendar, Shield, Menu, X, ChevronRight, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -60,6 +60,17 @@ export default function Layout() {
                 </Link>
               );
             })}
+            {user && (
+              <Link
+                to="/billing"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  location.pathname === "/billing" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                <CreditCard className="w-4 h-4" />
+                Billing
+              </Link>
+            )}
             {isAdmin && (
               <Link
                 to="/admin"
@@ -103,6 +114,16 @@ export default function Layout() {
                 </Link>
               );
             })}
+            {user && (
+              <Link
+                to="/billing"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <CreditCard className="w-4 h-4 text-muted-foreground" />
+                Billing
+                <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
+              </Link>
+            )}
             {isAdmin && (
               <Link
                 to="/admin"
