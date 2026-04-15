@@ -25,6 +25,7 @@ export default function Directory() {
   const todayStr = new Date().toISOString().slice(0, 10);
   const [dateFrom, setDateFrom] = useState(todayStr);
   const [dateTo, setDateTo] = useState("");
+  const [nearbyCounties, setNearbyCounties] = useState(null);
 
   useEffect(() => {
     setType(params.get("type") || "");
@@ -101,7 +102,8 @@ export default function Directory() {
       if (type && l.type !== type) return false;
       if (subcategoryGroup && l.subcategory_group !== subcategoryGroup) return false;
       if (category && l.category !== category) return false;
-      if (county && l.county !== county) return false;
+      if (nearbyCounties && !nearbyCounties.includes(l.county)) return false;
+      if (!nearbyCounties && county && l.county !== county) return false;
       if (town && l.town !== town) return false;
       if (search) {
         const s = search.toLowerCase();
@@ -150,7 +152,7 @@ export default function Directory() {
       if (dateTo && key > dateTo) return false;
       return true;
     });
-  }, [listings, search, type, subcategoryGroup, category, county, town]);
+  }, [listings, search, type, subcategoryGroup, category, county, town, nearbyCounties]);
 
   if (loading) {
     return (
@@ -185,6 +187,7 @@ export default function Directory() {
         dateFrom={dateFrom} setDateFrom={setDateFrom}
         dateTo={dateTo} setDateTo={setDateTo}
         todayStr={todayStr}
+        nearbyCounties={nearbyCounties} setNearbyCounties={setNearbyCounties}
       />
 
       {filtered.length === 0 ? (
