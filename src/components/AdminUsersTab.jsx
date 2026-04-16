@@ -165,6 +165,7 @@ export default function AdminUsersTab() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("user");
   const [inviting, setInviting] = useState(false);
+  const [roleFilter, setRoleFilter] = useState("all");
 
   const load = () => {
     setLoading(true);
@@ -238,8 +239,19 @@ export default function AdminUsersTab() {
         </Button>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">{users.length} registered user{users.length !== 1 ? "s" : ""}</p>
+        <div className="flex flex-wrap gap-1.5">
+          {[["all", "All"], ["admin", "Super Admin"], ["group_admin", "Group Admin"], ["listing_owner", "Listing Owner"], ["user", "View Only"]].map(([val, label]) => (
+            <button
+              key={val}
+              onClick={() => setRoleFilter(val)}
+              className={`text-xs px-3 py-1 rounded-full border font-medium transition-colors ${roleFilter === val ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/40"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <Dialog open={showInvite} onOpenChange={setShowInvite}>
@@ -280,7 +292,7 @@ export default function AdminUsersTab() {
           </div>
         </DialogContent>
       </Dialog>
-      {users.map((u) =>
+      {users.filter(u => roleFilter === "all" || u.role === roleFilter).map((u) =>
         editingId === u.id ? (
           <EditUserRow key={u.id} user={u} onSave={handleSave} onCancel={() => setEditingId(null)} />
         ) : (
