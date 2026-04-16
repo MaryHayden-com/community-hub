@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const results = [];
 
     for (const listing of needsImage) {
-      const urls = [listing.website, listing.facebook_url, listing.instagram_url].filter(Boolean);
+      const urls = [listing.website, listing.facebook_url, listing.instagram_url].filter(Boolean).map(u => u.trim()).filter(u => u.startsWith('http'));
       let foundImage = null;
 
       for (const url of urls) {
@@ -80,12 +80,43 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Fallback: try Clearbit logo API for websites
+      if (!foundImage && listing.website) {
+        try {
+          const domain = new URL(listing.website.trim()).hostname.replace(/^www\./, '');
+          const logoUrl = `https://logo.clearbit.com/${domain}`;
+          const logoRes = await fetch(logoUrl, { signal: AbortSignal.timeout(5000) });
+          if (logoRes.ok && logoRes.headers.get('content-type')?.startsWith('image/')) {
+            foundImage = logoUrl;
+          }
+        } catch (_) {}
+      }
+
       if (foundImage) {
-        await base44.asServiceRole.entities.CommunityListing.update(listing.id, { image_url: foundImage });
+        // Also normalise subcategory_group and category to arrays while we're updating
+        const patch = { image_url: foundImage };
+        if (listing.subcategory_group && !Array.isArray(listing.subcategory_group)) {
+          patch.subcategory_group = [listing.subcategory_group];
+        }
+        if (listing.category && !Array.isArray(listing.category)) {
+          patch.category = [listing.category];
+        }
+        await base44.asServiceRole.entities.CommunityListing.update(listing.id, patch);
         console.log(`✓ ${listing.name}: ${foundImage}`);
         results.push({ id: listing.id, name: listing.name, image_url: foundImage, status: 'updated' });
         updated++;
       } else {
+        // Still normalise string fields even if no image found
+        const migratePatch = {};
+        if (listing.subcategory_group && !Array.isArray(listing.subcategory_group)) {
+          migratePatch.subcategory_group = [listing.subcategory_group];
+        }
+        if (listing.category && !Array.isArray(listing.category)) {
+          migratePatch.category = [listing.category];
+        }
+        if (Object.keys(migratePatch).length) {
+          await base44.asServiceRole.entities.CommunityListing.update(listing.id, migratePatch);
+        }
         console.log(`✗ ${listing.name}: no image found`);
         results.push({ id: listing.id, name: listing.name, status: 'not_found' });
         failed++;
