@@ -30,14 +30,15 @@ export default function AdminClaimRequests() {
     await base44.entities.ClaimRequest.update(claim.id, { status: "approved" });
     // Link the owner email to the listing
     await base44.entities.CommunityListing.update(claim.listing_id, { owner_email: claim.email });
-    // Invite with listing_owner role
-    await base44.users.inviteUser(claim.email, "listing_owner");
-    // If user already exists, upgrade their role
-    const existingUsers = await base44.entities.User.filter({ email: claim.email });
-    if (existingUsers.length > 0) {
-      await base44.entities.User.update(existingUsers[0].id, { role: "listing_owner" });
-    }
-    toast({ title: "Approved & Invited", description: `${claim.email} has been granted Listing Owner access for ${claim.listing_name}.` });
+    // Invite the user (valid role: "user")
+    await base44.users.inviteUser(claim.email, "user");
+    // Send approval notification email to the claimant
+    await base44.integrations.Core.SendEmail({
+      to: claim.email,
+      subject: `Your listing claim has been approved – ${claim.listing_name}`,
+      body: `Hi ${claim.name},\n\nGreat news! Your request to claim the listing "${claim.listing_name}" on our community directory has been approved.\n\nYou can now log in to manage your listing, update your details, and more.\n\nIf you haven't already, you should receive a separate invitation email to set up your account.\n\nThanks for being part of the community!\n\nThe Community Directory Team`,
+    });
+    toast({ title: "Approved & Invited", description: `${claim.email} has been approved and notified.` });
     setActionId(null);
     load();
   };
