@@ -5,41 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { X, Link as LinkIcon, ShieldCheck, ShieldOff, ExternalLink, Send, UserCheck, CheckCircle2, Circle, Pencil, ArrowRightLeft } from "lucide-react";
+import { X, Link as LinkIcon, ShieldCheck, ShieldOff, ExternalLink, Send, UserCheck, CheckCircle2, Circle, ArrowRightLeft, ChevronDown } from "lucide-react";
 import ActionDueBadge from "./ActionDueBadge";
 import { format } from "date-fns";
 
 const ACTION_TYPE_LABELS = {
-  follow_up: "Follow Up",
-  call: "Call",
-  email: "Email",
-  visit: "Visit",
-  review: "Review",
-  note: "Note",
-  ownership_transfer: "Ownership Transfer",
-  claim_approved: "Claim Approved",
-  claim_rejected: "Claim Rejected",
-  verified: "Verified",
-  unverified: "Unverified",
-  plan_upgrade: "Plan Upgrade",
-  other: "Other",
+  follow_up: "Follow Up", call: "Call", email: "Email", visit: "Visit",
+  review: "Review", note: "Note", ownership_transfer: "Ownership Transfer",
+  claim_approved: "Claim Approved", claim_rejected: "Claim Rejected",
+  verified: "Verified", unverified: "Unverified", plan_upgrade: "Plan Upgrade", other: "Other",
 };
 
 const ACTION_ICONS = {
-  follow_up: "🔁",
-  call: "📞",
-  email: "✉️",
-  visit: "📍",
-  review: "🔍",
-  note: "📝",
-  ownership_transfer: "🔀",
-  claim_approved: "✅",
-  claim_rejected: "❌",
-  verified: "🛡️",
-  unverified: "⚠️",
-  plan_upgrade: "⭐",
-  other: "•",
+  follow_up: "🔁", call: "📞", email: "✉️", visit: "📍", review: "🔍",
+  note: "📝", ownership_transfer: "🔀", claim_approved: "✅", claim_rejected: "❌",
+  verified: "🛡️", unverified: "⚠️", plan_upgrade: "⭐", other: "•",
 };
+
+const SYSTEM_TYPES = ["verified", "unverified", "claim_approved", "claim_rejected", "ownership_transfer", "plan_upgrade"];
 
 export default function ListingDetailPanel({ listing, onClose, onListingUpdated, currentUser }) {
   const [actions, setActions] = useState([]);
@@ -51,7 +34,7 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
   const [transferEmail, setTransferEmail] = useState(listing.owner_email || "");
   const [transferMode, setTransferMode] = useState(false);
   const [transferring, setTransferring] = useState(false);
-  const [users, setUsers] = useState([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const loadActions = () => {
     setLoadingActions(true);
@@ -62,11 +45,10 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
 
   useEffect(() => {
     loadActions();
-    base44.entities.User.list().then(setUsers).catch(() => {});
   }, [listing.id]);
 
   const handleAddAction = async () => {
-    if (!newNote.trim() && newActionType === "note") return;
+    if (!newNote.trim()) return;
     setSaving(true);
     await base44.entities.ListingAction.create({
       listing_id: listing.id,
@@ -93,20 +75,31 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
     loadActions();
   };
 
+  const handleVerifyToggle = async () => {
+    const newVal = !listing.is_verified;
+    await base44.entities.CommunityListing.update(listing.id, { is_verified: newVal });
+    await base44.entities.ListingAction.create({
+      listing_id: listing.id, listing_name: listing.name,
+      action_type: newVal ? "verified" : "unverified",
+      note: `Marked as ${newVal ? "verified" : "unverified"}`,
+      is_done: true,
+      created_by_name: currentUser?.full_name || "Admin",
+    });
+    loadActions();
+    onListingUpdated?.();
+  };
+
   const handleTransferOwnership = async () => {
     if (!transferEmail.trim()) return;
     setTransferring(true);
     await base44.entities.CommunityListing.update(listing.id, { owner_email: transferEmail.trim() });
-    // Log the action
     await base44.entities.ListingAction.create({
-      listing_id: listing.id,
-      listing_name: listing.name,
+      listing_id: listing.id, listing_name: listing.name,
       action_type: "ownership_transfer",
       note: `Ownership transferred to ${transferEmail.trim()} by ${currentUser?.full_name || currentUser?.email}`,
       is_done: true,
       created_by_name: currentUser?.full_name || currentUser?.email || "Admin",
     });
-    // Try to upgrade the new owner's role
     try {
       const existing = await base44.entities.User.filter({ email: transferEmail.trim() });
       if (existing.length > 0 && existing[0].role !== "admin") {
@@ -123,143 +116,151 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
   };
 
   const pendingActions = actions.filter((a) => !a.is_done && a.due_date);
-  const completedOrNotes = actions.filter((a) => a.is_done || !a.due_date);
+  const history = actions.filter((a) => a.is_done || !a.due_date);
 
   return (
-    <div className="fixed inset-0 z-50 flex" onClick={onClose}>
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" />
-
-      {/* Panel */}
-      <div
-        className="absolute right-0 top-0 h-full w-full max-w-lg bg-background shadow-2xl flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between p-5 border-b bg-card">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline" className="text-xs">{listing.type}</Badge>
-              {listing.is_verified && <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200"><ShieldCheck className="w-3 h-3 mr-1" />Verified</Badge>}
-              {listing.is_featured && <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">Featured</Badge>}
-            </div>
-            <h2 className="font-display text-xl font-bold mt-1 truncate">{listing.name}</h2>
-            <p className="text-sm text-muted-foreground">{listing.town}, Co. {listing.county}</p>
-            {listing.owner_email && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                <UserCheck className="w-3 h-3" /> {listing.owner_email}
-              </p>
+    <div className="border-t border-b-0 bg-muted/20 px-4 py-4 space-y-4">
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant="outline" className="text-xs">{listing.type}</Badge>
+            {listing.is_verified && (
+              <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+                <ShieldCheck className="w-3 h-3 mr-1" />Verified
+              </Badge>
+            )}
+            {listing.plan && listing.plan !== "basic" && (
+              <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
+                {listing.plan}
+              </Badge>
             )}
           </div>
-          <div className="flex items-center gap-1 ml-2 shrink-0">
-            <a href={`/listing/${listing.id}`} target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon" className="h-8 w-8"><ExternalLink className="w-3.5 h-3.5" /></Button>
-            </a>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}><X className="w-4 h-4" /></Button>
+          <div className="flex items-center gap-3 mt-1 flex-wrap">
+            <h3 className="font-semibold text-base">{listing.name}</h3>
+            <span className="text-sm text-muted-foreground">{listing.town}, Co. {listing.county}</span>
+            {listing.owner_email && (
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <UserCheck className="w-3 h-3" />{listing.owner_email}
+              </span>
+            )}
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="flex gap-2 px-5 py-3 border-b bg-muted/30">
-          <Button
-            size="sm" variant="outline"
-            className="text-xs gap-1.5"
-            onClick={() => {
-              onListingUpdated?.({ ...listing, is_verified: !listing.is_verified });
-              base44.entities.CommunityListing.update(listing.id, { is_verified: !listing.is_verified }).then(() => {
-                base44.entities.ListingAction.create({ listing_id: listing.id, listing_name: listing.name, action_type: listing.is_verified ? "unverified" : "verified", note: `Marked as ${listing.is_verified ? "unverified" : "verified"}`, is_done: true, created_by_name: currentUser?.full_name || "Admin" });
-                loadActions();
-              });
-            }}
-          >
-            {listing.is_verified ? <ShieldOff className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-            {listing.is_verified ? "Unverify" : "Verify"}
-          </Button>
-          <Button size="sm" variant="outline" className="text-xs gap-1.5" onClick={() => setTransferMode(!transferMode)}>
-            <ArrowRightLeft className="w-3.5 h-3.5" /> Transfer Owner
-          </Button>
-          {listing.website && (
-            <a href={listing.website} target="_blank" rel="noopener noreferrer">
-              <Button size="sm" variant="outline" className="text-xs gap-1.5"><LinkIcon className="w-3.5 h-3.5" /> Website</Button>
-            </a>
-          )}
-        </div>
-
-        {/* Transfer ownership panel */}
-        {transferMode && (
-          <div className="px-5 py-3 bg-blue-50 border-b border-blue-100 flex gap-2 items-center">
-            <Input
-              placeholder="New owner email..."
-              value={transferEmail}
-              onChange={(e) => setTransferEmail(e.target.value)}
-              className="text-sm h-8 flex-1"
-            />
-            <Button size="sm" onClick={handleTransferOwnership} disabled={transferring} className="shrink-0">
-              {transferring ? "Transferring…" : "Transfer"}
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setTransferMode(false)}>Cancel</Button>
-          </div>
-        )}
-
-        {/* Add action */}
-        <div className="px-5 py-4 border-b space-y-2">
-          <div className="flex gap-2">
-            <Select value={newActionType} onValueChange={setNewActionType}>
-              <SelectTrigger className="w-36 h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {["note", "follow_up", "call", "email", "visit", "review", "other"].map((t) => (
-                  <SelectItem key={t} value={t} className="text-xs">{ACTION_TYPE_LABELS[t]}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="date"
-              value={newDueDate}
-              onChange={(e) => setNewDueDate(e.target.value)}
-              className="h-8 text-xs w-36"
-              placeholder="Due date"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Add a note or action..."
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              className="h-8 text-sm"
-              onKeyDown={(e) => e.key === "Enter" && handleAddAction()}
-            />
-            <Button size="sm" onClick={handleAddAction} disabled={saving || !newNote.trim()} className="shrink-0 h-8">
-              <Send className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Activity Feed */}
-        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-1">
-          {loadingActions ? (
-            <div className="flex justify-center py-8 text-muted-foreground text-sm">Loading...</div>
-          ) : actions.length === 0 ? (
-            <div className="py-8 text-center text-muted-foreground text-sm">No activity yet. Add a note or action above.</div>
-          ) : (
-            <>
-              {pendingActions.length > 0 && (
-                <>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-1 pb-2">Upcoming</p>
-                  {pendingActions.map((a) => <ActionRow key={a.id} action={a} onToggle={handleToggleDone} />)}
-                </>
-              )}
-              {completedOrNotes.length > 0 && (
-                <>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-3 pb-2">History</p>
-                  {completedOrNotes.map((a) => <ActionRow key={a.id} action={a} onToggle={handleToggleDone} />)}
-                </>
-              )}
-            </>
-          )}
+        <div className="flex items-center gap-1 shrink-0">
+          <a href={`/listing/${listing.id}`} target="_blank" rel="noopener noreferrer">
+            <Button variant="ghost" size="icon" className="h-7 w-7"><ExternalLink className="w-3.5 h-3.5" /></Button>
+          </a>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}><X className="w-4 h-4" /></Button>
         </div>
       </div>
+
+      {/* Quick action buttons */}
+      <div className="flex gap-2 flex-wrap">
+        <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5" onClick={handleVerifyToggle}>
+          {listing.is_verified ? <ShieldOff className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+          {listing.is_verified ? "Unverify" : "Verify"}
+        </Button>
+        <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5" onClick={() => setTransferMode(!transferMode)}>
+          <ArrowRightLeft className="w-3.5 h-3.5" /> Transfer Owner
+        </Button>
+        {listing.website && (
+          <a href={listing.website} target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5"><LinkIcon className="w-3.5 h-3.5" /> Website</Button>
+          </a>
+        )}
+        {listing.email && (
+          <a href={`mailto:${listing.email}`}>
+            <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5">✉️ Email</Button>
+          </a>
+        )}
+        {listing.phone && (
+          <a href={`tel:${listing.phone}`}>
+            <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5">📞 Call</Button>
+          </a>
+        )}
+      </div>
+
+      {/* Transfer ownership */}
+      {transferMode && (
+        <div className="flex gap-2 items-center bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+          <Input
+            placeholder="New owner email..."
+            value={transferEmail}
+            onChange={(e) => setTransferEmail(e.target.value)}
+            className="text-sm h-8 flex-1"
+          />
+          <Button size="sm" onClick={handleTransferOwnership} disabled={transferring} className="shrink-0">
+            {transferring ? "Transferring…" : "Transfer"}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setTransferMode(false)}>Cancel</Button>
+        </div>
+      )}
+
+      {/* Add note / action */}
+      <div className="bg-card border rounded-lg p-3 space-y-2">
+        <div className="flex gap-2">
+          <Select value={newActionType} onValueChange={setNewActionType}>
+            <SelectTrigger className="w-32 h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {["note", "follow_up", "call", "email", "visit", "review", "other"].map((t) => (
+                <SelectItem key={t} value={t} className="text-xs">{ACTION_TYPE_LABELS[t]}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            type="date"
+            value={newDueDate}
+            onChange={(e) => setNewDueDate(e.target.value)}
+            className="h-8 text-xs w-36"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Add a note or reminder..."
+            value={newNote}
+            onChange={(e) => setNewNote(e.target.value)}
+            className="h-8 text-sm"
+            onKeyDown={(e) => e.key === "Enter" && handleAddAction()}
+          />
+          <Button size="sm" onClick={handleAddAction} disabled={saving || !newNote.trim()} className="shrink-0 h-8">
+            <Send className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Upcoming actions */}
+      {loadingActions ? (
+        <p className="text-xs text-muted-foreground">Loading activity...</p>
+      ) : (
+        <div className="space-y-1">
+          {pendingActions.length > 0 && (
+            <>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pb-1">Upcoming Reminders</p>
+              {pendingActions.map((a) => <ActionRow key={a.id} action={a} onToggle={handleToggleDone} />)}
+            </>
+          )}
+
+          {/* History collapsible */}
+          {history.length > 0 && (
+            <div className="pt-1">
+              <button
+                className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors pb-1"
+                onClick={() => setHistoryOpen(!historyOpen)}
+              >
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${historyOpen ? "rotate-180" : ""}`} />
+                History ({history.length})
+              </button>
+              {historyOpen && history.map((a) => <ActionRow key={a.id} action={a} onToggle={handleToggleDone} />)}
+            </div>
+          )}
+
+          {actions.length === 0 && (
+            <p className="text-xs text-muted-foreground italic py-1">No activity yet. Add a note above.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -267,10 +268,10 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
 function ActionRow({ action, onToggle }) {
   const icon = ACTION_ICONS[action.action_type] || "•";
   const label = ACTION_TYPE_LABELS[action.action_type] || action.action_type;
-  const isSystem = ["verified", "unverified", "claim_approved", "claim_rejected", "ownership_transfer", "plan_upgrade"].includes(action.action_type);
+  const isSystem = SYSTEM_TYPES.includes(action.action_type);
 
   return (
-    <div className={`flex items-start gap-3 py-2.5 px-3 rounded-lg ${action.is_done || isSystem ? "opacity-70" : "bg-card border"}`}>
+    <div className={`flex items-start gap-3 py-2 px-3 rounded-lg text-sm ${action.is_done || isSystem ? "opacity-60" : "bg-card border"}`}>
       <button
         className={`mt-0.5 shrink-0 ${isSystem ? "cursor-default" : "cursor-pointer hover:opacity-70"}`}
         onClick={() => !isSystem && onToggle(action)}
@@ -282,9 +283,7 @@ function ActionRow({ action, onToggle }) {
       </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-            <span>{icon}</span> {label}
-          </span>
+          <span className="text-xs font-medium text-muted-foreground">{icon} {label}</span>
           {action.due_date && <ActionDueBadge dueDate={action.due_date} isDone={action.is_done} />}
         </div>
         {action.note && <p className="text-sm text-foreground mt-0.5 leading-snug">{action.note}</p>}

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import ListingDetailPanel from "../components/ListingDetailPanel";
+import ListingDetailPanel from "../components/ListingDetailPanel.jsx";
 import ActionDueBadge from "../components/ActionDueBadge";
 import { isToday, isPast, parseISO } from "date-fns";
 import { ShieldCheck, Star, UserCheck } from "lucide-react";
@@ -47,7 +47,7 @@ export default function GroupAdminDashboard() {
   const [listings, setListings] = useState([]);
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedListing, setSelectedListing] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
@@ -194,73 +194,75 @@ export default function GroupAdminDashboard() {
           const TypeIcon = cfg.icon;
           const priority = listing._priority;
           const next = listing._nextAction;
+          const isExpanded = expandedId === listing.id;
 
           const rowBg =
-            priority === "overdue" ? "bg-red-50/40 hover:bg-red-50/70" :
-            priority === "today" ? "bg-amber-50/40 hover:bg-amber-50/70" :
+            priority === "overdue" ? "bg-red-50/40 hover:bg-red-50/60" :
+            priority === "today" ? "bg-amber-50/40 hover:bg-amber-50/60" :
             "hover:bg-muted/30";
 
           return (
-            <div
-              key={listing.id}
-              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rowBg}`}
-              onClick={() => setSelectedListing(listing)}
-            >
-              <div className={`w-1 h-10 rounded-full shrink-0 ${
-                priority === "overdue" ? "bg-red-400" :
-                priority === "today" ? "bg-amber-400" :
-                priority === "upcoming" ? "bg-blue-300" : "bg-transparent"
-              }`} />
+            <div key={listing.id} className="divide-y">
+              <div
+                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rowBg} ${isExpanded ? "border-l-2 border-primary" : ""}`}
+                onClick={() => setExpandedId(isExpanded ? null : listing.id)}
+              >
+                <div className={`w-1 h-10 rounded-full shrink-0 ${
+                  priority === "overdue" ? "bg-red-400" :
+                  priority === "today" ? "bg-amber-400" :
+                  priority === "upcoming" ? "bg-blue-300" : "bg-muted"
+                }`} />
 
-              {listing.image_url ? (
-                <img src={listing.image_url} alt={listing.name} className="w-9 h-9 rounded-lg object-cover shrink-0" />
-              ) : (
-                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                  <TypeIcon className="w-4 h-4 text-muted-foreground" />
-                </div>
-              )}
+                {listing.image_url ? (
+                  <img src={listing.image_url} alt={listing.name} className="w-9 h-9 rounded-lg object-cover shrink-0" />
+                ) : (
+                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <TypeIcon className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                )}
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-sm truncate">{listing.name}</span>
-                  <span className="text-xs text-muted-foreground hidden sm:block">· {listing.town}, {listing.county}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-sm truncate">{listing.name}</span>
+                    <span className="text-xs text-muted-foreground hidden sm:block">· {listing.town}, {listing.county}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <Badge variant="outline" className={`text-xs py-0 px-1.5 ${cfg.color}`}>
+                      <TypeIcon className="w-2.5 h-2.5 mr-0.5" />{listing.type}
+                    </Badge>
+                    {listing.is_verified && <ShieldCheck className="w-3 h-3 text-emerald-500" />}
+                    {listing.owner_email && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                        <UserCheck className="w-3 h-3" />{listing.owner_email}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                  <Badge variant="outline" className={`text-xs py-0 px-1.5 ${cfg.color}`}>
-                    <TypeIcon className="w-2.5 h-2.5 mr-0.5" />{listing.type}
-                  </Badge>
-                  {listing.is_verified && <ShieldCheck className="w-3 h-3 text-emerald-500" />}
-                  {listing.owner_email && (
-                    <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                      <UserCheck className="w-3 h-3" />{listing.owner_email}
-                    </span>
+
+                <div className="shrink-0 text-right min-w-[120px] hidden sm:block">
+                  {next ? (
+                    <div className="flex flex-col items-end gap-1">
+                      <ActionDueBadge dueDate={next.due_date} isDone={next.is_done} />
+                      <span className="text-xs text-muted-foreground truncate max-w-[110px]">{next.note || next.action_type}</span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">No next action</span>
                   )}
                 </div>
               </div>
 
-              <div className="shrink-0 text-right min-w-[120px] hidden sm:block">
-                {next ? (
-                  <div className="flex flex-col items-end gap-1">
-                    <ActionDueBadge dueDate={next.due_date} isDone={next.is_done} />
-                    <span className="text-xs text-muted-foreground truncate max-w-[110px]">{next.note || next.action_type}</span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground italic">No next action</span>
-                )}
-              </div>
+              {isExpanded && (
+                <ListingDetailPanel
+                  listing={listing}
+                  currentUser={user}
+                  onClose={() => setExpandedId(null)}
+                  onListingUpdated={() => { setExpandedId(null); reload(); }}
+                />
+              )}
             </div>
           );
         })}
       </div>
-
-      {selectedListing && (
-        <ListingDetailPanel
-          listing={selectedListing}
-          currentUser={user}
-          onClose={() => setSelectedListing(null)}
-          onListingUpdated={() => { setSelectedListing(null); reload(); }}
-        />
-      )}
     </div>
   );
 }

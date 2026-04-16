@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Search, X, ShieldCheck, Star, UserCheck, Building2, Users, GraduationCap, Calendar, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
 import ListingDetailPanel from "./ListingDetailPanel";
 import ActionDueBadge from "./ActionDueBadge";
-import { isToday, isPast, isFuture, parseISO, format } from "date-fns";
+import { isToday, isPast, parseISO } from "date-fns";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -20,7 +20,7 @@ const PRIORITY_ORDER = { overdue: 0, today: 1, upcoming: 2, no_action: 3, done: 
 
 function getListingPriority(nextAction) {
   if (!nextAction) return "no_action";
-  if (nextAction.is_done) return "done";
+  if (nextAction.is_done) return "no_action";
   if (!nextAction.due_date) return "no_action";
   const date = parseISO(nextAction.due_date);
   if (isPast(date) && !isToday(date)) return "overdue";
@@ -31,7 +31,7 @@ function getListingPriority(nextAction) {
 export default function AdminActionStream({ listings, onListingUpdated, currentUser }) {
   const [actions, setActions] = useState([]);
   const [loadingActions, setLoadingActions] = useState(true);
-  const [selectedListing, setSelectedListing] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
   const [search, setSearch] = useState("");
   const [filterCounty, setFilterCounty] = useState("");
   const [filterType, setFilterType] = useState("");
@@ -46,7 +46,6 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
 
   useEffect(() => { loadActions(); }, []);
 
-  // For each listing, find its next pending action
   const listingsWithActions = useMemo(() => {
     return listings
       .filter((l) => l.type !== "What's On")
@@ -65,7 +64,7 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
   }, [listings, actions]);
 
   const allCounties = [...new Set(listings.map((l) => l.county).filter(Boolean))].sort();
-  const allTypes = [...new Set(listings.map((l) => l.type).filter(Boolean))].sort();
+  const allTypes = [...new Set(listings.filter(l => l.type !== "What's On").map((l) => l.type).filter(Boolean))].sort();
 
   const filtered = useMemo(() => {
     return listingsWithActions
@@ -116,12 +115,12 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
 
   return (
     <div className="space-y-4">
-      {/* Stats row */}
+      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatPill icon={<AlertCircle className="w-4 h-4 text-red-500" />} label="Overdue" value={stats.overdue} color="text-red-600" onClick={() => setFilterStatus("overdue")} />
-        <StatPill icon={<Clock className="w-4 h-4 text-amber-500" />} label="Due Today" value={stats.today} color="text-amber-600" onClick={() => setFilterStatus("today")} />
-        <StatPill icon={<CheckCircle2 className="w-4 h-4 text-muted-foreground" />} label="No Action" value={stats.no_action} color="text-muted-foreground" onClick={() => setFilterStatus("no_action")} />
-        <StatPill icon={<Building2 className="w-4 h-4 text-primary" />} label="Total" value={stats.total} color="text-primary" onClick={() => setFilterStatus("all")} />
+        <StatPill icon={<AlertCircle className="w-4 h-4 text-red-500" />} label="Overdue" value={stats.overdue} color="text-red-600" onClick={() => setFilterStatus("overdue")} active={filterStatus === "overdue"} />
+        <StatPill icon={<Clock className="w-4 h-4 text-amber-500" />} label="Due Today" value={stats.today} color="text-amber-600" onClick={() => setFilterStatus("today")} active={filterStatus === "today"} />
+        <StatPill icon={<CheckCircle2 className="w-4 h-4 text-muted-foreground" />} label="No Action" value={stats.no_action} color="text-muted-foreground" onClick={() => setFilterStatus("no_action")} active={filterStatus === "no_action"} />
+        <StatPill icon={<Building2 className="w-4 h-4 text-primary" />} label="Total" value={stats.total} color="text-primary" onClick={() => setFilterStatus("all")} active={filterStatus === "all"} />
       </div>
 
       {/* Filters */}
@@ -165,7 +164,7 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} listings</span>
       </div>
 
-      {/* Action Stream */}
+      {/* Stream list */}
       <div className="bg-card border rounded-xl overflow-hidden divide-y">
         {filtered.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground text-sm">No listings match your filters</div>
@@ -174,89 +173,92 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
           const TypeIcon = cfg.icon;
           const priority = listing._priority;
           const next = listing._nextAction;
+          const isExpanded = expandedId === listing.id;
 
           const rowBg =
-            priority === "overdue" ? "bg-red-50/40 hover:bg-red-50/70" :
-            priority === "today" ? "bg-amber-50/40 hover:bg-amber-50/70" :
+            priority === "overdue" ? "bg-red-50/40 hover:bg-red-50/60" :
+            priority === "today" ? "bg-amber-50/40 hover:bg-amber-50/60" :
             "hover:bg-muted/30";
 
           return (
-            <div
-              key={listing.id}
-              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rowBg}`}
-              onClick={() => setSelectedListing(listing)}
-            >
-              {/* Priority stripe */}
-              <div className={`w-1 h-10 rounded-full shrink-0 ${
-                priority === "overdue" ? "bg-red-400" :
-                priority === "today" ? "bg-amber-400" :
-                priority === "upcoming" ? "bg-blue-300" :
-                "bg-transparent"
-              }`} />
+            <div key={listing.id} className="divide-y">
+              {/* Row */}
+              <div
+                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors select-none ${rowBg} ${isExpanded ? "border-l-2 border-primary" : ""}`}
+                onClick={() => setExpandedId(isExpanded ? null : listing.id)}
+              >
+                {/* Priority stripe */}
+                <div className={`w-1 h-10 rounded-full shrink-0 ${
+                  priority === "overdue" ? "bg-red-400" :
+                  priority === "today" ? "bg-amber-400" :
+                  priority === "upcoming" ? "bg-blue-300" :
+                  "bg-muted"
+                }`} />
 
-              {/* Image */}
-              {listing.image_url ? (
-                <img src={listing.image_url} alt={listing.name} className="w-9 h-9 rounded-lg object-cover shrink-0" />
-              ) : (
-                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                  <TypeIcon className="w-4 h-4 text-muted-foreground" />
-                </div>
-              )}
+                {/* Thumbnail */}
+                {listing.image_url ? (
+                  <img src={listing.image_url} alt={listing.name} className="w-9 h-9 rounded-lg object-cover shrink-0" />
+                ) : (
+                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <TypeIcon className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                )}
 
-              {/* Main info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-sm text-foreground truncate">{listing.name}</span>
-                  <span className="text-xs text-muted-foreground hidden sm:block">· {listing.town}, {listing.county}</span>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-sm text-foreground truncate">{listing.name}</span>
+                    <span className="text-xs text-muted-foreground hidden sm:block">· {listing.town}, {listing.county}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <Badge variant="outline" className={`text-xs py-0 px-1.5 ${cfg.color}`}>
+                      <TypeIcon className="w-2.5 h-2.5 mr-0.5" />{listing.type}
+                    </Badge>
+                    {listing.is_verified && <ShieldCheck className="w-3 h-3 text-emerald-500" />}
+                    {listing.is_featured && <Star className="w-3 h-3 text-amber-400 fill-amber-400" />}
+                    {listing.owner_email && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                        <UserCheck className="w-3 h-3" />{listing.owner_email}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                  <Badge variant="outline" className={`text-xs py-0 px-1.5 ${cfg.color}`}>
-                    <TypeIcon className="w-2.5 h-2.5 mr-0.5" />{listing.type}
-                  </Badge>
-                  {listing.is_verified && <ShieldCheck className="w-3 h-3 text-emerald-500" />}
-                  {listing.is_featured && <Star className="w-3 h-3 text-amber-400 fill-amber-400" />}
-                  {listing.owner_email && (
-                    <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                      <UserCheck className="w-3 h-3" />{listing.owner_email}
-                    </span>
+
+                {/* Next action */}
+                <div className="shrink-0 text-right min-w-[140px] hidden sm:block">
+                  {next ? (
+                    <div className="flex flex-col items-end gap-1">
+                      <ActionDueBadge dueDate={next.due_date} isDone={next.is_done} />
+                      <span className="text-xs text-muted-foreground truncate max-w-[130px]">{next.note || next.action_type}</span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">No next action</span>
                   )}
                 </div>
               </div>
 
-              {/* Next action */}
-              <div className="shrink-0 text-right min-w-[140px] hidden sm:block">
-                {next ? (
-                  <div className="flex flex-col items-end gap-1">
-                    <ActionDueBadge dueDate={next.due_date} isDone={next.is_done} />
-                    <span className="text-xs text-muted-foreground truncate max-w-[130px]">{next.note || next.action_type}</span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground italic">No next action</span>
-                )}
-              </div>
+              {/* Inline expanded panel */}
+              {isExpanded && (
+                <ListingDetailPanel
+                  listing={listing}
+                  currentUser={currentUser}
+                  onClose={() => setExpandedId(null)}
+                  onListingUpdated={() => { onListingUpdated?.(); loadActions(); setExpandedId(null); }}
+                />
+              )}
             </div>
           );
         })}
       </div>
-
-      {/* Detail panel */}
-      {selectedListing && (
-        <ListingDetailPanel
-          listing={selectedListing}
-          currentUser={currentUser}
-          onClose={() => setSelectedListing(null)}
-          onListingUpdated={() => { onListingUpdated?.(); setSelectedListing(null); }}
-        />
-      )}
     </div>
   );
 }
 
-function StatPill({ icon, label, value, color, onClick }) {
+function StatPill({ icon, label, value, color, onClick, active }) {
   return (
     <button
       onClick={onClick}
-      className="bg-card border rounded-xl px-4 py-3 flex items-center gap-3 hover:border-primary/30 hover:shadow-sm transition-all text-left w-full"
+      className={`bg-card border rounded-xl px-4 py-3 flex items-center gap-3 hover:border-primary/40 hover:shadow-sm transition-all text-left w-full ${active ? "border-primary/40 shadow-sm" : ""}`}
     >
       {icon}
       <div>
