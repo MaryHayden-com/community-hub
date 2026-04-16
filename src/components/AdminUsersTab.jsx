@@ -115,7 +115,21 @@ export default function AdminUsersTab() {
     }
     setInviting(true);
     try {
-      await base44.users.inviteUser(inviteEmail, inviteRole);
+      // The invite API only supports "admin" or "user" base roles.
+      // Invite as "admin" for admin, otherwise invite as "user" then update role.
+      const baseRole = inviteRole === "admin" ? "admin" : "user";
+      await base44.users.inviteUser(inviteEmail, baseRole);
+
+      // If the desired role is a custom one, update it after invite
+      if (inviteRole !== "admin" && inviteRole !== "user") {
+        // Find the newly created user and update their role
+        const allUsers = await base44.entities.User.list("-created_date", 500);
+        const invited = allUsers.find((u) => u.email === inviteEmail);
+        if (invited) {
+          await base44.entities.User.update(invited.id, { role: inviteRole });
+        }
+      }
+
       toast({ title: "Invitation sent", description: `Invited ${inviteEmail} as ${ROLE_LABELS[inviteRole]}` });
       setShowInvite(false);
       setInviteEmail("");
