@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, X, ShieldCheck, Star, UserCheck, Building2, Users, GraduationCap, Calendar, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
+import { Loader2, Search, X, ShieldCheck, Star, UserCheck, Building2, Users, GraduationCap, Calendar, AlertCircle, Clock, CheckCircle2, CheckSquare, Square } from "lucide-react";
 import ListingDetailPanel from "./ListingDetailPanel";
 import ActionDueBadge from "./ActionDueBadge";
 import { isToday, isPast, parseISO } from "date-fns";
@@ -36,6 +36,8 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
   const [filterCounty, setFilterCounty] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectMode, setSelectMode] = useState(false);
 
   const loadActions = () => {
     setLoadingActions(true);
@@ -162,10 +164,60 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
           </Button>
         )}
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} listings</span>
+        <Button
+          variant={selectMode ? "secondary" : "outline"}
+          size="sm"
+          onClick={() => { setSelectMode(!selectMode); setSelectedIds([]); }}
+        >
+          <CheckSquare className="w-4 h-4 mr-1" />
+          {selectMode ? "Cancel" : "Select"}
+        </Button>
       </div>
+
+      {/* Bulk action bar */}
+      {selectMode && selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-primary/5 border border-primary/20 rounded-xl">
+          <span className="text-sm font-medium text-primary">{selectedIds.length} selected</span>
+          <div className="flex items-center gap-2 ml-auto">
+            <Button size="sm" variant="outline" onClick={async () => {
+              for (const id of selectedIds) {
+                const listing = listings.find(l => l.id === id);
+                if (listing) await base44.entities.CommunityListing.update(id, { is_verified: true });
+              }
+              onListingUpdated?.();
+              setSelectedIds([]);
+            }}>
+              <ShieldCheck className="w-4 h-4 mr-1 text-emerald-600" /> Verify All
+            </Button>
+            <Button size="sm" variant="outline" onClick={async () => {
+              for (const id of selectedIds) {
+                await base44.entities.ListingAction.create({ listing_id: id, listing_name: listings.find(l => l.id === id)?.name || "", action_type: "follow_up", note: "Bulk follow-up", due_date: new Date().toISOString().split("T")[0] });
+              }
+              loadActions();
+              setSelectedIds([]);
+            }}>
+              <Clock className="w-4 h-4 mr-1 text-amber-600" /> Add Follow-Up
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
+              <X className="w-4 h-4 mr-1" /> Clear
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Stream list */}
       <div className="bg-card border rounded-xl overflow-hidden divide-y">
+        {selectMode && filtered.length > 0 && (
+          <div className="flex items-center gap-3 px-4 py-2 bg-muted/40 border-b">
+            <input
+              type="checkbox"
+              className="cursor-pointer"
+              checked={selectedIds.length === filtered.length}
+              onChange={() => setSelectedIds(selectedIds.length === filtered.length ? [] : filtered.map(l => l.id))}
+            />
+            <span className="text-xs text-muted-foreground">Select all ({filtered.length})</span>
+          </div>
+        )}
         {filtered.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground text-sm">No listings match your filters</div>
         ) : filtered.map((listing) => {
@@ -185,8 +237,23 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
               {/* Row */}
               <div
                 className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors select-none ${rowBg} ${isExpanded ? "border-l-2 border-primary" : ""}`}
-                onClick={() => setExpandedId(isExpanded ? null : listing.id)}
+                onClick={() => {
+                  if (selectMode) {
+                    setSelectedIds(prev => prev.includes(listing.id) ? prev.filter(id => id !== listing.id) : [...prev, listing.id]);
+                  } else {
+                    setExpandedId(isExpanded ? null : listing.id);
+                  }
+                }}
               >
+                {/* Checkbox (select mode) */}
+                {selectMode && (
+                  <input
+                    type="checkbox"
+                    className="cursor-pointer shrink-0"
+                    checked={selectedIds.includes(listing.id)}
+                    onChange={() => {}}
+                  />
+                )}
                 {/* Priority stripe */}
                 <div className={`w-1 h-10 rounded-full shrink-0 ${
                   priority === "overdue" ? "bg-red-400" :
