@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap, ImagePlus } from "lucide-react";
 import AdminActionStream from "../components/AdminActionStream";
 import AdminClaimRequests from "../components/AdminClaimRequests";
 import AdminOverview from "../components/AdminOverview";
@@ -40,6 +40,7 @@ export default function Admin() {
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
   const [bulkFetchingImages, setBulkFetchingImages] = useState(false);
   const [bulkFetchProgress, setBulkFetchProgress] = useState(null);
+  const [fetchingImageId, setFetchingImageId] = useState(null);
   const [fetchResult, setFetchResult] = useState(null);
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -92,6 +93,30 @@ export default function Admin() {
     setBulkFetchProgress(null);
     toast({ title: "Bulk image fetch complete", description: `Updated ${updated} of ${needsImage.length} listings.` });
     loadListings();
+  };
+
+  const handleFetchSingleImage = async (l, e) => {
+    e.stopPropagation();
+    const urls = [l.website, l.facebook_url, l.instagram_url].filter(Boolean);
+    if (!urls.length) {
+      toast({ title: "No URLs", description: "This listing has no website or social links to fetch from." });
+      return;
+    }
+    setFetchingImageId(l.id);
+    try {
+      const res = await base44.functions.invoke('fetchOgImage', { urls });
+      if (res.data?.image_url) {
+        await base44.entities.CommunityListing.update(l.id, { image_url: res.data.image_url });
+        toast({ title: "Image fetched", description: `Updated image for ${l.name}.` });
+        loadListings();
+      } else {
+        toast({ title: "No image found", description: "Couldn't find an image from the provided URLs." });
+      }
+    } catch (err) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setFetchingImageId(null);
+    }
   };
 
   const handleFetchWhatsOn = async () => {
@@ -234,6 +259,17 @@ export default function Admin() {
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleBulkFetchImages}
+            disabled={bulkFetchingImages}
+          >
+            {bulkFetchingImages
+              ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" />{bulkFetchProgress ? `${bulkFetchProgress.done}/${bulkFetchProgress.total}` : "Fetching…"}</>
+              : "Bulk Fetch Images"}
+          </Button>
         {(activeTab === "listings" || activeTab === "whatson") && activeTab !== "overview" && (
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center border rounded-lg overflow-hidden">
@@ -321,16 +357,6 @@ export default function Admin() {
                 </div>
               </PopoverContent>
             </Popover>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBulkFetchImages}
-              disabled={bulkFetchingImages}
-            >
-              {bulkFetchingImages
-                ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" />{bulkFetchProgress ? `${bulkFetchProgress.done}/${bulkFetchProgress.total}` : "Fetching…"}</>
-                : "Bulk Fetch Images"}
-            </Button>
             <ImportExport listings={listings} onImportComplete={loadListings} />
             <Button onClick={() => setEditing({})} className="gap-1.5">
               <Plus className="w-4 h-4" /> Add Listing
@@ -604,6 +630,14 @@ export default function Admin() {
                           title={l.is_verified ? "Unverify" : "Mark as Verified"}
                         >
                           {l.is_verified ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
+                        </Button>
+                        <Button
+                          variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"
+                          onClick={(e) => handleFetchSingleImage(l, e)}
+                          disabled={fetchingImageId === l.id}
+                          title="Fetch image from website/social links"
+                        >
+                          {fetchingImageId === l.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}>
                           <Edit className="w-3.5 h-3.5" />
