@@ -217,46 +217,46 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
   const GROUP_MAP = {
-    "Business": ["Accommodation", "Food & Beverage", "Retail", "Professional Services", "Personal Services", "Healthcare", "Trades & Construction"],
-    "Club & Group": ["Sports & Recreation", "Youth & Community", "Arts & Culture", "Faith & Religious", "Leisure & Community", "Charity & Welfare"],
-    "Community Services": ["Libraries", "Faith & Worship"],
-    "Education": ["Schools", "Higher Education", "Childcare", "Training & Skills"],
-    "What's On": ["Festivals & Markets", "Entertainment", "Community Activities", "Seasonal & Themed"]
+    "Business": ["Accommodation", "Food & Beverage", "Healthcare", "Personal Services", "Professional Services", "Retail", "Trades & Construction"],
+    "Club & Group": ["Arts & Culture", "Charity & Welfare", "Faith & Religious", "Leisure & Community", "Sports & Recreation", "Youth & Community"],
+    "Community Services": ["Faith & Worship", "Libraries"],
+    "Education": ["Childcare", "Higher Education", "Schools", "Training & Skills"],
+    "What's On": ["Community Activities", "Entertainment", "Festivals & Markets", "Seasonal & Themed"]
   };
 
   const CATEGORY_BY_GROUP = {
     "Business": {
-      "Accommodation": ["Hotels", "B&B", "Airbnb", "Room to Let", "Guesthouses"],
-      "Food & Beverage": ["Restaurant", "Café", "Bar & Pub", "Takeaway", "Bakery"],
-      "Retail": ["Supermarket", "Grocery", "Newsagent", "Bookshop", "Hardware", "Clothing & Fashion", "Gift Shop", "Craft & Hobby", "Florist", "Butcher", "Fishmonger", "Off Licence", "Health Food & Organic"],
-      "Professional Services": ["Solicitor", "Accountant", "Financial Services", "Estate Agent"],
-      "Personal Services": ["Hair & Beauty", "Barber", "Gym & Fitness", "Cleaning Services", "Childcare & Crèche"],
-      "Healthcare": ["Dentist", "GP & Medical", "Veterinary", "Pharmacy"],
-      "Trades & Construction": ["Plumber", "Electrician", "Builder", "Carpenter", "Painter & Decorator"]
+      "Accommodation": ["Airbnb", "B&B", "Guesthouses", "Hotels", "Room to Let"],
+      "Food & Beverage": ["Bakery", "Bar & Pub", "Café", "Restaurant", "Takeaway"],
+      "Healthcare": ["Dentist", "GP & Medical", "Pharmacy", "Veterinary"],
+      "Personal Services": ["Barber", "Childcare & Crèche", "Cleaning Services", "Gym & Fitness", "Hair & Beauty"],
+      "Professional Services": ["Accountant", "Estate Agent", "Financial Services", "Solicitor"],
+      "Retail": ["Bookshop", "Butcher", "Clothing & Fashion", "Craft & Hobby", "Fishmonger", "Florist", "Gift Shop", "Grocery", "Hardware", "Health Food & Organic", "Newsagent", "Off Licence", "Supermarket"],
+      "Trades & Construction": ["Builder", "Carpenter", "Electrician", "Painter & Decorator", "Plumber"]
     },
     "Club & Group": {
-      "Sports & Recreation": ["GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics", "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian", "Rowing", "Sailing"],
-      "Youth & Community": ["Scouts", "Girl Guides", "Youth Club", "Tidy Towns", "Community Group", "Residents Association"],
-      "Arts & Culture": ["Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club"],
-      "Faith & Religious": ["Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community"],
-      "Leisure & Community": ["Walking Group", "Gardening Club", "Toastmasters", "ICA", "Men's Shed", "Women's Group", "Senior Citizens"],
-      "Charity & Welfare": ["Charity"]
+      "Arts & Culture": ["Art & Craft", "Book Club", "Dance", "Drama & Theatre", "Music"],
+      "Charity & Welfare": ["Charity"],
+      "Faith & Religious": ["Baptist Church", "Buddhist Centre", "Catholic Church", "Church of Ireland", "Evangelical Church", "Faith Community", "Hindu Temple", "Islamic Centre / Mosque", "Jewish Synagogue", "Methodist Church", "Orthodox Church", "Presbyterian Church", "Quaker Meeting House"],
+      "Leisure & Community": ["Gardening Club", "ICA", "Men's Shed", "Senior Citizens", "Toastmasters", "Walking Group", "Women's Group"],
+      "Sports & Recreation": ["Athletics", "Boxing", "Cycling", "Equestrian", "GAA", "Golf", "Martial Arts", "Rowing", "Rugby", "Sailing", "Soccer / Football", "Swimming", "Tennis"],
+      "Youth & Community": ["Community Group", "Girl Guides", "Residents Association", "Scouts", "Tidy Towns", "Youth Club"]
     },
     "Community Services": {
-      "Libraries": ["Public Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
-      "Faith & Worship": ["Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community"]
+      "Faith & Worship": ["Baptist Church", "Buddhist Centre", "Catholic Church", "Church of Ireland", "Evangelical Church", "Faith Community", "Hindu Temple", "Islamic Centre / Mosque", "Jewish Synagogue", "Methodist Church", "Orthodox Church", "Presbyterian Church", "Quaker Meeting House"],
+      "Libraries": ["Community Library", "County Library", "Mobile Library", "Public Library", "School Library", "University Library"]
     },
     "Education": {
-      "Schools": ["Primary School", "Secondary School", "Gaelscoil", "Gaelcholáiste", "Special Education"],
-      "Higher Education": ["Third Level", "Further Education"],
-      "Childcare": ["Montessori", "Childcare", "Crèche"],
-      "Training & Skills": ["Language School", "Music Lessons", "Arts & Drama", "Sports Coaching", "Adult Education", "Tutoring", "Community Training", "Youthreach"]
+      "Childcare": ["Childcare", "Crèche", "Montessori"],
+      "Higher Education": ["Further Education", "Third Level"],
+      "Schools": ["Gaelcholáiste", "Gaelscoil", "Primary School", "Secondary School", "Special Education"],
+      "Training & Skills": ["Adult Education", "Arts & Drama", "Community Training", "Language School", "Music Lessons", "Sports Coaching", "Tutoring", "Youthreach"]
     },
     "What's On": {
+      "Community Activities": ["Community Event", "Family Event", "Fundraiser", "Talk & Lecture", "Workshop"],
+      "Entertainment": ["Concert", "Exhibition", "Theatre"],
       "Festivals & Markets": ["Festival", "Market"],
-      "Entertainment": ["Concert", "Theatre", "Exhibition"],
-      "Community Activities": ["Community Event", "Workshop", "Talk & Lecture", "Fundraiser", "Family Event"],
-      "Seasonal & Themed": ["Christmas Event", "Summer Event", "Food Event", "Sports Event", "Cultural Event"]
+      "Seasonal & Themed": ["Christmas Event", "Cultural Event", "Food Event", "Sports Event", "Summer Event"]
     }
   };
 
@@ -266,44 +266,50 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const categorySuggestions = useMemo(() => {
     const byType = {
       "Business": [
-        "Restaurant", "Café", "Bar & Pub", "Takeaway", "Supermarket", "Grocery",
-        "Pharmacy", "Hardware", "Clothing & Fashion", "Hair & Beauty", "Barber",
-        "Solicitor", "Accountant", "Financial Services", "Estate Agent",
-        "Garage & Motor", "Plumber", "Electrician", "Builder", "Carpenter",
-        "Painter & Decorator", "Cleaning Services", "Childcare & Crèche",
-        "Hotel", "B&B", "Gym & Fitness", "Dentist", "GP & Medical", "Veterinary",
-        "Florist", "Bakery", "Butcher", "Fishmonger", "Off Licence",
-        "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby", "Health Food & Organic",
+        "Accountant", "Airbnb", "B&B", "Bakery", "Bar & Pub", "Barber",
+        "Bookshop", "Builder", "Butcher", "Café", "Carpenter",
+        "Childcare & Crèche", "Cleaning Services", "Clothing & Fashion",
+        "Craft & Hobby", "Dentist", "Electrician", "Estate Agent",
+        "Financial Services", "Fishmonger", "Florist", "Gift Shop", "GP & Medical",
+        "Grocery", "Guesthouses", "Gym & Fitness", "Hair & Beauty", "Hardware",
+        "Health Food & Organic", "Hotels", "Newsagent", "Off Licence",
+        "Painter & Decorator", "Pharmacy", "Plumber", "Restaurant",
+        "Room to Let", "Solicitor", "Supermarket", "Takeaway", "Veterinary",
       ],
       "Club & Group": [
-        "GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics",
-        "Swimming", "Cycling", "Boxing", "Martial Arts", "Equestrian",
-        "Rowing", "Sailing",
-        "Scouts", "Girl Guides", "Youth Club",
-        "Tidy Towns", "Community Group", "Residents Association",
-        "Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club",
-        "Walking Group", "Gardening Club", "Toastmasters", "ICA",
-        "Men's Shed", "Women's Group", "Senior Citizens", "Charity",
-        "Catholic Church", "Church of Ireland", "Methodist Church",
-        "Presbyterian Church", "Baptist Church", "Evangelical Church",
-        "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue",
-        "Hindu Temple", "Buddhist Centre", "Quaker Meeting House",
-        "Faith Community",
-        "Public Library", "County Library", "Mobile Library",
-        "Community Library", "University Library", "School Library",
+        "Art & Craft", "Athletics", "Baptist Church", "Book Club", "Boxing",
+        "Buddhist Centre", "Catholic Church", "Charity", "Church of Ireland",
+        "Community Group", "Cycling", "Dance", "Drama & Theatre",
+        "Equestrian", "Evangelical Church", "Faith Community", "GAA",
+        "Gardening Club", "Girl Guides", "Golf", "Hindu Temple", "ICA",
+        "Islamic Centre / Mosque", "Jewish Synagogue", "Martial Arts",
+        "Men's Shed", "Methodist Church", "Music", "Orthodox Church",
+        "Presbyterian Church", "Quaker Meeting House", "Residents Association",
+        "Rowing", "Rugby", "Sailing", "Scouts", "Senior Citizens",
+        "Soccer / Football", "Swimming", "Tennis", "Tidy Towns",
+        "Toastmasters", "Walking Group", "Women's Group", "Youth Club",
+      ],
+      "Community Services": [
+        "Community Library", "County Library", "Mobile Library",
+        "Public Library", "School Library", "University Library",
+        "Baptist Church", "Buddhist Centre", "Catholic Church",
+        "Church of Ireland", "Evangelical Church", "Faith Community",
+        "Hindu Temple", "Islamic Centre / Mosque", "Jewish Synagogue",
+        "Methodist Church", "Orthodox Church", "Presbyterian Church",
+        "Quaker Meeting House",
       ],
       "Education": [
-        "Primary School", "Secondary School", "Further Education",
-        "Third Level", "Youthreach", "Gaelscoil", "Gaelcholáiste",
-        "Special Education", "Montessori", "Childcare", "Crèche",
-        "Tutoring", "Language School", "Music Lessons", "Arts & Drama",
-        "Sports Coaching", "Adult Education", "Community Training",
+        "Adult Education", "Arts & Drama", "Childcare", "Community Training",
+        "Crèche", "Further Education", "Gaelcholáiste", "Gaelscoil",
+        "Language School", "Montessori", "Music Lessons", "Primary School",
+        "Secondary School", "Special Education", "Sports Coaching",
+        "Third Level", "Tutoring", "Youthreach",
       ],
       "What's On": [
-        "Festival", "Market", "Concert", "Theatre", "Exhibition",
-        "Sports Event", "Fundraiser", "Community Event", "Workshop",
-        "Talk & Lecture", "Food Event", "Outdoor Event", "Family Event",
-        "Christmas Event", "Summer Event", "Cultural Event",
+        "Christmas Event", "Community Event", "Concert", "Cultural Event",
+        "Exhibition", "Family Event", "Festival", "Food Event", "Fundraiser",
+        "Market", "Sports Event", "Summer Event", "Talk & Lecture",
+        "Theatre", "Workshop",
       ],
     };
     const list = byType[form.type] || [];
