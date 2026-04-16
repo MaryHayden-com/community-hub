@@ -171,8 +171,11 @@ export default function Directory() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display text-3xl font-bold">Directory</h1>
+          <h1 className="font-display text-3xl font-bold">Towkin</h1>
           <p className="text-muted-foreground mt-1">
+            Your town. Your kin. Discover the businesses, clubs, schools and events that bring your town's kin together.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
             {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
           </p>
         </div>
