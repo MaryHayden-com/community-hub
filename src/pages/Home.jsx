@@ -71,7 +71,7 @@ export default function Home() {
             <Link to="/directory">
               <Button size="lg" className="gap-2 h-12 px-6">
                 <Search className="w-4 h-4" />
-                Explore Towkin
+                Explore Directory
               </Button>
             </Link>
           </div>
