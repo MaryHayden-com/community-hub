@@ -237,6 +237,7 @@ export default function Admin() {
       if (l.type !== "What's On") return false;
       if (filterCounty && l.county !== filterCounty) return false;
       if (filterTown && l.town !== filterTown) return false;
+      if (filterFeatured && !l.is_featured) return false;
       if (!search) return true;
       const s = search.toLowerCase();
       return (
@@ -499,7 +500,7 @@ export default function Admin() {
           </SelectContent>
         </Select>
 
-        {activeTab === "listings" && (
+        {(activeTab === "listings" || activeTab === "whatson") && (
           <button
             onClick={() => setFilterFeatured(!filterFeatured)}
             className={`flex items-center gap-1 text-xs border rounded-md px-2 py-1.5 transition-colors ${filterFeatured ? "bg-amber-100 border-amber-400 text-amber-700 font-semibold" : "bg-card text-muted-foreground hover:text-foreground"}`}
@@ -535,6 +536,7 @@ export default function Admin() {
                   <th className="text-left px-4 py-3 font-medium">Category</th>
                   <th className="text-left px-4 py-3 font-medium cursor-pointer select-none hover:text-primary" onClick={() => handleSort("county")}>County {sortKey === "county" ? (sortDir === "asc" ? "↑" : "↓") : <span className="text-muted-foreground/40">↕</span>}</th>
                   <th className="text-left px-4 py-3 font-medium">Town</th>
+                  <th className="text-left px-4 py-3 font-medium">Featured</th>
                   <th className="text-right px-4 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
@@ -552,6 +554,7 @@ export default function Admin() {
                     <td className="px-4 py-3 text-muted-foreground">{l.category || "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{l.county}</td>
                     <td className="px-4 py-3 text-muted-foreground">{l.town}</td>
+                    <td className="px-4 py-3">{l.is_featured ? <span className="text-amber-500 text-base">★</span> : <span className="text-muted-foreground/30 text-base">☆</span>}</td>
                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}><Edit className="w-3.5 h-3.5" /></Button>
