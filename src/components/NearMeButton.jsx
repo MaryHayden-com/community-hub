@@ -27,11 +27,17 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
         onNearbyChange(counties.map((c) => c.county));
         setLoading(false);
       },
-      () => {
-        setError("Could not get your location. Please allow location access.");
+      (error) => {
+        if (error.code === 1) {
+          setError("Location access denied. Please enable in browser settings.");
+        } else if (error.code === 3) {
+          setError("Location request timed out. Try again or check your connection.");
+        } else {
+          setError("Could not determine your location. Try again.");
+        }
         setLoading(false);
       },
-      { timeout: 8000 }
+      { timeout: 20000, enableHighAccuracy: false }
     );
   };
 
