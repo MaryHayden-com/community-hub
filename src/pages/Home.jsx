@@ -28,6 +28,17 @@ export default function Home() {
      ]).finally(() => setLoading(false));
    }, []);
 
+   useEffect(() => {
+     const unsubscribe = base44.entities.CommunityListing.subscribe((event) => {
+       if (event.type === 'update') {
+         setListings((prev) => prev.map((l) => l.id === event.id ? event.data : l));
+       } else if (event.type === 'create') {
+         setListings((prev) => [event.data, ...prev]);
+       }
+     });
+     return unsubscribe;
+   }, []);
+
    const ownedListing = useMemo(() => listings.find((l) => l.owner_email === userEmail), [listings, userEmail]);
 
   const featured = useMemo(() => listings.filter((l) => l.is_featured).slice(0, 6), [listings]);
