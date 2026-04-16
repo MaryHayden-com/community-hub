@@ -157,12 +157,15 @@ export default function OwnerDashboard() {
       {selectedListing && (
         <>
           {/* Listing Header */}
-          <div className="flex items-center gap-3 mb-6 p-4 bg-card border rounded-xl">
+          <div className="flex items-center gap-3 mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
             {selectedListing.image_url && (
               <img src={selectedListing.image_url} alt={selectedListing.name} className="w-12 h-12 rounded-lg object-cover shrink-0" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="font-semibold truncate">{selectedListing.name}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-semibold truncate">{selectedListing.name}</p>
+                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs">Claimed ✓</Badge>
+              </div>
               <p className="text-sm text-muted-foreground">{selectedListing.town}, Co. {selectedListing.county}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">

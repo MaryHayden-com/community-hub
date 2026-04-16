@@ -15,6 +15,7 @@ export default function AdminClaimRequests() {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState(null);
+  const [showResolved, setShowResolved] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -59,6 +60,9 @@ export default function AdminClaimRequests() {
     );
   }
 
+  const pendingClaims = claims.filter((c) => c.status === "pending");
+  const resolvedClaims = claims.filter((c) => c.status !== "pending");
+
   if (claims.length === 0) {
     return (
       <div className="py-16 text-center text-muted-foreground">
@@ -67,9 +71,32 @@ export default function AdminClaimRequests() {
     );
   }
 
+  const displayClaims = showResolved ? resolvedClaims : pendingClaims;
+
   return (
-    <div className="space-y-3">
-      {claims.map((claim) => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setShowResolved(false)}
+          className={`px-3 py-1 text-sm font-medium rounded-full border transition-colors ${!showResolved ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border hover:border-primary/40"}`}
+        >
+          Pending ({pendingClaims.length})
+        </button>
+        <button
+          onClick={() => setShowResolved(true)}
+          className={`px-3 py-1 text-sm font-medium rounded-full border transition-colors ${showResolved ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border hover:border-primary/40"}`}
+        >
+          Resolved ({resolvedClaims.length})
+        </button>
+      </div>
+
+      {displayClaims.length === 0 ? (
+        <div className="py-8 text-center text-muted-foreground text-sm">
+          <p>{showResolved ? "No approved or rejected claims yet." : "No pending claim requests."}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+      {displayClaims.map((claim) => (
         <div key={claim.id} className="bg-card border rounded-xl p-4">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div className="space-y-1 flex-1">
@@ -118,6 +145,8 @@ export default function AdminClaimRequests() {
           </div>
         </div>
       ))}
+        </div>
+      )}
     </div>
   );
 }
