@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap } from "lucide-react";
+import AdminActionStream from "../components/AdminActionStream";
 import AdminClaimRequests from "../components/AdminClaimRequests";
 import AdminOverview from "../components/AdminOverview";
 import AdminUsersTab from "../components/AdminUsersTab";
@@ -387,6 +388,15 @@ export default function Admin() {
           <Users className="w-4 h-4" />
           Users
         </button>
+        <button
+          onClick={() => setActiveTab("stream")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            activeTab === "stream" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Zap className="w-4 h-4" />
+          Action Stream
+        </button>
       </div>
 
       {activeTab === "overview" && (
@@ -402,6 +412,13 @@ export default function Admin() {
 
       {activeTab === "claims" && <AdminClaimRequests />}
       {activeTab === "users" && <AdminUsersTab />}
+      {activeTab === "stream" && (
+        <AdminActionStream
+          listings={listings}
+          currentUser={user}
+          onListingUpdated={loadListings}
+        />
+      )}
 
       {activeTab === "listings" && selectMode && selectedIds.length > 0 && (
         <BulkEditBar

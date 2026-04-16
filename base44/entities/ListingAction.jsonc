@@ -1,0 +1,78 @@
+{
+  "name": "ListingAction",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "listing_name": {
+      "type": "string",
+      "title": "Listing Name"
+    },
+    "action_type": {
+      "type": "string",
+      "title": "Action Type",
+      "enum": [
+        "follow_up",
+        "call",
+        "email",
+        "visit",
+        "review",
+        "note",
+        "ownership_transfer",
+        "claim_approved",
+        "claim_rejected",
+        "verified",
+        "unverified",
+        "plan_upgrade",
+        "other"
+      ],
+      "enumNames": [
+        "Follow Up",
+        "Call",
+        "Email",
+        "Visit",
+        "Review Listing",
+        "Note",
+        "Ownership Transfer",
+        "Claim Approved",
+        "Claim Rejected",
+        "Marked Verified",
+        "Marked Unverified",
+        "Plan Upgrade",
+        "Other"
+      ]
+    },
+    "note": {
+      "type": "string",
+      "title": "Note / Description"
+    },
+    "due_date": {
+      "type": "string",
+      "title": "Due Date (YYYY-MM-DD)"
+    },
+    "is_done": {
+      "type": "boolean",
+      "title": "Done",
+      "default": false
+    },
+    "done_date": {
+      "type": "string",
+      "title": "Done Date"
+    },
+    "assigned_to": {
+      "type": "string",
+      "title": "Assigned To (email)"
+    },
+    "created_by_name": {
+      "type": "string",
+      "title": "Created By Name"
+    }
+  },
+  "required": [
+    "listing_id",
+    "listing_name",
+    "action_type"
+  ]
+}

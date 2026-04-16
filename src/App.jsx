@@ -15,7 +15,7 @@ import Admin from './pages/Admin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Billing from './pages/Billing';
 import OwnerDashboard from './pages/OwnerDashboard';
-import GroupAdminDashboard from './pages/GroupAdminDashboard';
+import GroupAdminDashboard from './pages/GroupAdminDashboard.jsx';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
