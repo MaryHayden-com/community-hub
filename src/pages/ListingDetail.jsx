@@ -277,12 +277,10 @@ export default function ListingDetail() {
 
           {/* Claim / Removal */}
           <div className="mt-6 pt-6 border-t flex flex-wrap gap-3">
-            {!listing.is_verified && (
-              <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
-                <Flag className="w-3.5 h-3.5" />
-                Claim this listing
-              </Button>
-            )}
+            <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
+              <Flag className="w-3.5 h-3.5" />
+              Claim this listing
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setShowRemoval(true)}>
               <ShieldCheck className="w-3.5 h-3.5" />
               Request removal
