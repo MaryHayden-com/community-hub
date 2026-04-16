@@ -19,11 +19,13 @@ export default function Home() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
 
   useEffect(() => {
-    base44.entities.CommunityListing.list("-created_date", 2000)
-      .then(setListings)
-      .finally(() => setLoading(false));
+    Promise.all([
+      base44.entities.CommunityListing.list("-created_date", 2000).then(setListings),
+      base44.auth.me().then((u) => setUserEmail(u?.email || null)).catch(() => setUserEmail(null)),
+    ]).finally(() => setLoading(false));
   }, []);
 
   const featured = useMemo(() => listings.filter((l) => l.is_featured).slice(0, 6), [listings]);
@@ -136,7 +138,7 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featured.map((l) => (
-              <ListingCard key={l.id} listing={l} />
+              <ListingCard key={l.id} listing={l} isOwned={l.owner_email === userEmail} />
             ))}
           </div>
         </section>

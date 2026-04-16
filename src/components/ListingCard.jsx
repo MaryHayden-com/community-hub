@@ -16,7 +16,7 @@ const typeGradients = {
   "What's On": "from-amber-50 to-amber-100",
 };
 
-export default function ListingCard({ listing }) {
+export default function ListingCard({ listing, isOwned }) {
   const config = typeConfig[listing.type] || typeConfig["Business"];
   const Icon = config.icon;
   const gradient = typeGradients[listing.type] || "from-slate-50 to-slate-100";
@@ -24,7 +24,7 @@ export default function ListingCard({ listing }) {
     return (
     <Link
       to={`/listing/${listing.id}`}
-      className="group block bg-card rounded-xl border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden"
+      className={`group block rounded-xl border transition-all duration-300 overflow-hidden ${isOwned ? "bg-emerald-50 border-emerald-200 hover:border-emerald-300 hover:shadow-lg" : "bg-card hover:border-primary/30 hover:shadow-lg"}`}
     >
       <div className="h-36 overflow-hidden relative">
         {listing.image_url ? (
@@ -41,10 +41,15 @@ export default function ListingCard({ listing }) {
       </div>
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-              {listing.name}
-            </h3>
+           <div className="flex-1 min-w-0">
+             <div className="flex items-center gap-2 flex-wrap">
+               <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                 {listing.name}
+               </h3>
+               {isOwned && (
+                 <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs shrink-0">Yours</Badge>
+               )}
+             </div>
             <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3 shrink-0" />
               <span className="truncate">
@@ -53,7 +58,8 @@ export default function ListingCard({ listing }) {
                 , {listing.county}
               </span>
             </div>
-          </div>
+            </div>
+            </div>
           {listing.is_featured && (
             <Star className="w-4 h-4 text-accent shrink-0 fill-accent" />
           )}
