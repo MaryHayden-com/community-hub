@@ -4,15 +4,17 @@ import { Button } from "@/components/ui/button";
 import { getCountiesNearby } from "@/utils/countyCoordinates";
 
 const RADIUS_OPTIONS = [
-  { label: "~30 km", km: 30 },
-  { label: "~60 km", km: 60 },
-  { label: "~100 km", km: 100 },
+  { label: "10 km", km: 10 },
+  { label: "20 km", km: 20 },
+  { label: "30 km", km: 30 },
+  { label: "50 km", km: 50 },
+  { label: "100 km", km: 100 },
 ];
 
 export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [radius, setRadius] = useState(60);
+  const [radius, setRadius] = useState(10);
 
   const locate = (km = radius) => {
     if (!navigator.geolocation) {
@@ -23,7 +25,11 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
     setError(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const counties = getCountiesNearby(pos.coords.latitude, pos.coords.longitude, km);
+        let counties = getCountiesNearby(pos.coords.latitude, pos.coords.longitude, km);
+        // Always return at least the nearest county even if centroid is > km away
+        if (counties.length === 0) {
+          counties = getCountiesNearby(pos.coords.latitude, pos.coords.longitude, 999).slice(0, 1);
+        }
         onNearbyChange(counties.map((c) => c.county));
         setLoading(false);
       },
