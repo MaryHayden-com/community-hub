@@ -1,8 +1,7 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
 import {
-  LayoutGrid, Calendar, Users, Flag, CheckCircle2, Clock,
-  Plus, FileUp, UserPlus, Inbox, TrendingUp, Star, MapPin
+  LayoutGrid, Calendar, Flag, CheckCircle2, Clock,
+  Plus, FileUp, Inbox, TrendingUp, Star, MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -84,11 +83,7 @@ export default function AdminOverview({ listings, pendingClaimsCount, onAddListi
               </span>
             )}
           </Button>
-          <Link to="/admin?tab=users">
-            <Button size="sm" variant="outline" className="gap-1.5">
-              <UserPlus className="w-4 h-4" /> Add User
-            </Button>
-          </Link>
+
         </div>
       </div>
 
