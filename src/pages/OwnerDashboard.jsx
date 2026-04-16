@@ -72,6 +72,24 @@ export default function OwnerDashboard() {
   }, []);
 
   useEffect(() => {
+    if (!user?.email) return;
+    const unsubscribe = base44.entities.CommunityListing.subscribe((event) => {
+      if (event.data?.owner_email === user.email) {
+        setMyListings((prev) => {
+          const exists = prev.find((l) => l.id === event.id);
+          if (event.type === 'create' || event.type === 'update') {
+            return exists ? prev.map((l) => l.id === event.id ? event.data : l) : [event.data, ...prev];
+          } else if (event.type === 'delete') {
+            return prev.filter((l) => l.id !== event.id);
+          }
+          return prev;
+        });
+      }
+    });
+    return unsubscribe;
+  }, [user?.email]);
+
+  useEffect(() => {
     if (!selectedListing) return;
     base44.entities.ListingEngagement.filter({ listing_id: selectedListing.id })
       .then(setEngagement)
