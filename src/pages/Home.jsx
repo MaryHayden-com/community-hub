@@ -2,10 +2,11 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES } from "../utils/irelandData";
-import { MapPin, Building2, Users, GraduationCap, Calendar, ArrowRight, Star, Search } from "lucide-react";
+import { MapPin, Building2, Users, GraduationCap, Calendar, ArrowRight, Star, Search, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CountyCard from "../components/CountyCard";
 import ListingCard from "../components/ListingCard";
+import SubmitListingForm from "../components/SubmitListingForm";
 
 const categories = [
   { type: "Business", label: "Businesses", icon: Building2, desc: "Local shops, services & trades" },
@@ -17,6 +18,7 @@ const categories = [
 export default function Home() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
 
   useEffect(() => {
     base44.entities.CommunityListing.list("-created_date", 2000)
@@ -58,6 +60,7 @@ export default function Home() {
 
   return (
     <div>
+      <SubmitListingForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-primary/5 via-background to-accent/5 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
@@ -74,6 +77,10 @@ export default function Home() {
                 Explore Directory
               </Button>
             </Link>
+            <Button size="lg" variant="outline" className="gap-2 h-12 px-6" onClick={() => setShowSubmitForm(true)}>
+              <PlusCircle className="w-4 h-4" />
+              Add Your Listing
+            </Button>
           </div>
           <div className="mt-6 flex justify-center gap-6 text-sm text-muted-foreground">
             <span className="font-medium">{listings.length} Listings</span>
