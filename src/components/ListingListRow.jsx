@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone, Facebook, Instagram, Linkedin } from "lucide-react";
+import { Building2, Users, GraduationCap, Calendar, MapPin, Star, Globe, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const typeConfig = {
@@ -48,9 +48,10 @@ export default function ListingListRow({ listing }) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 shrink-0 text-muted-foreground">
-        {listing.phone && <Phone className="w-3.5 h-3.5" />}
-        {listing.website && <ExternalLink className="w-3.5 h-3.5" />}
+      <div className="flex items-center gap-2 shrink-0">
+        {listing.phone && <Phone className="w-3.5 h-3.5 text-muted-foreground" />}
+        {listing.email && <Mail className="w-3.5 h-3.5 text-muted-foreground" />}
+        {listing.website && <Globe className="w-3.5 h-3.5 text-muted-foreground" />}
         {listing.facebook_url && <Facebook className="w-3.5 h-3.5 text-blue-600" />}
         {listing.instagram_url && <Instagram className="w-3.5 h-3.5 text-pink-500" />}
         {listing.linkedin_url && <Linkedin className="w-3.5 h-3.5 text-blue-700" />}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Users, GraduationCap, Calendar, MapPin, Star, ExternalLink, Phone, Facebook, Instagram, Linkedin } from "lucide-react";
+import { Building2, Users, GraduationCap, Calendar, MapPin, Star, Globe, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const typeConfig = {
@@ -82,37 +82,30 @@ export default function ListingCard({ listing }) {
           </p>
         )}
 
-        <div className="flex items-center gap-3 pt-1 text-xs text-muted-foreground">
-          {listing.phone && (
-            <span className="flex items-center gap-1">
-              <Phone className="w-3 h-3" /> Contact
-            </span>
-          )}
+        <div className="flex items-center gap-3 pt-1">
+          {listing.phone && <Phone className="w-3.5 h-3.5 text-muted-foreground" />}
+          {listing.email && <Mail className="w-3.5 h-3.5 text-muted-foreground" />}
           {listing.website && (
-            <a href={listing.website} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="flex items-center gap-1 hover:text-primary">
-              <ExternalLink className="w-3 h-3" /> Website
+            <a href={listing.website} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+              <Globe className="w-3.5 h-3.5 text-muted-foreground hover:text-primary transition-colors" />
+            </a>
+          )}
+          {listing.facebook_url && (
+            <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+              <Facebook className="w-3.5 h-3.5 text-blue-600 hover:opacity-80 transition-opacity" />
+            </a>
+          )}
+          {listing.instagram_url && (
+            <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+              <Instagram className="w-3.5 h-3.5 text-pink-500 hover:opacity-80 transition-opacity" />
+            </a>
+          )}
+          {listing.linkedin_url && (
+            <a href={listing.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+              <Linkedin className="w-3.5 h-3.5 text-blue-700 hover:opacity-80 transition-opacity" />
             </a>
           )}
         </div>
-        {(listing.facebook_url || listing.instagram_url || listing.linkedin_url) && (
-          <div className="flex items-center gap-2 pt-1">
-            {listing.facebook_url && (
-              <a href={listing.facebook_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-blue-600 transition-colors">
-                <Facebook className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {listing.instagram_url && (
-              <a href={listing.instagram_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-pink-600 transition-colors">
-                <Instagram className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {listing.linkedin_url && (
-              <a href={listing.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-blue-700 transition-colors">
-                <Linkedin className="w-3.5 h-3.5" />
-              </a>
-            )}
-          </div>
-        )}
       </div>
     </Link>
   );
