@@ -115,7 +115,7 @@ export default function Directory() {
         return (
           (l.name || "").toLowerCase().includes(s) ||
           (l.description || "").toLowerCase().includes(s) ||
-          (l.category || "").toLowerCase().includes(s) ||
+          (Array.isArray(l.category) ? l.category.join(" ") : (l.category || "")).toLowerCase().includes(s) ||
           (l.town || "").toLowerCase().includes(s)
         );
       }
