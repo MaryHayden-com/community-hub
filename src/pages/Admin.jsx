@@ -35,6 +35,7 @@ export default function Admin() {
   const [filterType, setFilterType] = useState("");
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
+  const [filterFeatured, setFilterFeatured] = useState(false);
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
   const [fetchingWhatsOn, setFetchingWhatsOn] = useState(false);
@@ -46,7 +47,7 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState("overview");
   const [triggerImport, setTriggerImport] = useState(false);
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
-  const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: false });
+  const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: true });
 
 
   const ALL_COLUMNS = [
@@ -216,6 +217,7 @@ export default function Admin() {
       if (filterType && l.type !== filterType) return false;
       if (filterCounty && l.county !== filterCounty) return false;
       if (filterTown && l.town !== filterTown) return false;
+      if (filterFeatured && !l.is_featured) return false;
       if (!search) return true;
       const s = search.toLowerCase();
       return (
@@ -497,9 +499,18 @@ export default function Admin() {
           </SelectContent>
         </Select>
 
-        {(filterType || filterCounty || filterTown || search) && (
+        {activeTab === "listings" && (
           <button
-            onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); setSearch(""); }}
+            onClick={() => setFilterFeatured(!filterFeatured)}
+            className={`flex items-center gap-1 text-xs border rounded-md px-2 py-1.5 transition-colors ${filterFeatured ? "bg-amber-100 border-amber-400 text-amber-700 font-semibold" : "bg-card text-muted-foreground hover:text-foreground"}`}
+          >
+            ★ Featured only
+          </button>
+        )}
+
+        {(filterType || filterCounty || filterTown || search || filterFeatured) && (
+          <button
+            onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); setSearch(""); setFilterFeatured(false); }}
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border rounded-md px-2 py-1.5 bg-card hover:border-primary/40 transition-colors"
           >
             <X className="w-3 h-3" /> Clear
@@ -611,7 +622,7 @@ export default function Admin() {
                        } else if (key === "name") {
                          content = <span className="font-medium text-foreground">{l.name}</span>;
                        } else if (key === "is_featured") {
-                         content = l.is_featured ? "★" : "";
+                         content = l.is_featured ? <span className="text-amber-500 text-base">★</span> : <span className="text-muted-foreground/30 text-base">☆</span>;
                        } else if (key === "website") {
                          content = l.website ? <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{l.website}</a> : "";
                        } else {
