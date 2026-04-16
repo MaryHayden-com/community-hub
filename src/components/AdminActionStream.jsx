@@ -37,7 +37,7 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
   const [filterType, setFilterType] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedIds, setSelectedIds] = useState([]);
-  const [selectMode, setSelectMode] = useState(false);
+  const [selectMode, setSelectMode] = useState(true);
 
   const loadActions = () => {
     setLoadingActions(true);
