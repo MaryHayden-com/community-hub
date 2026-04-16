@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import MultiCheckboxPicker from "@/components/MultiCheckboxPicker";
+import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
 function FieldRow({ label, field, isHidden, toggleHidden, children }) {
   const hidden = isHidden(field);
@@ -223,7 +223,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
   const GROUP_MAP = {
-    "Business": ["Accommodation", "Food & Beverage", "Healthcare", "Industry", "Personal Services", "Professional Services", "Retail", "Tourism", "Trades & Construction"],
+    "Business": ["Accommodation", "Financial & Insurance", "Food & Beverage", "Healthcare", "Industry", "Media & Communications", "Personal Services", "Professional Services", "Retail", "Tourism", "Trades & Construction", "Transport & Logistics"],
     "Club & Group": ["Arts & Culture", "Charity & Welfare", "Faith & Religious", "Leisure & Community", "Sports & Recreation", "Youth & Community"],
     "Community Services": ["Faith & Worship", "Libraries"],
     "Education": ["Childcare", "Higher Education", "Schools", "Training & Skills"],
@@ -240,7 +240,10 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
       "Retail": ["Bookshop", "Butcher", "Clothing & Fashion", "Craft & Hobby", "Fishmonger", "Florist", "Gift Shop", "Grocery", "Hardware", "Health Food & Organic", "Newsagent", "Off Licence", "Supermarket"],
       "Industry": ["Agriculture", "Distillery & Brewery", "Engineering", "Food Production", "Manufacturing", "Technology"],
       "Tourism": ["Activity & Adventure", "Attraction", "Caravan & Camping", "Heritage & Culture", "Tour Operator", "Tourist Information"],
-      "Trades & Construction": ["Builder", "Carpenter", "Electrician", "Painter & Decorator", "Plumber"]
+      "Trades & Construction": ["Builder", "Carpenter", "Electrician", "Painter & Decorator", "Plumber"],
+      "Transport & Logistics": ["Bus & Coach", "Courier & Delivery", "Freight & Haulage", "Moving Services", "Taxi & Private Hire"],
+      "Media & Communications": ["Advertising", "Design & Creative", "Marketing", "Photography & Video", "Print & Publishing", "Web & Digital"],
+      "Financial & Insurance": ["Accountant", "Bank & Credit Union", "Bookkeeper", "Financial Advisor", "Insurance Broker", "Mortgage Broker"]
     },
     "Club & Group": {
       "Arts & Culture": ["Art & Craft", "Book Club", "Dance", "Drama & Theatre", "Music"],
@@ -282,15 +285,18 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const categorySuggestions = useMemo(() => {
     const byType = {
       "Business": [
-        "Accountant", "Airbnb", "B&B", "Bakery", "Bar & Pub", "Barber",
-        "Bookshop", "Builder", "Butcher", "Café", "Carpenter",
-        "Childcare & Crèche", "Cleaning Services", "Clothing & Fashion",
-        "Craft & Hobby", "Dentist", "Electrician", "Estate Agent",
-        "Financial Services", "Fishmonger", "Florist", "Gift Shop", "GP & Medical",
-        "Grocery", "Guesthouses", "Gym & Fitness", "Hair & Beauty", "Hardware",
-        "Health Food & Organic", "Hotels", "Manufacturing", "Newsagent", "Off Licence",
-        "Painter & Decorator", "Pharmacy", "Plumber", "Restaurant",
-        "Room to Let", "Solicitor", "Supermarket", "Takeaway", "Tourism", "Veterinary",
+        "Accountant", "Advertising", "Airbnb", "B&B", "Bakery", "Bank & Credit Union",
+        "Bar & Pub", "Barber", "Bookkeeper", "Bookshop", "Builder", "Bus & Coach",
+        "Butcher", "Café", "Carpenter", "Childcare & Crèche", "Cleaning Services",
+        "Clothing & Fashion", "Courier & Delivery", "Craft & Hobby", "Design & Creative",
+        "Dentist", "Electrician", "Estate Agent", "Financial Advisor", "Fishmonger",
+        "Florist", "Freight & Haulage", "Gift Shop", "GP & Medical", "Grocery",
+        "Guesthouses", "Gym & Fitness", "Hair & Beauty", "Hardware", "Health Food & Organic",
+        "Hotels", "Insurance Broker", "Manufacturing", "Marketing", "Mortgage Broker",
+        "Moving Services", "Newsagent", "Off Licence", "Painter & Decorator", "Pharmacy",
+        "Photography & Video", "Plumber", "Print & Publishing", "Restaurant", "Room to Let",
+        "Solicitor", "Supermarket", "Takeaway", "Taxi & Private Hire", "Tourism",
+        "Veterinary", "Web & Digital",
       ],
       "Club & Group": [
         "Art & Craft", "Athletics", "Baptist Church", "Book Club", "Boxing",
@@ -420,11 +426,11 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             <div className="space-y-3">
               <div>
                 <Label>Group(s) <span className="text-xs text-muted-foreground ml-1">— select all that apply</span></Label>
-                <MultiCheckboxPicker
+                <MultiSelectDropdown
                   options={groupOptions}
                   selected={form.subcategory_group}
+                  placeholder="Select group(s)..."
                   onChange={(v) => {
-                    // Remove any categories no longer valid for new group selection
                     const validCats = new Set();
                     v.forEach((g) => (CATEGORY_BY_GROUP[form.type]?.[g] || []).forEach((c) => validCats.add(c)));
                     update("subcategory_group", v);
@@ -435,9 +441,10 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
               {categoryOptions.length > 0 && (
                 <div>
                   <Label>Category / Categories <span className="text-xs text-muted-foreground ml-1">— select all that apply</span></Label>
-                  <MultiCheckboxPicker
+                  <MultiSelectDropdown
                     options={categoryOptions}
                     selected={form.category}
+                    placeholder="Select category/categories..."
                     onChange={(v) => update("category", v)}
                   />
                 </div>
