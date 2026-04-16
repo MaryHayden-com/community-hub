@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Pencil, Check, X, UserPlus } from "lucide-react";
+import { Loader2, Pencil, Check, X, UserPlus, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ALL_COUNTIES } from "@/utils/irelandData";
 
 const ROLE_LABELS = {
   admin: "Super Admin",
@@ -23,62 +25,133 @@ const ROLE_COLORS = {
   user: "bg-gray-50 text-gray-600 border-gray-200",
 };
 
+const LISTING_TYPES = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
+
+function TagCheckboxGroup({ title, prefix, options, selectedTags, onToggle }) {
+  const [open, setOpen] = useState(false);
+  const selectedInGroup = options.filter((o) => selectedTags.includes(`${prefix}:${o}`));
+
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-3 py-2 bg-muted/40 hover:bg-muted/70 transition-colors text-sm font-medium"
+      >
+        <span>{title}</span>
+        <div className="flex items-center gap-2">
+          {selectedInGroup.length > 0 && (
+            <span className="text-xs bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 leading-none">
+              {selectedInGroup.length}
+            </span>
+          )}
+          {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        </div>
+      </button>
+      {open && (
+        <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
+          {options.map((opt) => {
+            const tag = `${prefix}:${opt}`;
+            return (
+              <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm">
+                <Checkbox
+                  checked={selectedTags.includes(tag)}
+                  onCheckedChange={() => onToggle(tag)}
+                />
+                <span className="truncate">{opt}</span>
+              </label>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EditUserRow({ user, onSave, onCancel }) {
   const [role, setRole] = useState(user.role || "user");
-  const [tagsInput, setTagsInput] = useState((user.managed_tags || []).join(", "));
+  const [selectedTags, setSelectedTags] = useState(user.managed_tags || []);
   const [saving, setSaving] = useState(false);
+
+  const toggleTag = (tag) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
 
   const handleSave = async () => {
     setSaving(true);
-    const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
-    await base44.auth.updateMe ? null : null; // not for other users
-    // Use admin entity update
     await base44.entities.User.update(user.id, {
       role,
-      managed_tags: role === "group_admin" ? tags : [],
+      managed_tags: role === "group_admin" ? selectedTags : [],
     });
     setSaving(false);
     onSave();
   };
 
   return (
-    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
+    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm font-medium">{user.full_name || user.email}</span>
         <span className="text-xs text-muted-foreground">{user.email}</span>
       </div>
-      <div className="flex flex-wrap gap-3 items-end">
-        <div>
-          <label className="text-xs text-muted-foreground block mb-1">Role</label>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="border border-input rounded-md px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            {Object.entries(ROLE_LABELS).map(([val, label]) => (
-              <option key={val} value={val}>{label}</option>
-            ))}
-          </select>
+
+      <div>
+        <label className="text-xs text-muted-foreground block mb-1">Role</label>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="border border-input rounded-md px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          {Object.entries(ROLE_LABELS).map(([val, label]) => (
+            <option key={val} value={val}>{label}</option>
+          ))}
+        </select>
+      </div>
+
+      {role === "group_admin" && (
+        <div className="space-y-2">
+          <label className="text-xs text-muted-foreground block">Access Filters — tick all that apply</label>
+
+          <TagCheckboxGroup
+            title="County"
+            prefix="county"
+            options={ALL_COUNTIES}
+            selectedTags={selectedTags}
+            onToggle={toggleTag}
+          />
+
+          <TagCheckboxGroup
+            title="Listing Type"
+            prefix="type"
+            options={LISTING_TYPES}
+            selectedTags={selectedTags}
+            onToggle={toggleTag}
+          />
+
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap gap-1 pt-1">
+              {selectedTags.map((t) => (
+                <span
+                  key={t}
+                  onClick={() => toggleTag(t)}
+                  className="text-xs bg-primary/10 text-primary border border-primary/20 rounded px-1.5 py-0.5 cursor-pointer hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-colors"
+                  title="Click to remove"
+                >
+                  {t} ×
+                </span>
+              ))}
+            </div>
+          )}
         </div>
-        {role === "group_admin" && (
-          <div className="flex-1 min-w-[240px]">
-            <label className="text-xs text-muted-foreground block mb-1">Managed Tags (comma separated)</label>
-            <input
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-              placeholder="county:Leitrim, type:What's On, town:Carrick-on-Shannon"
-              className="w-full border border-input rounded-md px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-            <p className="text-xs text-muted-foreground mt-1">Format: <code>county:NAME</code>, <code>town:NAME</code>, <code>type:NAME</code>, <code>category:NAME</code></p>
-          </div>
-        )}
-        <div className="flex gap-2">
-          <Button size="sm" disabled={saving} onClick={handleSave}>
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5 mr-1" />}
-            Save
-          </Button>
-          <Button size="sm" variant="outline" onClick={onCancel}><X className="w-3.5 h-3.5" /></Button>
-        </div>
+      )}
+
+      <div className="flex gap-2">
+        <Button size="sm" disabled={saving} onClick={handleSave}>
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5 mr-1" />}
+          Save
+        </Button>
+        <Button size="sm" variant="outline" onClick={onCancel}><X className="w-3.5 h-3.5" /></Button>
       </div>
     </div>
   );
