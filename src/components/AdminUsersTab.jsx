@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Pencil, Check, X } from "lucide-react";
+import { Loader2, Pencil, Check, X, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const ROLE_LABELS = {
   admin: "Super Admin",
@@ -84,6 +88,10 @@ export default function AdminUsersTab() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("user");
+  const [inviting, setInviting] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -100,13 +108,78 @@ export default function AdminUsersTab() {
     load();
   };
 
+  const handleInvite = async () => {
+    if (!inviteEmail || !inviteEmail.includes("@")) {
+      toast({ title: "Invalid email", variant: "destructive" });
+      return;
+    }
+    setInviting(true);
+    try {
+      await base44.users.inviteUser(inviteEmail, inviteRole);
+      toast({ title: "Invitation sent", description: `Invited ${inviteEmail} as ${ROLE_LABELS[inviteRole]}` });
+      setShowInvite(false);
+      setInviteEmail("");
+      setInviteRole("user");
+      load();
+    } catch (err) {
+      toast({ title: "Failed to invite", description: err.message, variant: "destructive" });
+    } finally {
+      setInviting(false);
+    }
+  };
+
   if (loading) return (
     <div className="flex justify-center py-16"><Loader2 className="w-7 h-7 animate-spin text-primary" /></div>
   );
 
   return (
     <div className="space-y-2">
-      <p className="text-sm text-muted-foreground mb-4">{users.length} registered user{users.length !== 1 ? "s" : ""}</p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-muted-foreground">{users.length} registered user{users.length !== 1 ? "s" : ""}</p>
+        <Button size="sm" onClick={() => setShowInvite(true)}>
+          <UserPlus className="w-4 h-4 mr-1.5" />
+          Invite User
+        </Button>
+      </div>
+
+      <Dialog open={showInvite} onOpenChange={setShowInvite}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Invite User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div>
+              <Label>Email Address</Label>
+              <Input
+                type="email"
+                placeholder="user@example.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Role</Label>
+              <Select value={inviteRole} onValueChange={setInviteRole}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(ROLE_LABELS).map(([val, label]) => (
+                    <SelectItem key={val} value={val}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setShowInvite(false)}>Cancel</Button>
+              <Button onClick={handleInvite} disabled={inviting}>
+                {inviting && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
+                Send Invite
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       {users.map((u) =>
         editingId === u.id ? (
           <EditUserRow key={u.id} user={u} onSave={handleSave} onCancel={() => setEditingId(null)} />
