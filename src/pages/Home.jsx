@@ -16,17 +16,19 @@ const categories = [
 ];
 
 export default function Home() {
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showSubmitForm, setShowSubmitForm] = useState(false);
-  const [userEmail, setUserEmail] = useState(null);
+   const [listings, setListings] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [showSubmitForm, setShowSubmitForm] = useState(false);
+   const [userEmail, setUserEmail] = useState(null);
 
-  useEffect(() => {
-    Promise.all([
-      base44.entities.CommunityListing.list("-created_date", 2000).then(setListings),
-      base44.auth.me().then((u) => setUserEmail(u?.email || null)).catch(() => setUserEmail(null)),
-    ]).finally(() => setLoading(false));
-  }, []);
+   useEffect(() => {
+     Promise.all([
+       base44.entities.CommunityListing.list("-created_date", 2000).then(setListings),
+       base44.auth.me().then((u) => setUserEmail(u?.email || null)).catch(() => setUserEmail(null)),
+     ]).finally(() => setLoading(false));
+   }, []);
+
+   const ownedListing = useMemo(() => listings.find((l) => l.owner_email === userEmail), [listings, userEmail]);
 
   const featured = useMemo(() => listings.filter((l) => l.is_featured).slice(0, 6), [listings]);
 
@@ -79,10 +81,19 @@ export default function Home() {
                 Explore Directory
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="gap-2 h-12 px-6" onClick={() => setShowSubmitForm(true)}>
-              <PlusCircle className="w-4 h-4" />
-              Add Your Listing
-            </Button>
+            {ownedListing ? (
+              <Link to={`/dashboard`}>
+                <Button size="lg" variant="outline" className="gap-2 h-12 px-6">
+                  <PlusCircle className="w-4 h-4" />
+                  Edit Your Listing
+                </Button>
+              </Link>
+            ) : (
+              <Button size="lg" variant="outline" className="gap-2 h-12 px-6" onClick={() => setShowSubmitForm(true)}>
+                <PlusCircle className="w-4 h-4" />
+                Add Your Listing
+              </Button>
+            )}
           </div>
           <div className="mt-6 flex justify-center gap-6 text-sm text-muted-foreground">
             <span className="font-medium">{listings.length} Listings</span>
