@@ -363,6 +363,7 @@ export default function Admin() {
             </Button>
           </div>
         )}
+        </div>
       </div>
 
       {/* Tab Navigation */}
