@@ -204,15 +204,16 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const [saving, setSaving] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
 
-  // Auto-fetch image when a URL is added and no image exists yet
+  // Auto-fetch image when a URL is added and no image exists yet (only for new listings)
   useEffect(() => {
+    if (!isNew) return;
     const urls = [form.website, form.facebook_url, form.instagram_url].filter(Boolean);
     if (!urls.length || form.image_url || fetchingImage) return;
     const timer = setTimeout(async () => {
       setFetchingImage(true);
       try {
         const res = await base44.functions.invoke('fetchOgImage', { urls });
-        if (res.data?.image_url) setForm(prev => ({ ...prev, image_url: res.data.image_url }));
+        if (res.data?.image_url) setForm(prev => prev.image_url ? prev : ({ ...prev, image_url: res.data.image_url }));
       } finally {
         setFetchingImage(false);
       }
@@ -570,24 +571,40 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
 
           <div>
             <Label>Image</Label>
-            <div className="space-y-2 mt-1">
-              <Input type="file" accept="image/*" onChange={handleImageUpload} />
+            <div className="space-y-3 mt-1">
+              {form.image_url && (
+                <div className="flex items-center gap-3 p-2 border rounded-lg bg-muted/30">
+                  <img src={form.image_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover border shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground truncate">{form.image_url}</p>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => update("image_url", "")} className="text-destructive shrink-0">
+                    Remove
+                  </Button>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Upload an image</p>
+                <Input type="file" accept="image/*" onChange={handleImageUpload} />
+              </div>
+
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="flex-1 h-px bg-border" />
-                <span>or paste a URL</span>
+                <span>or</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
-              <div className="flex items-center gap-3">
+
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-muted-foreground">Paste an image URL</p>
                 <Input
                   placeholder="https://example.com/image.jpg"
                   value={form.image_url}
                   onChange={(e) => update("image_url", e.target.value)}
                   className="flex-1"
                 />
-                {form.image_url && (
-                  <img src={form.image_url} alt="Preview" className="w-12 h-12 rounded-lg object-cover border shrink-0" />
-                )}
               </div>
+
               <Button type="button" variant="outline" size="sm" onClick={handleFetchImage} disabled={fetchingImage} className="gap-1.5 w-full">
                 {fetchingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
                 Auto-fetch image from website / social links
