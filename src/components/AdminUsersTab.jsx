@@ -133,13 +133,26 @@ export default function AdminUsersTab() {
   );
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-muted-foreground">{users.length} registered user{users.length !== 1 ? "s" : ""}</p>
-        <Button size="sm" onClick={() => setShowInvite(true)}>
-          <UserPlus className="w-4 h-4 mr-1.5" />
+    <div className="space-y-4">
+      {/* Invite User Banner */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-2 border-primary/20 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-primary" />
+            Invite New Users
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Add team members, group admins, or listing owners to the platform
+          </p>
+        </div>
+        <Button size="lg" onClick={() => setShowInvite(true)} className="shadow-md">
+          <UserPlus className="w-5 h-5 mr-2" />
           Invite User
         </Button>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{users.length} registered user{users.length !== 1 ? "s" : ""}</p>
       </div>
 
       <Dialog open={showInvite} onOpenChange={setShowInvite}>
