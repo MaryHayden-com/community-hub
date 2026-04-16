@@ -227,7 +227,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     "Business": {
       "Accommodation": ["Hotels", "B&B", "Airbnb", "Room to Let", "Guesthouses"],
       "Food & Beverage": ["Restaurant", "Café", "Bar & Pub", "Takeaway", "Bakery"],
-      "Retail": ["Supermarket", "Grocery", "Newsagent", "Bookshop", "Hardware", "Clothing & Fashion", "Gift Shop", "Craft & Hobby", "Florist", "Butcher", "Fishmonger", "Off Licence"],
+      "Retail": ["Supermarket", "Grocery", "Newsagent", "Bookshop", "Hardware", "Clothing & Fashion", "Gift Shop", "Craft & Hobby", "Florist", "Butcher", "Fishmonger", "Off Licence", "Health Food & Organic"],
       "Professional Services": ["Solicitor", "Accountant", "Financial Services", "Estate Agent"],
       "Personal Services": ["Hair & Beauty", "Barber", "Gym & Fitness", "Cleaning Services", "Childcare & Crèche"],
       "Healthcare": ["Dentist", "GP & Medical", "Veterinary", "Pharmacy"],
@@ -269,7 +269,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
         "Painter & Decorator", "Cleaning Services", "Childcare & Crèche",
         "Hotel", "B&B", "Gym & Fitness", "Dentist", "GP & Medical", "Veterinary",
         "Florist", "Bakery", "Butcher", "Fishmonger", "Off Licence",
-        "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby",
+        "Newsagent", "Bookshop", "Gift Shop", "Craft & Hobby", "Health Food & Organic",
       ],
       "Club & Group": [
         "GAA", "Soccer / Football", "Rugby", "Tennis", "Golf", "Athletics",
