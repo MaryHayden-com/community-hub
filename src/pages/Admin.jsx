@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users } from "lucide-react";
 import AdminClaimRequests from "../components/AdminClaimRequests";
 import AdminOverview from "../components/AdminOverview";
+import AdminUsersTab from "../components/AdminUsersTab";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -377,6 +378,15 @@ export default function Admin() {
             </span>
           )}
         </button>
+        <button
+          onClick={() => setActiveTab("users")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            activeTab === "users" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          Users
+        </button>
       </div>
 
       {activeTab === "overview" && (
@@ -391,6 +401,7 @@ export default function Admin() {
       )}
 
       {activeTab === "claims" && <AdminClaimRequests />}
+      {activeTab === "users" && <AdminUsersTab />}
 
       {activeTab === "listings" && selectMode && selectedIds.length > 0 && (
         <BulkEditBar

@@ -30,9 +30,14 @@ export default function AdminClaimRequests() {
     await base44.entities.ClaimRequest.update(claim.id, { status: "approved" });
     // Link the owner email to the listing
     await base44.entities.CommunityListing.update(claim.listing_id, { owner_email: claim.email });
-    // Invite the user
-    await base44.users.inviteUser(claim.email, "user");
-    toast({ title: "Approved & Invited", description: `${claim.email} has been invited to manage ${claim.listing_name}.` });
+    // Invite with listing_owner role
+    await base44.users.inviteUser(claim.email, "listing_owner");
+    // If user already exists, upgrade their role
+    const existingUsers = await base44.entities.User.filter({ email: claim.email });
+    if (existingUsers.length > 0) {
+      await base44.entities.User.update(existingUsers[0].id, { role: "listing_owner" });
+    }
+    toast({ title: "Approved & Invited", description: `${claim.email} has been granted Listing Owner access for ${claim.listing_name}.` });
     setActionId(null);
     load();
   };

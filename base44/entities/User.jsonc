@@ -1,0 +1,31 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "title": "Role",
+      "enum": [
+        "admin",
+        "group_admin",
+        "listing_owner",
+        "user"
+      ],
+      "enumNames": [
+        "Super Admin",
+        "Group Admin",
+        "Listing Owner",
+        "User (View Only)"
+      ],
+      "default": "user"
+    },
+    "managed_tags": {
+      "type": "array",
+      "title": "Managed Tags (Group Admin scope)",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags scoping what this group admin can manage, e.g. county:Leitrim, type:What's On, town:Carrick-on-Shannon"
+    }
+  }
+}

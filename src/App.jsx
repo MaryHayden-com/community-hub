@@ -15,6 +15,7 @@ import Admin from './pages/Admin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Billing from './pages/Billing';
 import OwnerDashboard from './pages/OwnerDashboard';
+import GroupAdminDashboard from './pages/GroupAdminDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,6 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/billing" element={<Billing />} />
         <Route path="/dashboard" element={<OwnerDashboard />} />
+        <Route path="/group-dashboard" element={<GroupAdminDashboard />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

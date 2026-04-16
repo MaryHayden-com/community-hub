@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Home, MapPin, Building2, Users, GraduationCap, Calendar, Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard } from "lucide-react";
+import { Home, MapPin, Building2, Users, GraduationCap, Calendar, Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -27,15 +27,8 @@ export default function Layout() {
   }, [location.pathname, location.search]);
 
   const isAdmin = user?.role === "admin";
-  const [hasClaimedListing, setHasClaimedListing] = useState(false);
-
-  useEffect(() => {
-    if (user?.email) {
-      base44.entities.CommunityListing.filter({ owner_email: user.email })
-        .then((results) => setHasClaimedListing(results.length > 0))
-        .catch(() => {});
-    }
-  }, [user]);
+  const isGroupAdmin = user?.role === "group_admin";
+  const isListingOwner = user?.role === "listing_owner";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -69,7 +62,7 @@ export default function Layout() {
                 </Link>
               );
             })}
-            {user && hasClaimedListing && (
+            {isListingOwner && (
               <Link
                 to="/dashboard"
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
@@ -78,6 +71,17 @@ export default function Layout() {
               >
                 <LayoutDashboard className="w-4 h-4" />
                 My Dashboard
+              </Link>
+            )}
+            {isGroupAdmin && (
+              <Link
+                to="/group-dashboard"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  location.pathname === "/group-dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                <Tag className="w-4 h-4" />
+                Group Dashboard
               </Link>
             )}
             {user && (
@@ -134,13 +138,23 @@ export default function Layout() {
                 </Link>
               );
             })}
-            {user && hasClaimedListing && (
+            {isListingOwner && (
               <Link
                 to="/dashboard"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 <LayoutDashboard className="w-4 h-4 text-muted-foreground" />
                 My Dashboard
+                <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
+              </Link>
+            )}
+            {isGroupAdmin && (
+              <Link
+                to="/group-dashboard"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <Tag className="w-4 h-4 text-muted-foreground" />
+                Group Dashboard
                 <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
               </Link>
             )}
