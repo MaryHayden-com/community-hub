@@ -19,7 +19,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    base44.entities.CommunityListing.list("-created_date", 500)
+    base44.entities.CommunityListing.list("-created_date", 2000)
       .then(setListings)
       .finally(() => setLoading(false));
   }, []);
