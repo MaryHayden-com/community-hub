@@ -42,14 +42,19 @@ export default function Directory() {
   }, []);
 
   const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county), []);
+  // Helper: normalise a field that may be a string or array
+  const toArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);
+
   const groups = useMemo(() => {
     if (!type) return [];
-    const grps = listings.filter((l) => l.type === type).map((l) => l.subcategory_group).filter(Boolean);
+    const grps = listings.filter((l) => l.type === type).flatMap((l) => toArr(l.subcategory_group)).filter(Boolean);
     return [...new Set(grps)].sort();
   }, [listings, type]);
   const categories = useMemo(() => {
     if (!type || !subcategoryGroup) return [];
-    const cats = listings.filter((l) => l.type === type && l.subcategory_group === subcategoryGroup).map((l) => l.category).filter(Boolean);
+    const cats = listings
+      .filter((l) => l.type === type && toArr(l.subcategory_group).includes(subcategoryGroup))
+      .flatMap((l) => toArr(l.category)).filter(Boolean);
     return [...new Set(cats)].sort();
   }, [listings, type, subcategoryGroup]);
   const towns = useMemo(() => {
@@ -100,8 +105,8 @@ export default function Directory() {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
       if (type && l.type !== type) return false;
-      if (subcategoryGroup && l.subcategory_group !== subcategoryGroup) return false;
-      if (category && l.category !== category) return false;
+      if (subcategoryGroup && !toArr(l.subcategory_group).includes(subcategoryGroup)) return false;
+      if (category && !toArr(l.category).includes(category)) return false;
       if (nearbyCounties && !nearbyCounties.includes(l.county)) return false;
       if (!nearbyCounties && county && l.county !== county) return false;
       if (town && l.town !== town) return false;

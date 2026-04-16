@@ -25,17 +25,25 @@
       ]
     },
     "subcategory_group": {
-      "type": "string",
-      "title": "Group"
+      "type": "array",
+      "title": "Group(s)",
+      "items": {
+        "type": "string"
+      },
+      "description": "One or more groups this listing belongs to"
     },
     "category": {
-      "type": "string",
-      "title": "Category / Trade Type"
+      "type": "array",
+      "title": "Category / Categories",
+      "items": {
+        "type": "string"
+      },
+      "description": "One or more categories this listing belongs to"
     },
     "parent_listing_id": {
       "type": "string",
       "title": "Parent Listing ID",
-      "description": "Links a What's On event back to its parent venue listing (e.g. a Mass to its church)"
+      "description": "Links a What's On event back to its parent venue listing"
     },
     "country": {
       "type": "string",

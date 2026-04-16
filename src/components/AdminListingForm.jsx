@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import MultiCheckboxPicker from "@/components/MultiCheckboxPicker";
 
 function FieldRow({ label, field, isHidden, toggleHidden, children }) {
   const hidden = isHidden(field);
@@ -158,8 +159,12 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const [form, setForm] = useState({
     name: listing?.name || "",
     type: listing?.type || "Business",
-    subcategory_group: listing?.subcategory_group || "",
-    category: listing?.category || "",
+    subcategory_group: Array.isArray(listing?.subcategory_group)
+      ? listing.subcategory_group
+      : listing?.subcategory_group ? [listing.subcategory_group] : [],
+    category: Array.isArray(listing?.category)
+      ? listing.category
+      : listing?.category ? [listing.category] : [],
     country: listing?.country || "Ireland",
     county: listing?.county || "",
     town: listing?.town || "",
@@ -261,7 +266,15 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   };
 
   const groupOptions = form.type ? GROUP_MAP[form.type] || [] : [];
-  const categoryOptions = form.subcategory_group && CATEGORY_BY_GROUP[form.type]?.[form.subcategory_group] ? CATEGORY_BY_GROUP[form.type][form.subcategory_group] : [];
+  // Aggregate categories from ALL selected groups
+  const categoryOptions = useMemo(() => {
+    if (!form.type || !form.subcategory_group?.length) return [];
+    const all = new Set();
+    form.subcategory_group.forEach((g) => {
+      (CATEGORY_BY_GROUP[form.type]?.[g] || []).forEach((c) => all.add(c));
+    });
+    return [...all].sort();
+  }, [form.type, form.subcategory_group]);
 
   const categorySuggestions = useMemo(() => {
     const byType = {
@@ -312,10 +325,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
         "Theatre", "Workshop",
       ],
     };
-    const list = byType[form.type] || [];
-    if (!form.category) return list;
-    return list.filter((s) => s.toLowerCase().includes(form.category.toLowerCase()));
-  }, [form.type, form.category]);
+    return byType[form.type] || [];
+  }, [form.type]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -389,7 +400,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
             <div>
               <Label>Type *</Label>
-              <Select value={form.type} onValueChange={(v) => { update("type", v); update("subcategory_group", ""); update("category", ""); }}>
+              <Select value={form.type} onValueChange={(v) => { update("type", v); update("subcategory_group", []); update("category", []); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Business">Business</SelectItem>
@@ -403,29 +414,29 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
           </div>
 
           {groupOptions.length > 0 && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
               <div>
-                <Label>Group</Label>
-                <Select value={form.subcategory_group} onValueChange={(v) => { update("subcategory_group", v); update("category", ""); }}>
-                  <SelectTrigger><SelectValue placeholder="Select group" /></SelectTrigger>
-                  <SelectContent>
-                    {groupOptions.map((g) => (
-                      <SelectItem key={g} value={g}>{g}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Group(s) <span className="text-xs text-muted-foreground ml-1">— select all that apply</span></Label>
+                <MultiCheckboxPicker
+                  options={groupOptions}
+                  selected={form.subcategory_group}
+                  onChange={(v) => {
+                    // Remove any categories no longer valid for new group selection
+                    const validCats = new Set();
+                    v.forEach((g) => (CATEGORY_BY_GROUP[form.type]?.[g] || []).forEach((c) => validCats.add(c)));
+                    update("subcategory_group", v);
+                    update("category", (form.category || []).filter((c) => validCats.has(c)));
+                  }}
+                />
               </div>
               {categoryOptions.length > 0 && (
                 <div>
-                  <Label>Category</Label>
-                  <Select value={form.category} onValueChange={(v) => update("category", v)}>
-                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                    <SelectContent>
-                      {categoryOptions.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>Category / Categories <span className="text-xs text-muted-foreground ml-1">— select all that apply</span></Label>
+                  <MultiCheckboxPicker
+                    options={categoryOptions}
+                    selected={form.category}
+                    onChange={(v) => update("category", v)}
+                  />
                 </div>
               )}
             </div>
