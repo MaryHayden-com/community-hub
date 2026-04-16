@@ -218,7 +218,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
 
   const GROUP_MAP = {
     "Business": ["Accommodation", "Food & Beverage", "Retail", "Professional Services", "Personal Services", "Healthcare", "Trades & Construction"],
-    "Club & Group": ["Sports & Recreation", "Youth & Community", "Arts & Culture", "Faith & Religious", "Libraries", "Leisure & Community", "Charity & Welfare"],
+    "Club & Group": ["Sports & Recreation", "Youth & Community", "Arts & Culture", "Faith & Religious", "Leisure & Community", "Charity & Welfare"],
+    "Community Services": ["Libraries", "Faith & Worship"],
     "Education": ["Schools", "Higher Education", "Childcare", "Training & Skills"],
     "What's On": ["Festivals & Markets", "Entertainment", "Community Activities", "Seasonal & Themed"]
   };
@@ -238,9 +239,12 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
       "Youth & Community": ["Scouts", "Girl Guides", "Youth Club", "Tidy Towns", "Community Group", "Residents Association"],
       "Arts & Culture": ["Drama & Theatre", "Music", "Dance", "Art & Craft", "Book Club"],
       "Faith & Religious": ["Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community"],
-      "Libraries": ["Public Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
       "Leisure & Community": ["Walking Group", "Gardening Club", "Toastmasters", "ICA", "Men's Shed", "Women's Group", "Senior Citizens"],
       "Charity & Welfare": ["Charity"]
+    },
+    "Community Services": {
+      "Libraries": ["Public Library", "County Library", "Mobile Library", "Community Library", "University Library", "School Library"],
+      "Faith & Worship": ["Catholic Church", "Church of Ireland", "Methodist Church", "Presbyterian Church", "Baptist Church", "Evangelical Church", "Orthodox Church", "Islamic Centre / Mosque", "Jewish Synagogue", "Hindu Temple", "Buddhist Centre", "Quaker Meeting House", "Faith Community"]
     },
     "Education": {
       "Schools": ["Primary School", "Secondary School", "Gaelscoil", "Gaelcholáiste", "Special Education"],
@@ -384,6 +388,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
                 <SelectContent>
                   <SelectItem value="Business">Business</SelectItem>
                   <SelectItem value="Club & Group">Club & Group</SelectItem>
+                  <SelectItem value="Community Services">Community Services</SelectItem>
                   <SelectItem value="Education">Education</SelectItem>
                   <SelectItem value="What's On">What's On</SelectItem>
                 </SelectContent>

@@ -29,6 +29,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="Business">Business</SelectItem>
             <SelectItem value="Club & Group">Clubs & Groups</SelectItem>
+            <SelectItem value="Community Services">Community Services</SelectItem>
             <SelectItem value="Education">Education</SelectItem>
             <SelectItem value="What's On">What's On</SelectItem>
           </SelectContent>
