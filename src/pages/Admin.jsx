@@ -439,7 +439,7 @@ export default function Admin() {
           onImport={() => setTriggerImport(true)}
           onExport={() => {
             const headers = ["Type","Name","Category/Trade Type","County","Town","Description","Address","Phone","Email","Website","Facebook URL","Instagram URL","LinkedIn URL","Contact Name","Meeting Info","Is Featured"];
-            const rows = listings.map((l) => [l.type,l.name,(l.category||[]).join(";"),l.county,l.town,l.description,l.address,l.phone,l.email,l.website,l.facebook_url,l.instagram_url,l.linkedin_url,l.contact_name,l.meeting_info,l.is_featured?"Yes":"No"]);
+            const rows = listings.map((l) => [l.type,l.name, Array.isArray(l.category) ? l.category.join(";") : (l.category||""),l.county,l.town,l.description,l.address,l.phone,l.email,l.website,l.facebook_url,l.instagram_url,l.instagram_url,l.linkedin_url,l.contact_name,l.meeting_info,l.is_featured?"Yes":"No"]);
             const csv = [headers,...rows].map((r)=>r.map((c)=>{const val = Array.isArray(c) ? c.join(";") : (c||""); return `"${String(val).replace(/"/g,'""')}"`}).join(",")).join("\n");
             const a = document.createElement("a");
             a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
