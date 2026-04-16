@@ -222,7 +222,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
   const GROUP_MAP = {
-    "Business": ["Accommodation", "Food & Beverage", "Healthcare", "Personal Services", "Professional Services", "Retail", "Trades & Construction"],
+    "Business": ["Accommodation", "Food & Beverage", "Healthcare", "Industry", "Personal Services", "Professional Services", "Retail", "Tourism", "Trades & Construction"],
     "Club & Group": ["Arts & Culture", "Charity & Welfare", "Faith & Religious", "Leisure & Community", "Sports & Recreation", "Youth & Community"],
     "Community Services": ["Faith & Worship", "Libraries"],
     "Education": ["Childcare", "Higher Education", "Schools", "Training & Skills"],
@@ -237,6 +237,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
       "Personal Services": ["Barber", "Childcare & Crèche", "Cleaning Services", "Gym & Fitness", "Hair & Beauty"],
       "Professional Services": ["Accountant", "Estate Agent", "Financial Services", "Solicitor"],
       "Retail": ["Bookshop", "Butcher", "Clothing & Fashion", "Craft & Hobby", "Fishmonger", "Florist", "Gift Shop", "Grocery", "Hardware", "Health Food & Organic", "Newsagent", "Off Licence", "Supermarket"],
+      "Industry": ["Agriculture", "Distillery & Brewery", "Engineering", "Food Production", "Manufacturing", "Technology"],
+      "Tourism": ["Activity & Adventure", "Attraction", "Caravan & Camping", "Heritage & Culture", "Tour Operator", "Tourist Information"],
       "Trades & Construction": ["Builder", "Carpenter", "Electrician", "Painter & Decorator", "Plumber"]
     },
     "Club & Group": {
@@ -285,9 +287,9 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
         "Craft & Hobby", "Dentist", "Electrician", "Estate Agent",
         "Financial Services", "Fishmonger", "Florist", "Gift Shop", "GP & Medical",
         "Grocery", "Guesthouses", "Gym & Fitness", "Hair & Beauty", "Hardware",
-        "Health Food & Organic", "Hotels", "Newsagent", "Off Licence",
+        "Health Food & Organic", "Hotels", "Manufacturing", "Newsagent", "Off Licence",
         "Painter & Decorator", "Pharmacy", "Plumber", "Restaurant",
-        "Room to Let", "Solicitor", "Supermarket", "Takeaway", "Veterinary",
+        "Room to Let", "Solicitor", "Supermarket", "Takeaway", "Tourism", "Veterinary",
       ],
       "Club & Group": [
         "Art & Craft", "Athletics", "Baptist Church", "Book Club", "Boxing",
