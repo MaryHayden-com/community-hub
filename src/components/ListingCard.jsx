@@ -41,15 +41,15 @@ export default function ListingCard({ listing, isOwned }) {
       </div>
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
-           <div className="flex-1 min-w-0">
-             <div className="flex items-center gap-2 flex-wrap">
-               <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-                 {listing.name}
-               </h3>
-               {isOwned && (
-                 <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs shrink-0">Yours</Badge>
-               )}
-             </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                {listing.name}
+              </h3>
+              {isOwned && (
+                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs shrink-0">Yours</Badge>
+              )}
+            </div>
             <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3 shrink-0" />
               <span className="truncate">
@@ -58,8 +58,7 @@ export default function ListingCard({ listing, isOwned }) {
                 , {listing.county}
               </span>
             </div>
-            </div>
-            </div>
+          </div>
           {listing.is_featured && (
             <Star className="w-4 h-4 text-accent shrink-0 fill-accent" />
           )}
