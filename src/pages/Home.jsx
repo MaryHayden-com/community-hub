@@ -62,10 +62,10 @@ export default function Home() {
       <section className="relative bg-gradient-to-br from-primary/5 via-background to-accent/5 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-            Your Local <span className="text-primary">Community Hub</span>
+            Your town. Your <span className="text-primary">Community</span>.
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Discover businesses, clubs, schools and events in your area. Connecting communities across Ireland.
+            Discover the businesses, clubs, schools and events that bring your town's community together.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/directory">
