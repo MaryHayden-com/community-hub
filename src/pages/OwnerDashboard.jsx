@@ -5,6 +5,7 @@ import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NoticeForm from "../components/NoticeForm";
+import OwnerListingEditForm from "../components/OwnerListingEditForm";
 
 const METRIC_CONFIG = [
   { key: "view", label: "Profile Views", icon: Eye, color: "text-blue-600", bg: "bg-blue-50" },
@@ -52,6 +53,7 @@ export default function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [editingNotice, setEditingNotice] = useState(null); // null=closed, {}=new, {...}=edit
   const [deletingNoticeId, setDeletingNoticeId] = useState(null);
+  const [editingListing, setEditingListing] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then((u) => {
@@ -172,8 +174,11 @@ export default function OwnerDashboard() {
                 {selectedListing.plan === "premium" && <Crown className="w-3 h-3 mr-1" />}
                 {selectedListing.plan === "premium" ? "Premium" : selectedListing.plan === "standard" ? "Standard" : "Basic"}
               </Badge>
+              <Button variant="outline" size="sm" onClick={() => setEditingListing(true)}>
+                <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+              </Button>
               <Link to={`/listing/${selectedListing.id}`}>
-                <Button variant="outline" size="sm">View Listing</Button>
+                <Button variant="outline" size="sm">View</Button>
               </Link>
             </div>
           </div>
@@ -256,6 +261,22 @@ export default function OwnerDashboard() {
             )}
           </div>
         </>
+      )}
+
+      {/* Edit Listing Form */}
+      {editingListing && selectedListing && (
+        <OwnerListingEditForm
+          listing={selectedListing}
+          onClose={() => setEditingListing(false)}
+          onSave={() => {
+            setEditingListing(false);
+            base44.entities.CommunityListing.filter({ owner_email: user.email }).then((listings) => {
+              setMyListings(listings);
+              const updated = listings.find((l) => l.id === selectedListing.id);
+              if (updated) setSelectedListing(updated);
+            });
+          }}
+        />
       )}
 
       {/* Notice Form */}
