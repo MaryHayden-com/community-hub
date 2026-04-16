@@ -12,12 +12,14 @@
       "enum": [
         "Business",
         "Club & Group",
+        "Community Services",
         "Education",
         "What's On"
       ],
       "enumNames": [
         "Business",
         "Club & Group",
+        "Community Services",
         "Education",
         "What's On"
       ]
@@ -29,6 +31,11 @@
     "category": {
       "type": "string",
       "title": "Category / Trade Type"
+    },
+    "parent_listing_id": {
+      "type": "string",
+      "title": "Parent Listing ID",
+      "description": "Links a What's On event back to its parent venue listing (e.g. a Mass to its church)"
     },
     "country": {
       "type": "string",
