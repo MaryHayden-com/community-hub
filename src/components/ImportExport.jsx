@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
-import { Upload, Download, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Upload, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { toast } from "@/components/ui/use-toast";
+import * as XLSX from "xlsx";
 
 function mapCsvType(rawType) {
   const t = (rawType || "").trim().toLowerCase();
@@ -60,6 +61,8 @@ export default function ImportExport({ listings, onImportComplete }) {
       }
 
       const rows = Array.isArray(result.output) ? result.output : [];
+      // Fields that are hidden by default on import — must be claimed to reveal
+      const DEFAULT_HIDDEN = ["contact_name", "phone", "email", "address", "meeting_info"];
       const mapped = rows.map((r) => ({
         name: r.Name || "",
         type: mapCsvType(r.Type),
@@ -77,6 +80,7 @@ export default function ImportExport({ listings, onImportComplete }) {
         contact_name: r["Contact Name"] || "",
         meeting_info: r["Meeting Info"] || "",
         is_featured: (r["Is Featured"] || "").toLowerCase() === "yes",
+        hidden_fields: DEFAULT_HIDDEN,
       })).filter((r) => r.name && r.town);
 
       // Bulk create in batches of 50
@@ -98,24 +102,30 @@ export default function ImportExport({ listings, onImportComplete }) {
   const handleExport = () => {
     setExporting(true);
     try {
-      const headers = ["Type", "Name", "Category/Trade Type", "County", "Town", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured"];
+      const headers = ["Type", "Name", "Group", "Category/Trade Type", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email"];
       const rows = listings.map((l) => [
-        l.type, l.name, l.category, l.county, l.town, l.description, l.address, l.phone, l.email, l.website,
-        l.facebook_url, l.instagram_url, l.linkedin_url, l.contact_name, l.meeting_info, l.is_featured ? "Yes" : "No",
+        l.type, l.name,
+        Array.isArray(l.subcategory_group) ? l.subcategory_group.join("; ") : (l.subcategory_group || ""),
+        Array.isArray(l.category) ? l.category.join("; ") : (l.category || ""),
+        l.county, l.town, l.area || "", l.description || "", l.address || "",
+        l.phone || "", l.email || "", l.website || "",
+        l.facebook_url || "", l.instagram_url || "", l.linkedin_url || "",
+        l.contact_name || "", l.meeting_info || "",
+        l.is_featured ? "Yes" : "No",
+        l.is_verified ? "Yes" : "No",
+        l.plan || "basic",
+        l.owner_email || "",
       ]);
 
-      const csvContent = [headers, ...rows]
-        .map((row) => row.map((cell) => `"${(cell || "").replace(/"/g, '""')}"`).join(","))
-        .join("\n");
-
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `community-hub-export-${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast({ title: "Export Complete", description: `${listings.length} listings exported.` });
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      // Auto-width columns
+      ws["!cols"] = headers.map((h, i) => ({
+        wch: Math.max(h.length, ...rows.map(r => String(r[i] || "").length), 10)
+      }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Listings");
+      XLSX.writeFile(wb, `community-hub-export-${new Date().toISOString().split("T")[0]}.xlsx`);
+      toast({ title: "Export Complete", description: `${listings.length} listings exported to Excel.` });
     } catch (err) {
       toast({ title: "Export Error", description: err.message, variant: "destructive" });
     } finally {
@@ -148,7 +158,7 @@ export default function ImportExport({ listings, onImportComplete }) {
         disabled={exporting || !listings?.length}
       >
         {exporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Download className="w-4 h-4 mr-1.5" />}
-        Export
+        Export Excel
       </Button>
     </div>
   );
