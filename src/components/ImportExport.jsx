@@ -35,9 +35,15 @@ export default function ImportExport({ listings, onImportComplete }) {
             properties: {
               Type: { type: "string" },
               Name: { type: "string" },
-              "Category/Trade Type": { type: "string" },
+              "Group 1": { type: "string" },
+              "Group 2": { type: "string" },
+              "Group 3": { type: "string" },
+              "Category 1": { type: "string" },
+              "Category 2": { type: "string" },
+              "Category 3": { type: "string" },
               County: { type: "string" },
               Town: { type: "string" },
+              "Nearest Town/Area": { type: "string" },
               Description: { type: "string" },
               Address: { type: "string" },
               Phone: { type: "string" },
@@ -63,25 +69,35 @@ export default function ImportExport({ listings, onImportComplete }) {
       const rows = Array.isArray(result.output) ? result.output : [];
       // Fields that are hidden by default on import — must be claimed to reveal
       const DEFAULT_HIDDEN = ["contact_name", "phone", "email", "address", "meeting_info"];
-      const mapped = rows.map((r) => ({
-        name: r.Name || "",
-        type: mapCsvType(r.Type),
-        category: r["Category/Trade Type"] || "",
-        county: r.County || "",
-        town: r.Town || "",
-        description: r.Description || "",
-        address: r.Address || "",
-        phone: r.Phone || "",
-        email: r.Email || "",
-        website: r.Website || "",
-        facebook_url: r["Facebook URL"] || "",
-        instagram_url: r["Instagram URL"] || "",
-        linkedin_url: r["LinkedIn URL"] || "",
-        contact_name: r["Contact Name"] || "",
-        meeting_info: r["Meeting Info"] || "",
-        is_featured: (r["Is Featured"] || "").toLowerCase() === "yes",
-        hidden_fields: DEFAULT_HIDDEN,
-      })).filter((r) => r.name && r.town);
+      const mapped = rows.map((r) => {
+        // Collect groups from separate columns
+        const groups = ["Group 1", "Group 2", "Group 3"]
+          .map(k => (r[k] || "").trim()).filter(Boolean);
+        // Collect categories from separate columns
+        const cats = ["Category 1", "Category 2", "Category 3"]
+          .map(k => (r[k] || "").trim()).filter(Boolean);
+        return {
+          name: r.Name || "",
+          type: mapCsvType(r.Type),
+          subcategory_group: groups,
+          category: cats,
+          county: r.County || "",
+          town: r.Town || "",
+          area: r["Nearest Town/Area"] || "",
+          description: r.Description || "",
+          address: r.Address || "",
+          phone: r.Phone || "",
+          email: r.Email || "",
+          website: r.Website || "",
+          facebook_url: r["Facebook URL"] || "",
+          instagram_url: r["Instagram URL"] || "",
+          linkedin_url: r["LinkedIn URL"] || "",
+          contact_name: r["Contact Name"] || "",
+          meeting_info: r["Meeting Info"] || "",
+          is_featured: (r["Is Featured"] || "").toLowerCase() === "yes",
+          hidden_fields: DEFAULT_HIDDEN,
+        };
+      }).filter((r) => r.name && r.town);
 
       // Bulk create in batches of 50
       for (let i = 0; i < mapped.length; i += 50) {
@@ -102,20 +118,24 @@ export default function ImportExport({ listings, onImportComplete }) {
   const handleExport = () => {
     setExporting(true);
     try {
-      const headers = ["Type", "Name", "Group", "Category/Trade Type", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email"];
-      const rows = listings.map((l) => [
-        l.type, l.name,
-        Array.isArray(l.subcategory_group) ? l.subcategory_group.join("; ") : (l.subcategory_group || ""),
-        Array.isArray(l.category) ? l.category.join("; ") : (l.category || ""),
-        l.county, l.town, l.area || "", l.description || "", l.address || "",
-        l.phone || "", l.email || "", l.website || "",
-        l.facebook_url || "", l.instagram_url || "", l.linkedin_url || "",
-        l.contact_name || "", l.meeting_info || "",
-        l.is_featured ? "Yes" : "No",
-        l.is_verified ? "Yes" : "No",
-        l.plan || "basic",
-        l.owner_email || "",
-      ]);
+      const headers = ["Type", "Name", "Group 1", "Group 2", "Group 3", "Category 1", "Category 2", "Category 3", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email"];
+      const rows = listings.map((l) => {
+        const groups = Array.isArray(l.subcategory_group) ? l.subcategory_group : (l.subcategory_group ? [l.subcategory_group] : []);
+        const cats = Array.isArray(l.category) ? l.category : (l.category ? [l.category] : []);
+        return [
+          l.type, l.name,
+          groups[0] || "", groups[1] || "", groups[2] || "",
+          cats[0] || "", cats[1] || "", cats[2] || "",
+          l.county, l.town, l.area || "", l.description || "", l.address || "",
+          l.phone || "", l.email || "", l.website || "",
+          l.facebook_url || "", l.instagram_url || "", l.linkedin_url || "",
+          l.contact_name || "", l.meeting_info || "",
+          l.is_featured ? "Yes" : "No",
+          l.is_verified ? "Yes" : "No",
+          l.plan || "basic",
+          l.owner_email || "",
+        ];
+      });
 
       const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
       // Auto-width columns
