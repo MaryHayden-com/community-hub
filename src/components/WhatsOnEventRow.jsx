@@ -185,9 +185,9 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 py-3 min-w-0">
+      <div className="flex-1 px-4 py-3 min-w-0 flex flex-col">
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="font-bold leading-snug" style={{ color: '#097275' }}>
               {listing.name}
             </h3>
@@ -197,36 +197,9 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-            {listing.is_recurring && (
-              <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-blue-700 border-blue-200 bg-blue-50 whitespace-nowrap">
-                <RefreshCw className="w-3 h-3" />
-                {recurringLabel(listing)}
-              </span>
-            )}
-            {isMultiDay && (
-              <span className="text-xs border rounded-md px-2 py-0.5 text-purple-700 border-purple-200 bg-purple-50 whitespace-nowrap">
-                Multi-day event
-              </span>
-            )}
-            {listing.is_featured && (
-              <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-amber-700 border-amber-200 bg-amber-50 whitespace-nowrap">
-                <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                Featured
-              </span>
-            )}
-            <button
-              onClick={(e) => addToCalendar(e, listing, dateObj)}
-              title="Add to Calendar"
-              className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors whitespace-nowrap"
-            >
-              <CalendarPlus className="w-3 h-3" />
-              Add to Calendar
-            </button>
-          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-muted-foreground">
           {displayTime && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
@@ -245,6 +218,34 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
           {listing.is_free === false && (
             <span className="border rounded px-2 py-0.5 text-xs border-slate-300 text-slate-600 bg-slate-50">Paid</span>
           )}
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 flex-wrap mt-2">
+          {listing.is_recurring && (
+            <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-blue-700 border-blue-200 bg-blue-50 whitespace-nowrap">
+              <RefreshCw className="w-3 h-3" />
+              {recurringLabel(listing)}
+            </span>
+          )}
+          {isMultiDay && (
+            <span className="text-xs border rounded-md px-2 py-0.5 text-purple-700 border-purple-200 bg-purple-50 whitespace-nowrap">
+              Multi-day event
+            </span>
+          )}
+          {listing.is_featured && (
+            <span className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-amber-700 border-amber-200 bg-amber-50 whitespace-nowrap">
+              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+              Featured
+            </span>
+          )}
+          <button
+            onClick={(e) => addToCalendar(e, listing, dateObj)}
+            title="Add to Calendar"
+            className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors whitespace-nowrap"
+          >
+            <CalendarPlus className="w-3 h-3" />
+            Add to Calendar
+          </button>
         </div>
       </div>
     </Link>
