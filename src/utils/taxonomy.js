@@ -149,12 +149,13 @@ export const TAXONOMY = {
         "Community Group", "Residents Association", "Tidy Towns"
       ]
     },
-    "Health & Wellbeing": {
+    "Health & Wellness": {
       "Fitness & Movement": [
         "Gym & Fitness", "Pilates", "Running Club", "Yoga"
       ],
-      "Wellbeing": [
-        "Mindfulness & Meditation", "Weight Management"
+      "Therapies & Wellbeing": [
+        "Massage & Therapy", "Mindfulness & Meditation", "Physiotherapy",
+        "Weight Management", "Counselling & Support"
       ]
     }
   },
