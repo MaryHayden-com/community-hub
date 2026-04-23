@@ -3,9 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar } from "lucide-react";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
-import ViewToggle from "../components/ViewToggle";
 import ListingListRow from "../components/ListingListRow";
-import ListingCard from "../components/ListingCard";
 import { Badge } from "@/components/ui/badge";
 
 const typeIcons = {
@@ -23,7 +21,6 @@ export default function TownPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState("");
-  const [viewMode, setViewMode] = useState("grid");
 
   useEffect(() => {
     // Fetch all county listings, then show those whose town OR area matches
@@ -80,35 +77,34 @@ export default function TownPage() {
         </p>
       </div>
 
-      {/* Type Filter + View Toggle */}
-      <div className="flex items-center justify-between mb-6">
-      {types.length > 1 ? (
-        <div className="flex flex-wrap gap-2">
-          <Badge
-            variant={activeType === "" ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setActiveType("")}
-          >
-            All ({listings.length})
-          </Badge>
-          {types.map(([t, count]) => {
-            const Icon = typeIcons[t] || Building2;
-            return (
-              <Badge
-                key={t}
-                variant={activeType === t ? "default" : "outline"}
-                className="cursor-pointer flex items-center gap-1"
-                onClick={() => setActiveType(activeType === t ? "" : t)}
-              >
-                <Icon className="w-3 h-3" />
-                {t} ({count})
-              </Badge>
-            );
-          })}
-        </div>
-      ) : <div />}
-      <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-      </div>
+      {/* Type Filter */}
+       <div className="mb-6">
+       {types.length > 1 && (
+         <div className="flex flex-wrap gap-2">
+           <Badge
+             variant={activeType === "" ? "default" : "outline"}
+             className="cursor-pointer"
+             onClick={() => setActiveType("")}
+           >
+             All ({listings.length})
+           </Badge>
+           {types.map(([t, count]) => {
+             const Icon = typeIcons[t] || Building2;
+             return (
+               <Badge
+                 key={t}
+                 variant={activeType === t ? "default" : "outline"}
+                 className="cursor-pointer flex items-center gap-1"
+                 onClick={() => setActiveType(activeType === t ? "" : t)}
+               >
+                 <Icon className="w-3 h-3" />
+                 {t} ({count})
+               </Badge>
+             );
+           })}
+         </div>
+       )}
+       </div>
 
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
@@ -118,12 +114,6 @@ export default function TownPage() {
         <div className="flex flex-col gap-3">
           {filtered.map((l) => (
             <WhatsOnEventRow key={l.id} listing={l} />
-          ))}
-        </div>
-      ) : viewMode === "grid" ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((l) => (
-            <ListingCard key={l.id} listing={l} />
           ))}
         </div>
       ) : (
