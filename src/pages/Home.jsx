@@ -56,7 +56,7 @@ export default function Home() {
       county,
       count: map[county]?.count || 0,
       towns: map[county] ? [...map[county].towns].sort() : towns.slice(0, 5),
-    })).sort((a, b) => b.count - a.count || a.county.localeCompare(b.county));
+    })).sort((a, b) => a.county.localeCompare(b.county));
   }, [listings]);
 
   const typeCounts = useMemo(() => {
