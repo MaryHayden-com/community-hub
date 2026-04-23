@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar } from "lucide-react";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ListingListRow from "../components/ListingListRow";
+import { sortByTypeOrder } from "../utils/typeOrder";
 import { Badge } from "@/components/ui/badge";
 
 const typeIcons = {
@@ -37,17 +38,15 @@ export default function TownPage() {
 
   const filtered = useMemo(() => {
     const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
-    return [...base].sort((a, b) => {
-      const aIsEvent = a.type === "What's On";
-      const bIsEvent = b.type === "What's On";
-      // What's On always sorts by date
-      if (aIsEvent && bIsEvent) {
+    // What's On sorts by date, others by type then name
+    if (activeType === "What's On") {
+      return [...base].sort((a, b) => {
         const da = a.event_date || '9999';
         const db = b.event_date || '9999';
         return da.localeCompare(db);
-      }
-      return (a.name || '').localeCompare(b.name || '');
-    });
+      });
+    }
+    return sortByTypeOrder(base);
   }, [listings, activeType]);
 
   if (loading) {

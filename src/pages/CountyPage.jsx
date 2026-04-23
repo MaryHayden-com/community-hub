@@ -6,6 +6,7 @@ import ViewToggle from "../components/ViewToggle";
 import ListingListRow from "../components/ListingListRow";
 import { Button } from "@/components/ui/button";
 import ListingCard from "../components/ListingCard";
+import { sortByTypeOrder } from "../utils/typeOrder";
 
 export default function CountyPage() {
   const { county } = useParams();
@@ -30,7 +31,7 @@ export default function CountyPage() {
   }, [listings]);
 
   const sortedListings = useMemo(() =>
-    [...listings].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
+    sortByTypeOrder(listings),
     [listings]
   );
 

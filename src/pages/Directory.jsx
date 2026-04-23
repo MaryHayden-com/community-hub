@@ -6,6 +6,7 @@ import SearchFilter from "../components/SearchFilter";
 import { Loader2 } from "lucide-react";
 import ListingListRow from "../components/ListingListRow";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
+import { sortByTypeOrder } from "../utils/typeOrder";
 
 export default function Directory() {
   const location = useLocation();
@@ -157,7 +158,7 @@ export default function Directory() {
     });
 
     if (!isWhatsOn) {
-      return base.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+       return sortByTypeOrder(base);
     }
 
     // Expand multi-day events into individual day entries
