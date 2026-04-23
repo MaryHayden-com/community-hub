@@ -145,18 +145,18 @@ export default function Home() {
               <Link
                 key={cat.type}
                 to={`/directory?type=${encodeURIComponent(cat.type)}`}
-                className="group bg-card rounded-xl border p-4 sm:p-5 hover:shadow-lg transition-all duration-300"
-                style={{ borderColor: 'hsl(var(--border))' }}
+                className="group bg-card rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300"
+                style={{ border: '2px solid #E2701B' }}
               >
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-opacity"
-                  style={{ background: `${accent}18` }}>
-                  <Icon className="w-5 h-5" style={{ color: accent }} />
+                  style={{ background: '#E2701B22' }}>
+                  <Icon className="w-5 h-5" style={{ color: '#097275' }} />
                 </div>
-                <h3 className="mt-3 font-semibold text-sm sm:text-base transition-colors" style={{ color: 'hsl(var(--foreground))' }}>
+                <h3 className="mt-3 font-semibold text-sm sm:text-base" style={{ color: '#097275' }}>
                   {cat.label}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1 hidden sm:block">{cat.desc}</p>
-                <p className="text-xs font-medium mt-1" style={{ color: accent }}>
+                <p className="text-xs font-medium mt-1" style={{ color: '#E2701B' }}>
                   {typeCounts[cat.type] || 0} listings
                 </p>
               </Link>
