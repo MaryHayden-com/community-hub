@@ -624,7 +624,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             <Label className="cursor-pointer">Featured Listing</Label>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="sticky bottom-0 bg-background border-t pt-3 pb-1 flex justify-end gap-2 -mx-6 px-6 mt-4">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
