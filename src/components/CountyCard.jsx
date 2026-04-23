@@ -5,15 +5,16 @@ export default function CountyCard({ county, count, towns }) {
   return (
     <Link
       to={`/county/${encodeURIComponent(county)}`}
-      className="group block bg-card rounded-xl border hover:border-primary/30 hover:shadow-lg transition-all duration-300 p-5"
+      className="group block bg-card rounded-xl hover:shadow-lg transition-all duration-300 p-5"
+      style={{ border: '2px solid #E2701B' }}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-            <MapPin className="w-5 h-5 text-primary" />
+          <div className="w-11 h-11 rounded-lg flex items-center justify-center" style={{ background: '#E2701B22' }}>
+            <MapPin className="w-5 h-5" style={{ color: '#097275' }} />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+            <h3 className="font-bold" style={{ color: '#097275' }}>
               Co. {county}
             </h3>
             <p className="text-sm text-muted-foreground mt-0.5">
