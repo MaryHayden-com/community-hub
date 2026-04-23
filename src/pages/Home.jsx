@@ -82,16 +82,7 @@ export default function Home() {
         <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20" style={{ background: '#E2701B' }} />
         <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full opacity-10" style={{ background: '#E2701B' }} />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-          {/* MH Logo */}
-          <div className="flex justify-center mb-6">
-            <img
-              src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/77590268e_MH.PNG"
-              alt="Mary Hayden Logo"
-              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-lg rounded-full"
-            />
-          </div>
-
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 text-center">
           <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Mary Hayden · Business & Operations</p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
             Your Local <span style={{ color: '#E2701B' }}>Community</span>.
