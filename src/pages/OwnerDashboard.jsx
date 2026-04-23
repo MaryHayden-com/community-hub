@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock } from "lucide-react";
+import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NoticeForm from "../components/NoticeForm";
@@ -54,6 +54,9 @@ export default function OwnerDashboard() {
   const [editingNotice, setEditingNotice] = useState(null); // null=closed, {}=new, {...}=edit
   const [deletingNoticeId, setDeletingNoticeId] = useState(null);
   const [editingListing, setEditingListing] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteRequestSent, setDeleteRequestSent] = useState(false);
+  const [sendingDelete, setSendingDelete] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then((u) => {
@@ -108,6 +111,18 @@ export default function OwnerDashboard() {
     await base44.entities.ListingNotice.delete(id);
     setDeletingNoticeId(null);
     loadNotices();
+  };
+
+  const handleDeleteAccountRequest = async () => {
+    setSendingDelete(true);
+    await base44.integrations.Core.SendEmail({
+      to: "privacy@communityhub.ie",
+      subject: "Account Deletion Request",
+      body: `User ${user?.full_name || ""} (${user?.email}) has requested deletion of their account and all associated data.`,
+    });
+    setSendingDelete(false);
+    setDeleteRequestSent(true);
+    setShowDeleteAccount(false);
   };
 
   const countFor = (key) => engagement.filter((e) => e.event_type === key).length;
@@ -311,7 +326,45 @@ export default function OwnerDashboard() {
         />
       )}
 
-      {/* Delete confirmation */}
+      {/* Account Deletion Section */}
+      <div className="mt-10 pt-6 border-t">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Account Settings</h2>
+        {deleteRequestSent ? (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-700">
+            ✓ Your deletion request has been received. We'll process it within 7 days.
+          </div>
+        ) : (
+          <div className="bg-card border rounded-xl p-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium text-sm">Request Account Deletion</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Permanently delete your account and all associated data.</p>
+            </div>
+            <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/5 shrink-0" onClick={() => setShowDeleteAccount(true)}>
+              <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Delete Account
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Delete Account Confirmation */}
+      {showDeleteAccount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-card rounded-xl border p-6 max-w-sm w-full shadow-xl">
+            <AlertTriangle className="w-8 h-8 text-destructive mx-auto mb-3" />
+            <p className="font-semibold text-center mb-1">Delete your account?</p>
+            <p className="text-sm text-muted-foreground text-center mb-5">This will send a deletion request to our team. Your account and all data will be permanently removed within 7 days.</p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={() => setShowDeleteAccount(false)}>Cancel</Button>
+              <Button variant="destructive" size="sm" onClick={handleDeleteAccountRequest} disabled={sendingDelete}>
+                {sendingDelete && <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />}
+                Confirm & Request Deletion
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete notice confirmation */}
       {deletingNoticeId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-card rounded-xl border p-6 max-w-sm mx-4 shadow-xl">

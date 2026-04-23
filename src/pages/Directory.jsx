@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
@@ -26,6 +26,10 @@ export default function Directory() {
   const [dateFrom, setDateFrom] = useState(todayStr);
   const [dateTo, setDateTo] = useState("");
   const [nearbyCounties, setNearbyCounties] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const pullStartY = useRef(0);
+  const pullDelta = useRef(0);
+  const [pullIndicator, setPullIndicator] = useState(0); // 0-1 progress
 
   useEffect(() => {
     setType(params.get("type") || "");
@@ -35,11 +39,44 @@ export default function Directory() {
     setTown(params.get("town") || "");
   }, [location.search]);
 
-  useEffect(() => {
-    base44.entities.CommunityListing.list("-created_date", 1000)
-      .then(setListings)
-      .finally(() => setLoading(false));
+  const loadListings = useCallback(() => {
+    return base44.entities.CommunityListing.list("-created_date", 1000)
+      .then(setListings);
   }, []);
+
+  useEffect(() => {
+    loadListings().finally(() => setLoading(false));
+  }, []);
+
+  // Pull-to-refresh handlers
+  const handleTouchStart = useCallback((e) => {
+    if (window.scrollY === 0) pullStartY.current = e.touches[0].clientY;
+    else pullStartY.current = 0;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!pullStartY.current || refreshing) return;
+    const delta = e.touches[0].clientY - pullStartY.current;
+    if (delta > 0 && window.scrollY === 0) {
+      pullDelta.current = delta;
+      setPullIndicator(Math.min(delta / 100, 1));
+    }
+  }, [refreshing]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (pullDelta.current > 100 && !refreshing) {
+      setRefreshing(true);
+      setPullIndicator(1);
+      loadListings().finally(() => {
+        setRefreshing(false);
+        setPullIndicator(0);
+      });
+    } else {
+      setPullIndicator(0);
+    }
+    pullStartY.current = 0;
+    pullDelta.current = 0;
+  }, [refreshing, loadListings]);
 
   const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county), []);
   // Helper: normalise a field that may be a string or array
@@ -168,7 +205,21 @@ export default function Directory() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div
+      className="max-w-7xl mx-auto px-4 sm:px-6 py-8"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      {pullIndicator > 0 && (
+        <div
+          className="flex items-center justify-center overflow-hidden transition-all duration-150"
+          style={{ height: `${pullIndicator * 48}px`, opacity: pullIndicator }}
+        >
+          <div className={`w-6 h-6 border-2 border-primary border-t-transparent rounded-full ${refreshing ? "animate-spin" : ""}`} />
+        </div>
+      )}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-display text-3xl font-bold">Directory</h1>
