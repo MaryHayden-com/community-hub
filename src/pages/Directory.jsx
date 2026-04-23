@@ -222,7 +222,7 @@ export default function Directory() {
       )}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display text-3xl font-bold">Directory</h1>
+          <h1 className="font-display text-3xl font-bold" style={{ color: '#097275' }}>Directory</h1>
           <p className="text-muted-foreground mt-1">
             Discover the businesses, clubs, schools and events that bring your community together.
           </p>

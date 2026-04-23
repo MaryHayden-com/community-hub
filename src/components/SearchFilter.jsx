@@ -22,52 +22,52 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
       <div className="flex flex-wrap gap-2">
         <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup(""); setCategory(""); }}>
-          <SelectTrigger className="w-[160px] h-9 bg-card">
+          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="Business">Business</SelectItem>
-            <SelectItem value="Club & Group">Clubs & Groups</SelectItem>
-            <SelectItem value="Community Services">Community Services</SelectItem>
-            <SelectItem value="Education">Education</SelectItem>
-            <SelectItem value="What's On">What's On</SelectItem>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Types</SelectItem>
+            <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business</SelectItem>
+            <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
+            <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
+            <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education</SelectItem>
+            <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={county || "all"} onValueChange={(v) => { setCounty(v === "all" ? "" : v); setTown(""); }}>
-          <SelectTrigger className="w-[160px] h-9 bg-card">
+          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Counties" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Counties</SelectItem>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Counties</SelectItem>
             {[...counties].sort().map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
+              <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select value={town || "all"} onValueChange={(v) => setTown(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-[160px] h-9 bg-card">
+          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Towns" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Towns</SelectItem>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns</SelectItem>
             {[...towns].sort().map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
+              <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         {type && groups && groups.length > 0 && (
           <Select value={group || "all"} onValueChange={(v) => { setGroup(v === "all" ? "" : v); setCategory(""); }}>
-            <SelectTrigger className="w-[160px] h-9 bg-card">
+            <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
               <SelectValue placeholder="All Groups" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Groups</SelectItem>
+              <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Groups</SelectItem>
               {groups.map((g) => (
-                <SelectItem key={g} value={g}>{g}</SelectItem>
+                <SelectItem key={g} value={g} className="font-bold" style={{ color: '#097275' }}>{g}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -75,13 +75,13 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
         {type && group && categories && categories.length > 0 && (
           <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
-            <SelectTrigger className="w-[160px] h-9 bg-card">
+            <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Categories</SelectItem>
               {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                <SelectItem key={cat} value={cat} className="font-bold" style={{ color: '#097275' }}>{cat}</SelectItem>
               ))}
             </SelectContent>
           </Select>
