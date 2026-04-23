@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import SearchFilter from "../components/SearchFilter";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import ListingListRow from "../components/ListingListRow";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
@@ -28,6 +29,26 @@ export default function Directory() {
   const pullStartY = useRef(0);
   const pullDelta = useRef(0);
   const [pullIndicator, setPullIndicator] = useState(0); // 0-1 progress
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      const response = await base44.functions.invoke('exportListingsExcel', {});
+      // Trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'listings.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setExporting(false);
+    }
+  }, []);
 
   useEffect(() => {
     setType(params.get("type") || "");
@@ -228,6 +249,15 @@ export default function Directory() {
             {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
           </p>
         </div>
+        <Button
+          onClick={handleExport}
+          disabled={exporting}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exporting ? 'Exporting...' : 'Export Excel'}
+        </Button>
       </div>
 
       <SearchFilter
