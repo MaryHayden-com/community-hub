@@ -30,6 +30,11 @@ export default function Directory() {
   const pullDelta = useRef(0);
   const [pullIndicator, setPullIndicator] = useState(0); // 0-1 progress
   const [exporting, setExporting] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => setUser(null));
+  }, []);
 
   const handleExport = useCallback(async () => {
     setExporting(true);
@@ -249,15 +254,17 @@ export default function Directory() {
             {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
           </p>
         </div>
-        <Button
-          onClick={handleExport}
-          disabled={exporting}
-          variant="outline"
-          className="gap-2"
-        >
-          <Download className="w-4 h-4" />
-          {exporting ? 'Exporting...' : 'Export Excel'}
-        </Button>
+        {user?.role === 'admin' && (
+          <Button
+            onClick={handleExport}
+            disabled={exporting}
+            variant="outline"
+            className="gap-2"
+          >
+            <Download className="w-4 h-4" />
+            {exporting ? 'Exporting...' : 'Export Excel'}
+          </Button>
+        )}
       </div>
 
       <SearchFilter
