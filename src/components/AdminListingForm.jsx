@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
+import { getAllCategories, getGroupsForCategories } from "@/utils/taxonomy";
 
 function FieldRow({ label, field, isHidden, toggleHidden, children }) {
   const hidden = isHidden(field);
@@ -222,120 +223,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   }, [form.website, form.facebook_url, form.instagram_url]);
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
-  const GROUP_MAP = {
-    "Business": ["Accommodation", "Financial & Insurance", "Food & Beverage", "Healthcare", "Industry", "Media & Communications", "Personal Services", "Professional Services", "Retail", "Tourism", "Trades & Construction", "Transport & Logistics"],
-    "Club & Group": ["Arts & Culture", "Charity & Welfare", "Faith & Religious", "Leisure & Community", "Sports & Recreation", "Youth & Community"],
-    "Community Services": ["Faith & Worship", "Libraries"],
-    "Education": ["Childcare", "Higher Education", "Schools", "Training & Skills"],
-    "What's On": ["Community Activities", "Entertainment", "Festivals & Markets", "Seasonal & Themed"]
-  };
-
-  const CATEGORY_BY_GROUP = {
-    "Business": {
-      "Accommodation": ["Airbnb", "B&B", "Guesthouses", "Hotels", "Room to Let"],
-      "Food & Beverage": ["Bakery", "Bar & Pub", "Café", "Restaurant", "Takeaway"],
-      "Healthcare": ["Dentist", "GP & Medical", "Pharmacy", "Veterinary"],
-      "Personal Services": ["Barber", "Childcare & Crèche", "Cleaning Services", "Gym & Fitness", "Hair & Beauty"],
-      "Professional Services": ["Accountant", "Estate Agent", "Financial Services", "Solicitor"],
-      "Retail": ["Bookshop", "Butcher", "Clothing & Fashion", "Craft & Hobby", "Fishmonger", "Florist", "Gift Shop", "Grocery", "Hardware", "Health Food & Organic", "Newsagent", "Off Licence", "Supermarket"],
-      "Industry": ["Agriculture", "Distillery & Brewery", "Engineering", "Food Production", "Manufacturing", "Technology"],
-      "Tourism": ["Activity & Adventure", "Attraction", "Caravan & Camping", "Heritage & Culture", "Tour Operator", "Tourist Information"],
-      "Trades & Construction": ["Builder", "Carpenter", "Electrician", "Painter & Decorator", "Plumber"],
-      "Transport & Logistics": ["Bus & Coach", "Courier & Delivery", "Freight & Haulage", "Moving Services", "Taxi & Private Hire"],
-      "Media & Communications": ["Advertising", "Design & Creative", "Marketing", "Photography & Video", "Print & Publishing", "Web & Digital"],
-      "Financial & Insurance": ["Accountant", "Bank & Credit Union", "Bookkeeper", "Financial Advisor", "Insurance Broker", "Mortgage Broker"]
-    },
-    "Club & Group": {
-      "Arts & Culture": ["Art & Craft", "Book Club", "Dance", "Drama & Theatre", "Music"],
-      "Charity & Welfare": ["Charity"],
-      "Faith & Religious": ["Baptist Church", "Buddhist Centre", "Catholic Church", "Church of Ireland", "Evangelical Church", "Faith Community", "Hindu Temple", "Islamic Centre / Mosque", "Jewish Synagogue", "Methodist Church", "Orthodox Church", "Presbyterian Church", "Quaker Meeting House"],
-      "Leisure & Community": ["Gardening Club", "ICA", "Men's Shed", "Senior Citizens", "Toastmasters", "Walking Group", "Women's Group"],
-      "Sports & Recreation": ["Athletics", "Boxing", "Cycling", "Equestrian", "GAA", "Golf", "Martial Arts", "Rowing", "Rugby", "Sailing", "Soccer / Football", "Swimming", "Tennis"],
-      "Youth & Community": ["Community Group", "Girl Guides", "Residents Association", "Scouts", "Tidy Towns", "Youth Club"]
-    },
-    "Community Services": {
-      "Faith & Worship": ["Baptist Church", "Buddhist Centre", "Catholic Church", "Church of Ireland", "Evangelical Church", "Faith Community", "Hindu Temple", "Islamic Centre / Mosque", "Jewish Synagogue", "Methodist Church", "Orthodox Church", "Presbyterian Church", "Quaker Meeting House"],
-      "Libraries": ["Community Library", "County Library", "Mobile Library", "Public Library", "School Library", "University Library"]
-    },
-    "Education": {
-      "Childcare": ["Childcare", "Crèche", "Montessori"],
-      "Higher Education": ["Further Education", "Third Level"],
-      "Schools": ["Gaelcholáiste", "Gaelscoil", "Primary School", "Secondary School", "Special Education"],
-      "Training & Skills": ["Adult Education", "Arts & Drama", "Community Training", "Language School", "Music Lessons", "Sports Coaching", "Tutoring", "Youthreach"]
-    },
-    "What's On": {
-      "Community Activities": ["Community Event", "Family Event", "Fundraiser", "Talk & Lecture", "Workshop"],
-      "Entertainment": ["Concert", "Exhibition", "Theatre"],
-      "Festivals & Markets": ["Festival", "Market"],
-      "Seasonal & Themed": ["Christmas Event", "Cultural Event", "Food Event", "Sports Event", "Summer Event"]
-    }
-  };
-
-  const groupOptions = form.type ? GROUP_MAP[form.type] || [] : [];
-  // Aggregate categories from ALL selected groups
-  const categoryOptions = useMemo(() => {
-    if (!form.type || !form.subcategory_group?.length) return [];
-    const all = new Set();
-    form.subcategory_group.forEach((g) => {
-      (CATEGORY_BY_GROUP[form.type]?.[g] || []).forEach((c) => all.add(c));
-    });
-    return [...all].sort();
-  }, [form.type, form.subcategory_group]);
-
-  const categorySuggestions = useMemo(() => {
-    const byType = {
-      "Business": [
-        "Accountant", "Advertising", "Airbnb", "B&B", "Bakery", "Bank & Credit Union",
-        "Bar & Pub", "Barber", "Bookkeeper", "Bookshop", "Builder", "Bus & Coach",
-        "Butcher", "Café", "Carpenter", "Childcare & Crèche", "Cleaning Services",
-        "Clothing & Fashion", "Courier & Delivery", "Craft & Hobby", "Design & Creative",
-        "Dentist", "Electrician", "Estate Agent", "Financial Advisor", "Fishmonger",
-        "Florist", "Freight & Haulage", "Gift Shop", "GP & Medical", "Grocery",
-        "Guesthouses", "Gym & Fitness", "Hair & Beauty", "Hardware", "Health Food & Organic",
-        "Hotels", "Insurance Broker", "Manufacturing", "Marketing", "Mortgage Broker",
-        "Moving Services", "Newsagent", "Off Licence", "Painter & Decorator", "Pharmacy",
-        "Photography & Video", "Plumber", "Print & Publishing", "Restaurant", "Room to Let",
-        "Solicitor", "Supermarket", "Takeaway", "Taxi & Private Hire", "Tourism",
-        "Veterinary", "Web & Digital",
-      ],
-      "Club & Group": [
-        "Art & Craft", "Athletics", "Baptist Church", "Book Club", "Boxing",
-        "Buddhist Centre", "Catholic Church", "Charity", "Church of Ireland",
-        "Community Group", "Cycling", "Dance", "Drama & Theatre",
-        "Equestrian", "Evangelical Church", "Faith Community", "GAA",
-        "Gardening Club", "Girl Guides", "Golf", "Hindu Temple", "ICA",
-        "Islamic Centre / Mosque", "Jewish Synagogue", "Martial Arts",
-        "Men's Shed", "Methodist Church", "Music", "Orthodox Church",
-        "Presbyterian Church", "Quaker Meeting House", "Residents Association",
-        "Rowing", "Rugby", "Sailing", "Scouts", "Senior Citizens",
-        "Soccer / Football", "Swimming", "Tennis", "Tidy Towns",
-        "Toastmasters", "Walking Group", "Women's Group", "Youth Club",
-      ],
-      "Community Services": [
-        "Community Library", "County Library", "Mobile Library",
-        "Public Library", "School Library", "University Library",
-        "Baptist Church", "Buddhist Centre", "Catholic Church",
-        "Church of Ireland", "Evangelical Church", "Faith Community",
-        "Hindu Temple", "Islamic Centre / Mosque", "Jewish Synagogue",
-        "Methodist Church", "Orthodox Church", "Presbyterian Church",
-        "Quaker Meeting House",
-      ],
-      "Education": [
-        "Adult Education", "Arts & Drama", "Childcare", "Community Training",
-        "Crèche", "Further Education", "Gaelcholáiste", "Gaelscoil",
-        "Language School", "Montessori", "Music Lessons", "Primary School",
-        "Secondary School", "Special Education", "Sports Coaching",
-        "Third Level", "Tutoring", "Youthreach",
-      ],
-      "What's On": [
-        "Christmas Event", "Community Event", "Concert", "Cultural Event",
-        "Exhibition", "Family Event", "Festival", "Food Event", "Fundraiser",
-        "Market", "Sports Event", "Summer Event", "Talk & Lecture",
-        "Theatre", "Workshop",
-      ],
-    };
-    return byType[form.type] || [];
-  }, [form.type]);
+  // All categories for the selected type (from taxonomy)
+  const categoryOptions = useMemo(() => getAllCategories(form.type), [form.type]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -422,32 +311,26 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
           </div>
 
-          {groupOptions.length > 0 && (
-            <div className="space-y-3">
-              <div>
-                <Label>Group(s) <span className="text-xs text-muted-foreground ml-1">— select all that apply</span></Label>
-                <MultiSelectDropdown
-                  options={groupOptions}
-                  selected={form.subcategory_group}
-                  placeholder="Select group(s)..."
-                  onChange={(v) => {
-                    const validCats = new Set();
-                    v.forEach((g) => (CATEGORY_BY_GROUP[form.type]?.[g] || []).forEach((c) => validCats.add(c)));
-                    update("subcategory_group", v);
-                    update("category", (form.category || []).filter((c) => validCats.has(c)));
-                  }}
-                />
-              </div>
-              {categoryOptions.length > 0 && (
-                <div>
-                  <Label>Category / Categories <span className="text-xs text-muted-foreground ml-1">— select all that apply</span></Label>
-                  <MultiSelectDropdown
-                    options={categoryOptions}
-                    selected={form.category}
-                    placeholder="Select category/categories..."
-                    onChange={(v) => update("category", v)}
-                  />
-                </div>
+          {form.type && categoryOptions.length > 0 && (
+            <div>
+              <Label>
+                Category / Categories
+                <span className="text-xs text-muted-foreground ml-1">— select all that apply (groups assigned automatically)</span>
+              </Label>
+              <MultiSelectDropdown
+                options={categoryOptions}
+                selected={form.category}
+                placeholder="Select category/categories..."
+                onChange={(selectedCats) => {
+                  const autoGroups = getGroupsForCategories(form.type, selectedCats);
+                  update("category", selectedCats);
+                  update("subcategory_group", autoGroups);
+                }}
+              />
+              {form.subcategory_group?.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Groups: {form.subcategory_group.join(", ")}
+                </p>
               )}
             </div>
           )}
