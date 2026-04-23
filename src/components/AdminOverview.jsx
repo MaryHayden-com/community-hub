@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import {
   LayoutGrid, Calendar, Flag, CheckCircle2, Clock,
-  Plus, FileUp, FileDown, Inbox, TrendingUp, Star, MapPin
+  Plus, FileDown, Inbox, TrendingUp, Star, MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,7 +24,7 @@ function SectionHeading({ children }) {
   return <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">{children}</h2>;
 }
 
-export default function AdminOverview({ listings, pendingClaimsCount, onAddListing, onAddEvent, onGoToTab, onImport, onExport }) {
+export default function AdminOverview({ listings, pendingClaimsCount, onAddListing, onAddEvent, onGoToTab, onExport }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString().slice(0, 10);
@@ -71,9 +71,6 @@ export default function AdminOverview({ listings, pendingClaimsCount, onAddListi
           </Button>
           <Button size="sm" variant="outline" onClick={onAddEvent} className="gap-1.5">
             <Calendar className="w-4 h-4" /> Add Event
-          </Button>
-          <Button size="sm" variant="outline" onClick={onImport} className="gap-1.5">
-            <FileUp className="w-4 h-4" /> Import CSV
           </Button>
           <Button size="sm" variant="outline" onClick={onExport} className="gap-1.5">
             <FileDown className="w-4 h-4" /> Export CSV
