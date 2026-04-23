@@ -88,7 +88,7 @@ export default function Layout() {
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.to === "/"
@@ -99,10 +99,10 @@ export default function Layout() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 uppercase tracking-wide ${
-                    isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                  className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${
+                    isActive ? "bg-primary/10" : "hover:bg-muted"
                   }`}
-                  style={{ color: '#097275' }}
+                  style={{ color: '#097275', borderColor: '#E2701B' }}
                 >
                   <Icon className="w-4 h-4" />
                   {item.label}
@@ -110,22 +110,22 @@ export default function Layout() {
               );
             })}
             {isListingOwner && (
-              <Link to="/dashboard" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
+              <Link to="/dashboard" className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${location.pathname === "/dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275', borderColor: '#E2701B' }}>
                 <LayoutDashboard className="w-4 h-4" /> My Dashboard
               </Link>
             )}
             {isGroupAdmin && (
-              <Link to="/group-dashboard" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/group-dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
+              <Link to="/group-dashboard" className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${location.pathname === "/group-dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275', borderColor: '#E2701B' }}>
                 <Tag className="w-4 h-4" /> Group Dashboard
               </Link>
             )}
             {user && (
-              <Link to="/billing" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/billing" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
+              <Link to="/billing" className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${location.pathname === "/billing" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275', borderColor: '#E2701B' }}>
                 <CreditCard className="w-4 h-4" /> Billing
               </Link>
             )}
             {isAdmin && (
-              <Link to="/admin" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/admin" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
+              <Link to="/admin" className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${location.pathname === "/admin" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275', borderColor: '#E2701B' }}>
                 <Shield className="w-4 h-4" /> Admin
               </Link>
             )}
