@@ -70,16 +70,15 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
         <SelectPrimitive.Content
           ref={ref}
           className={cn(
-            "fixed bottom-0 left-0 right-0 z-50 max-h-[60vh] overflow-hidden rounded-t-lg border-t bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            "fixed bottom-0 left-0 right-0 z-50 max-h-[60vh] rounded-t-lg border-t bg-popover text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             className
           )}
           position="popper"
+          sideOffset={0}
           {...props}>
-          <div className="overflow-y-auto max-h-[60vh]">
-            <SelectPrimitive.Viewport className="p-1">
-              {children}
-            </SelectPrimitive.Viewport>
-          </div>
+          <SelectPrimitive.Viewport className="overflow-y-auto max-h-[60vh] p-1">
+            {children}
+          </SelectPrimitive.Viewport>
         </SelectPrimitive.Content>
       </SelectPrimitive.Portal>
     );
