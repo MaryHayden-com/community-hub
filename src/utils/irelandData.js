@@ -1,5 +1,29 @@
-// All 26 Republic of Ireland counties with their main towns/villages
+// All 32 counties of Ireland (26 Republic + 6 Northern Ireland)
 export const IRELAND_COUNTIES = [
+  {
+    county: "Antrim",
+    towns: ["Belfast", "Antrim", "Ballymena", "Ballyclare", "Carrickfergus", "Larne", "Lisburn", "Newtownabbey", "Randalstown", "Whitehead"]
+  },
+  {
+    county: "Armagh",
+    towns: ["Armagh City", "Craigavon", "Lurgan", "Portadown", "Banbridge", "Keady", "Markethill", "Tandragee"]
+  },
+  {
+    county: "Down",
+    towns: ["Downpatrick", "Bangor", "Newry", "Newtownards", "Ballynahinch", "Comber", "Dromore", "Kilkeel", "Newcastle", "Rathfriland", "Warrenpoint"]
+  },
+  {
+    county: "Fermanagh",
+    towns: ["Enniskillen", "Belleek", "Irvinestown", "Kesh", "Lisnaskea", "Maguiresbridge", "Rosslea"]
+  },
+  {
+    county: "Londonderry",
+    towns: ["Derry City", "Coleraine", "Limavady", "Maghera", "Magherafelt", "Portstewart", "Castledawson", "Dungiven"]
+  },
+  {
+    county: "Tyrone",
+    towns: ["Omagh", "Strabane", "Dungannon", "Cookstown", "Ballygawley", "Castlederg", "Fivemiletown", "Stewartstown"]
+  },
   {
     county: "Carlow",
     towns: ["Carlow", "Muinebheag", "Tullow", "Hacketstown", "Leighlinbridge", "Borris", "Rathvilly", "Bagenalstown"]
