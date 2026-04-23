@@ -12,7 +12,7 @@ const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/directory", label: "Directory", icon: MapPin },
   { to: "/directory?type=Business", label: "Businesses", icon: Building2 },
-  { to: "/directory?type=Club+%26+Group", label: "Clubs & Groups", icon: Users },
+  { to: "/directory?type=Club+%26+Group", label: "Groups", icon: Users },
   { to: "/directory?type=Education", label: "Education", icon: GraduationCap },
   { to: "/directory?type=What%27s+On", label: "What's On", icon: Calendar },
 ];
