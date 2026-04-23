@@ -71,8 +71,8 @@ export default function TownPage() {
       </Link>
 
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold flex items-center gap-2">
-          <MapPin className="w-7 h-7 text-primary" />
+        <h1 className="font-display text-3xl font-bold flex items-center gap-2" style={{ color: '#097275' }}>
+          <MapPin className="w-7 h-7" style={{ color: '#097275' }} />
           {decodedTown}
         </h1>
         <p className="text-muted-foreground mt-1">

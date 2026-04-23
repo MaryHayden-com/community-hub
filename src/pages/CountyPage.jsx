@@ -49,8 +49,8 @@ export default function CountyPage() {
       </Link>
 
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold flex items-center gap-2">
-          <MapPin className="w-7 h-7 text-primary" />
+        <h1 className="font-display text-3xl font-bold flex items-center gap-2" style={{ color: '#097275' }}>
+          <MapPin className="w-7 h-7" style={{ color: '#097275' }} />
           Co. {decodeURIComponent(county)}
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -60,16 +60,17 @@ export default function CountyPage() {
 
       {/* Towns Grid */}
       <div className="mb-10">
-        <h2 className="font-display text-xl font-semibold mb-4">Towns</h2>
+        <h2 className="font-display text-xl font-bold mb-4" style={{ color: '#097275' }}>Towns</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {towns.map(([townName, count]) => (
             <Link
               key={townName}
               to={`/town/${encodeURIComponent(county)}/${encodeURIComponent(townName)}`}
-              className="group flex items-center justify-between bg-card rounded-lg border p-3 hover:border-primary/30 hover:shadow-md transition-all"
+              className="group flex items-center justify-between bg-card rounded-lg p-3 hover:shadow-md transition-all"
+              style={{ border: '2px solid #E2701B' }}
             >
               <div>
-                <p className="font-medium text-sm group-hover:text-primary transition-colors">{townName}</p>
+                <p className="font-bold text-sm" style={{ color: '#097275' }}>{townName}</p>
                 <p className="text-xs text-muted-foreground">{count} listing{count !== 1 ? "s" : ""}</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
@@ -81,7 +82,7 @@ export default function CountyPage() {
       {/* All Listings */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-xl font-semibold">All Listings in Co. {decodeURIComponent(county)}</h2>
+          <h2 className="font-display text-xl font-bold" style={{ color: '#097275' }}>All Listings in Co. {decodeURIComponent(county)}</h2>
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
         </div>
         {viewMode === "grid" ? (

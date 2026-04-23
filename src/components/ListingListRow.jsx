@@ -16,7 +16,8 @@ export default function ListingListRow({ listing }) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="flex items-center gap-4 bg-card border rounded-xl px-4 py-3 hover:border-primary/30 hover:shadow-md transition-all group"
+      className="flex items-center gap-4 bg-card rounded-xl px-4 py-3 hover:shadow-md transition-all group"
+      style={{ border: '2px solid #E2701B' }}
     >
       <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
         {listing.image_url ? (
@@ -30,7 +31,7 @@ export default function ListingListRow({ listing }) {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-sm group-hover:text-primary transition-colors truncate">{listing.name}</span>
+          <span className="font-bold text-sm truncate" style={{ color: '#097275' }}>{listing.name}</span>
           {listing.is_featured && <Star className="w-3.5 h-3.5 text-accent fill-accent shrink-0" />}
           <Badge variant="outline" className={`text-xs shrink-0 ${config.color}`}>
             <Icon className="w-3 h-3 mr-1" />{listing.type}
