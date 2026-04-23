@@ -170,7 +170,7 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-16">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="font-display text-2xl font-semibold flex items-center gap-2">
+              <h2 className="font-display text-2xl font-bold flex items-center gap-2" style={{ color: '#097275' }}>
                 <Star className="w-5 h-5 text-accent fill-accent" />
                 Featured
               </h2>
@@ -192,7 +192,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-16">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="font-display text-2xl font-semibold">Browse by County</h2>
+            <h2 className="font-display text-2xl font-bold" style={{ color: '#097275' }}>Browse by County</h2>
             <p className="text-sm text-muted-foreground mt-1">Explore what's happening in each county</p>
           </div>
         </div>
