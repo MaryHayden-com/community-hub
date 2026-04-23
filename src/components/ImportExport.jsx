@@ -118,7 +118,7 @@ export default function ImportExport({ listings, onImportComplete }) {
   const handleExport = () => {
     setExporting(true);
     try {
-      const headers = ["Type", "Name", "Group 1", "Group 2", "Group 3", "Category 1", "Category 2", "Category 3", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email"];
+      const headers = ["Type", "Name", "Group 1", "Group 2", "Group 3", "Category 1", "Category 2", "Category 3", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email", "Image URL"];
       const rows = listings.map((l) => {
         const groups = Array.isArray(l.subcategory_group) ? l.subcategory_group : (l.subcategory_group ? [l.subcategory_group] : []);
         const cats = Array.isArray(l.category) ? l.category : (l.category ? [l.category] : []);
@@ -134,6 +134,7 @@ export default function ImportExport({ listings, onImportComplete }) {
           l.is_verified ? "Yes" : "No",
           l.plan || "basic",
           l.owner_email || "",
+          l.image_url || "",
         ];
       });
 
