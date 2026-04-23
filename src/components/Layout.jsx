@@ -80,9 +80,7 @@ export default function Layout() {
               </button>
             ) : null}
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-              </div>
+              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/a942382d3_MH.PNG" alt="MH Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
               <span className="font-display text-lg sm:text-xl font-bold tracking-tight uppercase" style={{ color: '#097275' }}>Community Hub</span>
             </Link>
           </div>
