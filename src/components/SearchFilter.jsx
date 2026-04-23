@@ -53,7 +53,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
             <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Types</SelectItem>
             <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business</SelectItem>
             <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
-            <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
+            <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Services</SelectItem>
             <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education</SelectItem>
             <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
           </SelectContent>
