@@ -238,6 +238,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
       return;
     }
     setSaving(true);
+    // Optimistic UI update
+    toast({ title: isNew ? "Creating..." : "Saving...", description: `${form.name}` });
     try {
       if (isNew) {
         await base44.entities.CommunityListing.create(form);

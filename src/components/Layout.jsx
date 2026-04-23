@@ -32,6 +32,7 @@ export default function Layout() {
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const mainRef = useRef(null);
+  const [tabScrollPositions, setTabScrollPositions] = useState({});
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -39,9 +40,17 @@ export default function Layout() {
 
   useEffect(() => {
     setMobileOpen(false);
-    // Scroll to top on route change
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [location.pathname, location.search]);
+    // Save scroll position before changing routes
+    if (mainRef.current) {
+      const currentTab = BOTTOM_TABS.find(tab => location.pathname.startsWith(tab.to.split("?")[0]))?.to || "/";
+      setTabScrollPositions(prev => ({ ...prev, [currentTab]: mainRef.current.scrollTop }));
+      // Restore scroll position for new tab
+      const newTab = BOTTOM_TABS.find(tab => location.pathname.startsWith(tab.to.split("?")[0]))?.to || "/";
+      setTimeout(() => {
+        if (mainRef.current) mainRef.current.scrollTop = tabScrollPositions[newTab] || 0;
+      }, 0);
+    }
+  }, [location.pathname, location.search, tabScrollPositions]);
 
   // System dark mode
   useEffect(() => {
@@ -202,31 +211,40 @@ export default function Layout() {
       {/* ── Mobile Bottom Navigation ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t flex items-stretch" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}>
         {BOTTOM_TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = tab.to === "/"
-            ? (location.pathname === "/" || location.pathname === "/directory")
-            : location.pathname.startsWith(tab.to.split("?")[0]) && tab.to !== "/";
-          return (
-            <button
-              key={tab.to}
-              onClick={() => {
-                if (isActive) {
-                  // Re-clicking active tab scrolls to top
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                  if (mainRef.current) mainRef.current.scrollTop = 0;
-                } else {
-                  navigate(tab.to);
-                }
-              }}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-3 min-h-[44px] text-[10px] font-medium transition-colors ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-              {tab.label}
-            </button>
-          );
-        })}
+            const Icon = tab.icon;
+            const isActive = tab.to === "/"
+              ? (location.pathname === "/" || location.pathname === "/directory")
+              : location.pathname.startsWith(tab.to.split("?")[0]) && tab.to !== "/";
+            return (
+              <button
+                key={tab.to}
+                onClick={() => {
+                  if (isActive) {
+                    // Re-clicking active tab scrolls to root and resets
+                    if (mainRef.current) mainRef.current.scrollTop = 0;
+                    setTabScrollPositions(prev => ({ ...prev, [tab.to]: 0 }));
+                    // If on a child route, navigate back to root of tab
+                    if (location.pathname !== tab.to && location.pathname !== "/" && location.pathname !== "/directory") {
+                      navigate(tab.to);
+                    }
+                  } else {
+                    // Switching tabs
+                    if (mainRef.current) {
+                      const currentTab = BOTTOM_TABS.find(t => location.pathname.startsWith(t.to.split("?")[0]))?.to || "/";
+                      setTabScrollPositions(prev => ({ ...prev, [currentTab]: mainRef.current.scrollTop }));
+                    }
+                    navigate(tab.to);
+                  }
+                }}
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-3 min-h-[44px] text-[10px] font-medium transition-colors ${
+                  isActive ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                {tab.label}
+              </button>
+            );
+          })}
       </nav>
     </div>
   );

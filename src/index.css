@@ -30,14 +30,26 @@ button, a, [role="tab"], [role="button"] {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
 }
 
-/* Smooth page transitions — horizontal slide (push/pop feel) */
+/* Smooth page transitions — responsive horizontal slide with push/pop effect */
 .page-transition {
-  animation: pagePush 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: pagePush 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes pagePush {
-  from { opacity: 0; transform: translateX(18px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { 
+    opacity: 0; 
+    transform: translateX(32px);
+  }
+  to   { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
 }
 
 @layer base {

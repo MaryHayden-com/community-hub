@@ -182,9 +182,17 @@ export default function Admin() {
 
   const handleToggleVerified = async (listing, e) => {
     e.stopPropagation();
-    await base44.entities.CommunityListing.update(listing.id, { is_verified: !listing.is_verified });
-    toast({ title: listing.is_verified ? "Unverified" : "Verified", description: `${listing.name} marked as ${listing.is_verified ? "unverified" : "verified"}.` });
-    loadListings();
+    // Optimistic UI update
+    const newVerified = !listing.is_verified;
+    setListings(prev => prev.map(l => l.id === listing.id ? { ...l, is_verified: newVerified } : l));
+    toast({ title: newVerified ? "Verified" : "Unverified", description: `${listing.name} marked as ${newVerified ? "verified" : "unverified"}.` });
+    try {
+      await base44.entities.CommunityListing.update(listing.id, { is_verified: newVerified });
+    } catch (err) {
+      // Revert optimistic update on error
+      setListings(prev => prev.map(l => l.id === listing.id ? { ...l, is_verified: listing.is_verified } : l));
+      toast({ title: "Error", description: "Failed to update verification status.", variant: "destructive" });
+    }
   };
 
   const handleDelete = async () => {
