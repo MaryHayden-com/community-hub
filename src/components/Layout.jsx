@@ -40,17 +40,7 @@ export default function Layout() {
 
   useEffect(() => {
     setMobileOpen(false);
-    // Save scroll position before changing routes
-    if (mainRef.current) {
-      const currentTab = BOTTOM_TABS.find(tab => location.pathname.startsWith(tab.to.split("?")[0]))?.to || "/";
-      setTabScrollPositions(prev => ({ ...prev, [currentTab]: mainRef.current.scrollTop }));
-      // Restore scroll position for new tab
-      const newTab = BOTTOM_TABS.find(tab => location.pathname.startsWith(tab.to.split("?")[0]))?.to || "/";
-      setTimeout(() => {
-        if (mainRef.current) mainRef.current.scrollTop = tabScrollPositions[newTab] || 0;
-      }, 0);
-    }
-  }, [location.pathname, location.search, tabScrollPositions]);
+  }, [location.pathname, location.search]);
 
   // System dark mode
   useEffect(() => {
