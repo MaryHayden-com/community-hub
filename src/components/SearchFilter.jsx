@@ -21,20 +21,6 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup(""); setCategory(""); }}>
-          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Types" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Types</SelectItem>
-            <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business</SelectItem>
-            <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
-            <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
-            <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education</SelectItem>
-            <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
-          </SelectContent>
-        </Select>
-
         <Select value={county || "all"} onValueChange={(v) => { setCounty(v === "all" ? "" : v); setTown(""); }}>
           <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Counties" />
@@ -56,6 +42,20 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
             {[...towns].sort().map((t) => (
               <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup(""); setCategory(""); }}>
+          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Types</SelectItem>
+            <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business</SelectItem>
+            <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
+            <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
+            <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education</SelectItem>
+            <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
           </SelectContent>
         </Select>
 
