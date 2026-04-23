@@ -4,7 +4,6 @@ import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 import { useState, useEffect } from "react"
-import { Drawer, DrawerContent } from "./drawer"
 
 import { cn } from "@/lib/utils"
 
@@ -64,33 +63,25 @@ SelectScrollDownButton.displayName =
 
 const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => {
   const isMobile = useIsMobileSelect();
-  const [open, setOpen] = React.useState(false);
-
-  // Sync with Radix Select's internal open state
-  React.useEffect(() => {
-    const handleOpenChange = () => {
-      if (ref?.current) {
-        const parent = ref.current.parentElement?.closest('[role="combobox"]');
-        if (parent) {
-          setOpen(parent.getAttribute('aria-expanded') === 'true');
-        }
-      }
-    };
-    document.addEventListener('pointerdown', handleOpenChange);
-    return () => document.removeEventListener('pointerdown', handleOpenChange);
-  }, [ref]);
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent>
-          <div className="max-h-[60vh] overflow-y-auto py-2">
+      <SelectPrimitive.Portal>
+        <SelectPrimitive.Content
+          ref={ref}
+          className={cn(
+            "fixed bottom-0 left-0 right-0 z-50 max-h-[60vh] overflow-hidden rounded-t-lg border-t bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            className
+          )}
+          position="popper"
+          {...props}>
+          <div className="overflow-y-auto max-h-[60vh]">
             <SelectPrimitive.Viewport className="p-1">
               {children}
             </SelectPrimitive.Viewport>
           </div>
-        </DrawerContent>
-      </Drawer>
+        </SelectPrimitive.Content>
+      </SelectPrimitive.Portal>
     );
   }
 
