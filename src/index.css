@@ -30,14 +30,14 @@ button, a, [role="tab"], [role="button"] {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
 }
 
-/* Smooth page transitions */
+/* Smooth page transitions — horizontal slide (push/pop feel) */
 .page-transition {
-  animation: fadeSlideIn 0.22s ease-out both;
+  animation: pagePush 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes pagePush {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @layer base {

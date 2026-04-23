@@ -208,16 +208,24 @@ export default function Layout() {
             ? location.pathname === "/"
             : location.pathname.startsWith(tab.to.split("?")[0]) && tab.to !== "/";
           return (
-            <Link
+            <button
               key={tab.to}
-              to={tab.to}
+              onClick={() => {
+                if (isActive) {
+                  // Re-clicking active tab scrolls to top
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  if (mainRef.current) mainRef.current.scrollTop = 0;
+                } else {
+                  navigate(tab.to);
+                }
+              }}
               className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-3 min-h-[44px] text-[10px] font-medium transition-colors ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
             >
               <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
               {tab.label}
-            </Link>
+            </button>
           );
         })}
       </nav>

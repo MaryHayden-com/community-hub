@@ -25,6 +25,7 @@ const ACTION_ICONS = {
 const SYSTEM_TYPES = ["verified", "unverified", "claim_approved", "claim_rejected", "ownership_transfer", "plan_upgrade"];
 
 export default function ListingDetailPanel({ listing, onClose, onListingUpdated, currentUser }) {
+  const [optimisticVerified, setOptimisticVerified] = useState(listing.is_verified);
   const [actions, setActions] = useState([]);
   const [loadingActions, setLoadingActions] = useState(true);
   const [newNote, setNewNote] = useState("");
@@ -76,7 +77,8 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
   };
 
   const handleVerifyToggle = async () => {
-    const newVal = !listing.is_verified;
+    const newVal = !optimisticVerified;
+    setOptimisticVerified(newVal); // optimistic
     await base44.entities.CommunityListing.update(listing.id, { is_verified: newVal });
     await base44.entities.ListingAction.create({
       listing_id: listing.id, listing_name: listing.name,
@@ -125,7 +127,7 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline" className="text-xs">{listing.type}</Badge>
-            {listing.is_verified && (
+            {optimisticVerified && (
               <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
                 <ShieldCheck className="w-3 h-3 mr-1" />Verified
               </Badge>
@@ -157,8 +159,8 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
       {/* Quick action buttons */}
       <div className="flex gap-2 flex-wrap">
         <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5" onClick={handleVerifyToggle}>
-          {listing.is_verified ? <ShieldOff className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-          {listing.is_verified ? "Unverify" : "Verify"}
+          {optimisticVerified ? <ShieldOff className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+          {optimisticVerified ? "Unverify" : "Verify"}
         </Button>
         <Button size="sm" variant="outline" className="text-xs h-7 gap-1.5" onClick={() => setTransferMode(!transferMode)}>
           <ArrowRightLeft className="w-3.5 h-3.5" /> Transfer Owner

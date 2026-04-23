@@ -536,7 +536,8 @@ export default function Admin() {
         </div>
       ) : (
         <div className="bg-card rounded-xl border overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
@@ -575,6 +576,29 @@ export default function Admin() {
               </tbody>
             </table>
           </div>
+          {/* Mobile cards */}
+          <div className="sm:hidden divide-y">
+            {filteredWhatsOn.map((l) => (
+              <div key={l.id} className="p-4 cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setEditing(l)}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{l.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{l.county} · {l.town}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {l.is_recurring
+                        ? `Every ${l.recurring_day}${l.event_time ? ` at ${l.event_time}` : ""}`
+                        : l.event_date || "No date"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    {l.is_featured && <span className="text-amber-500">★</span>}
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}><Edit className="w-3.5 h-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(l.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
           {filteredWhatsOn.length === 0 && (
             <div className="py-12 text-center text-muted-foreground">No What's On events found</div>
           )}
@@ -587,7 +611,8 @@ export default function Admin() {
         </div>
       ) : viewMode === "list" ? (
         <div className="bg-card rounded-xl border overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
@@ -648,33 +673,56 @@ export default function Admin() {
                      })}
                      <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost" size="icon" className={`h-8 w-8 ${l.is_verified ? "text-emerald-600" : "text-muted-foreground"}`}
-                          onClick={(e) => handleToggleVerified(l, e)}
-                          title={l.is_verified ? "Unverify" : "Mark as Verified"}
-                        >
+                        <Button variant="ghost" size="icon" className={`h-8 w-8 ${l.is_verified ? "text-emerald-600" : "text-muted-foreground"}`} onClick={(e) => handleToggleVerified(l, e)} title={l.is_verified ? "Unverify" : "Mark as Verified"}>
                           {l.is_verified ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
                         </Button>
-                        <Button
-                          variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"
-                          onClick={(e) => handleFetchSingleImage(l, e)}
-                          disabled={fetchingImageId === l.id}
-                          title="Fetch image from website/social links"
-                        >
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={(e) => handleFetchSingleImage(l, e)} disabled={fetchingImageId === l.id} title="Fetch image">
                           {fetchingImageId === l.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}>
-                          <Edit className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(l.id)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(l)}><Edit className="w-3.5 h-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(l.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+          {/* Mobile cards */}
+          <div className="sm:hidden divide-y">
+            {filtered.map((l) => (
+              <div
+                key={l.id}
+                className={`p-4 cursor-pointer hover:bg-muted/30 transition-colors ${selectMode && selectedIds.includes(l.id) ? "bg-primary/10" : ""}`}
+                onClick={() => {
+                  if (mergeMode) handleMergeSelect(l);
+                  else if (selectMode) toggleSelect(l);
+                  else setEditing(l);
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  {selectMode && (
+                    <input type="checkbox" checked={selectedIds.includes(l.id)} onChange={() => toggleSelect(l)} className="mt-1 cursor-pointer" onClick={(e) => e.stopPropagation()} />
+                  )}
+                  {l.image_url && (
+                    <img src={l.image_url} alt={l.name} className="h-12 w-12 rounded-lg object-cover shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium truncate">{l.name}</p>
+                      {l.is_featured && <span className="text-amber-500 text-xs">★</span>}
+                      {l.is_verified && <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{l.type}</p>
+                    <p className="text-xs text-muted-foreground">{l.town}, {l.county}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setEditing(l)}><Edit className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive" onClick={() => setDeleteId(l.id)}><Trash2 className="w-4 h-4" /></Button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           {filtered.length === 0 && (
             <div className="py-12 text-center text-muted-foreground">No listings found</div>
