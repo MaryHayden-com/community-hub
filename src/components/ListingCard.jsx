@@ -24,7 +24,8 @@ export default function ListingCard({ listing, isOwned }) {
     return (
     <Link
       to={`/listing/${listing.id}`}
-      className={`group block rounded-xl border transition-all duration-300 overflow-hidden ${isOwned ? "bg-emerald-50 border-emerald-200 hover:border-emerald-300 hover:shadow-lg" : "bg-card hover:border-primary/30 hover:shadow-lg"}`}
+      className={`group block rounded-xl transition-all duration-300 overflow-hidden hover:shadow-lg ${isOwned ? "bg-emerald-50" : "bg-card"}`}
+      style={{ border: `2px solid ${isOwned ? '#6ee7b7' : '#E2701B'}` }}
     >
       <div className="h-36 overflow-hidden relative">
         {listing.image_url ? (
