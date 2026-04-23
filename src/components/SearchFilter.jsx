@@ -35,6 +35,30 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           </SelectContent>
         </Select>
 
+        <Select value={county || "all"} onValueChange={(v) => { setCounty(v === "all" ? "" : v); setTown(""); }}>
+          <SelectTrigger className="w-[160px] h-9 bg-card">
+            <SelectValue placeholder="All Counties" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Counties</SelectItem>
+            {[...counties].sort().map((c) => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={town || "all"} onValueChange={(v) => setTown(v === "all" ? "" : v)}>
+          <SelectTrigger className="w-[160px] h-9 bg-card">
+            <SelectValue placeholder="All Towns" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Towns</SelectItem>
+            {[...towns].sort().map((t) => (
+              <SelectItem key={t} value={t}>{t}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         {type && groups && groups.length > 0 && (
           <Select value={group || "all"} onValueChange={(v) => { setGroup(v === "all" ? "" : v); setCategory(""); }}>
             <SelectTrigger className="w-[160px] h-9 bg-card">
@@ -62,30 +86,6 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
             </SelectContent>
           </Select>
         )}
-
-        <Select value={county || "all"} onValueChange={(v) => { setCounty(v === "all" ? "" : v); setTown(""); }}>
-          <SelectTrigger className="w-[160px] h-9 bg-card">
-            <SelectValue placeholder="All Counties" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Counties</SelectItem>
-            {[...counties].sort().map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={town || "all"} onValueChange={(v) => setTown(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-[160px] h-9 bg-card">
-            <SelectValue placeholder="All Towns" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Towns</SelectItem>
-            {[...towns].sort().map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
 
         {isWhatsOn && setDateFrom && (
           <div className="flex items-center gap-2 bg-card border rounded-md px-3 h-9">
