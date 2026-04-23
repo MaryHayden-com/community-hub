@@ -1,184 +1,286 @@
 /**
- * Master taxonomy: Type → Group → Categories
- * Categories that appear in multiple groups are cross-linked automatically.
+ * Master taxonomy: Type → Group → SubGroup → Categories
+ * Categories that appear in multiple places are cross-linked automatically.
  * When a user picks categories, groups are derived automatically.
  */
 
 export const TAXONOMY = {
   "Business": {
-    "Accommodation": [
-      "Airbnb / Short-term Let", "B&B", "Guesthouse", "Hotel", "Room to Let",
-      "Self-Catering", "Hostel", "Glamping & Camping"
-    ],
-    "Food & Beverage": [
-      "Bakery", "Bar & Pub", "Café", "Coffee Shop", "Deli", "Fast Food",
-      "Food Producer", "Ice Cream", "Restaurant", "Takeaway"
-    ],
-    "Healthcare": [
-      "Dentist", "GP & Medical Centre", "Optician", "Pharmacy",
-      "Physiotherapy", "Veterinary"
-    ],
-    "Personal Services": [
-      "Barber", "Childcare & Crèche", "Cleaning Services",
-      "Dry Cleaning & Laundry", "Funeral Director", "Gym & Fitness",
-      "Hair & Beauty", "Massage & Therapy", "Nail Salon", "Tattoo & Piercing"
-    ],
-    "Professional Services": [
-      "Accountant", "Architect", "Auctioneer / Estate Agent",
-      "Financial Advisor", "Insurance Broker", "Mortgage Broker", "Solicitor"
-    ],
-    "Retail": [
-      "Bookshop", "Butcher", "Clothing & Fashion", "Craft & Hobby",
-      "DIY & Garden Centre", "Electronics", "Fishmonger", "Florist",
-      "Gift Shop", "Grocery", "Hardware", "Health Food & Organic",
-      "Jewellery", "Newsagent", "Off Licence", "Pharmacy", "Pet Shop",
-      "Second-hand & Vintage", "Supermarket", "Toy Shop"
-    ],
-    "Industry & Agriculture": [
-      "Agriculture & Farming", "Distillery & Brewery", "Engineering",
-      "Food Production & Processing", "Manufacturing", "Technology"
-    ],
-    "Tourism & Leisure": [
-      "Activity & Adventure", "Attraction", "Caravan & Camping",
-      "Heritage & Culture", "Tour Operator", "Tourist Information"
-    ],
-    "Trades & Construction": [
-      "Builder", "Carpenter & Joiner", "Electrician",
-      "Landscaping & Gardening", "Painter & Decorator", "Plumber",
-      "Roofer", "Tiler"
-    ],
-    "Transport & Logistics": [
-      "Bus & Coach", "Courier & Delivery", "Freight & Haulage",
-      "Moving Services", "Taxi & Private Hire"
-    ],
-    "Media & Creative": [
-      "Advertising", "Design & Creative", "Marketing & PR",
-      "Photography & Video", "Print & Publishing", "Web & Digital"
-    ],
-    "Financial Services": [
-      "Bank & Credit Union", "Bookkeeper", "Currency Exchange",
-      "Financial Advisor", "Insurance Broker", "Mortgage Broker"
-    ]
+    "Accommodation": {
+      "All Types": [
+        "Airbnb / Short-term Let", "B&B", "Guesthouse", "Hotel", "Room to Let",
+        "Self-Catering", "Hostel", "Glamping & Camping"
+      ]
+    },
+    "Food & Beverage": {
+      "All Types": [
+        "Bakery", "Bar & Pub", "Café", "Coffee Shop", "Deli", "Fast Food",
+        "Food Producer", "Ice Cream", "Restaurant", "Takeaway"
+      ]
+    },
+    "Healthcare": {
+      "Medical & Wellness": [
+        "Dentist", "GP & Medical Centre", "Optician", "Pharmacy",
+        "Physiotherapy", "Veterinary"
+      ]
+    },
+    "Personal Services": {
+      "Beauty & Grooming": [
+        "Barber", "Hair & Beauty", "Massage & Therapy", "Nail Salon", "Tattoo & Piercing"
+      ],
+      "Care & Wellbeing": [
+        "Childcare & Crèche", "Cleaning Services", "Dry Cleaning & Laundry",
+        "Funeral Director", "Gym & Fitness"
+      ]
+    },
+    "Professional Services": {
+      "All Types": [
+        "Accountant", "Architect", "Auctioneer / Estate Agent",
+        "Financial Advisor", "Insurance Broker", "Mortgage Broker", "Solicitor"
+      ]
+    },
+    "Retail": {
+      "Food & Drink": [
+        "Butcher", "Fishmonger", "Grocery", "Health Food & Organic",
+        "Newsagent", "Off Licence", "Supermarket"
+      ],
+      "Home & Garden": [
+        "DIY & Garden Centre", "Florist", "Hardware", "Pet Shop"
+      ],
+      "Fashion & Accessories": [
+        "Clothing & Fashion", "Jewellery"
+      ],
+      "Hobbies & Books": [
+        "Bookshop", "Craft & Hobby", "Gift Shop", "Toy Shop"
+      ],
+      "Other": [
+        "Electronics", "Pharmacy", "Second-hand & Vintage"
+      ]
+    },
+    "Industry & Agriculture": {
+      "All Types": [
+        "Agriculture & Farming", "Distillery & Brewery", "Engineering",
+        "Food Production & Processing", "Manufacturing", "Technology"
+      ]
+    },
+    "Tourism & Leisure": {
+      "All Types": [
+        "Activity & Adventure", "Attraction", "Caravan & Camping",
+        "Heritage & Culture", "Tour Operator", "Tourist Information"
+      ]
+    },
+    "Trades & Construction": {
+      "All Types": [
+        "Builder", "Carpenter & Joiner", "Electrician",
+        "Landscaping & Gardening", "Painter & Decorator", "Plumber",
+        "Roofer", "Tiler"
+      ]
+    },
+    "Transport & Logistics": {
+      "All Types": [
+        "Bus & Coach", "Courier & Delivery", "Freight & Haulage",
+        "Moving Services", "Taxi & Private Hire"
+      ]
+    },
+    "Media & Creative": {
+      "All Types": [
+        "Advertising", "Design & Creative", "Marketing & PR",
+        "Photography & Video", "Print & Publishing", "Web & Digital"
+      ]
+    },
+    "Financial Services": {
+      "All Types": [
+        "Bank & Credit Union", "Bookkeeper", "Currency Exchange",
+        "Financial Advisor", "Insurance Broker", "Mortgage Broker"
+      ]
+    }
   },
 
   "Club & Group": {
-    "Arts & Culture": [
-      "Art & Craft", "Book Club", "Choir", "Creative Writing",
-      "Dance", "Drama & Theatre", "Film Club", "Music", "Photography Club"
-    ],
-    "Charity & Welfare": [
-      "Charity", "Food Bank", "Hospice Support",
-      "Mental Health Support", "St Vincent de Paul", "Volunteer Group"
-    ],
-    "Faith & Religious": [
-      "Baptist", "Buddhist", "Catholic", "Church of Ireland",
-      "Evangelical", "Hindu", "Islamic / Mosque", "Jewish",
-      "Methodist", "Orthodox", "Presbyterian", "Quaker"
-    ],
-    "Leisure & Social": [
-      "Bridge Club", "Gardening Club", "ICA", "Men's Shed",
-      "Pigeon Club", "Senior Citizens", "Toastmasters",
-      "Walking Group", "Women's Group"
-    ],
-    "Sports & Recreation": [
-      "American Football", "Athletics", "Badminton", "Basketball",
-      "Boxing", "Camogie", "Cycling", "Equestrian", "GAA",
-      "Golf", "Hockey", "Hurling", "Kayaking & Rowing",
-      "Martial Arts", "Rugby", "Sailing", "Soccer / Football",
-      "Swimming", "Table Tennis", "Tennis"
-    ],
-    "Youth & Community": [
-      "Community Group", "Girl Guides", "Residents Association",
-      "Scouts", "Tidy Towns", "Youth Club"
-    ],
-    "Health & Wellbeing": [
-      "Mindfulness & Meditation", "Pilates", "Running Club",
-      "Weight Management", "Yoga"
-    ]
+    "Arts & Culture": {
+      "All Types": [
+        "Art & Craft", "Book Club", "Choir", "Creative Writing",
+        "Dance", "Drama & Theatre", "Film Club", "Music", "Photography Club"
+      ]
+    },
+    "Charity & Welfare": {
+      "All Types": [
+        "Charity", "Food Bank", "Hospice Support",
+        "Mental Health Support", "St Vincent de Paul", "Volunteer Group"
+      ]
+    },
+    "Faith & Religious": {
+      "All Types": [
+        "Baptist", "Buddhist", "Catholic", "Church of Ireland",
+        "Evangelical", "Hindu", "Islamic / Mosque", "Jewish",
+        "Methodist", "Orthodox", "Presbyterian", "Quaker"
+      ]
+    },
+    "Leisure & Social": {
+      "All Types": [
+        "Bridge Club", "Gardening Club", "ICA", "Men's Shed",
+        "Pigeon Club", "Senior Citizens", "Toastmasters",
+        "Walking Group", "Women's Group"
+      ]
+    },
+    "Sports & Recreation": {
+      "Team Sports": [
+        "American Football", "Camogie", "GAA", "Hockey", "Hurling",
+        "Rugby", "Soccer / Football"
+      ],
+      "Individual Sports": [
+        "Athletics", "Badminton", "Basketball", "Boxing", "Cycling",
+        "Equestrian", "Golf", "Martial Arts", "Sailing", "Swimming",
+        "Table Tennis", "Tennis"
+      ],
+      "Water Sports": [
+        "Kayaking & Rowing"
+      ]
+    },
+    "Youth & Community": {
+      "Youth Organisations": [
+        "Foróige", "Girl Guides", "Scouts", "Youth Club"
+      ],
+      "Youth Sports & Activities": [
+        "Gymnastics", "Karate", "Martial Arts (Youth)", "Youth Football",
+        "Youth Sports Coaching"
+      ],
+      "Community Groups": [
+        "Community Group", "Residents Association", "Tidy Towns"
+      ]
+    },
+    "Health & Wellbeing": {
+      "Fitness & Movement": [
+        "Gym & Fitness", "Pilates", "Running Club", "Yoga"
+      ],
+      "Wellbeing": [
+        "Mindfulness & Meditation", "Weight Management"
+      ]
+    }
   },
 
   "Community Services": {
-    "Care & Support": [
-      "Childminder", "Citizens Information", "Crèche",
-      "Day Care Centre", "Disability Services", "Home Help",
-      "Nursing Home", "Respite Care"
-    ],
-    "Emergency & Public Safety": [
-      "Civil Defence", "Coast Guard", "Fire Station",
-      "Garda Station", "Mountain Rescue", "RNLI / Lifeboat"
-    ],
-    "Faith & Worship": [
-      "Baptist", "Buddhist", "Catholic", "Church of Ireland",
-      "Evangelical", "Hindu", "Islamic / Mosque", "Jewish",
-      "Methodist", "Orthodox", "Presbyterian", "Quaker"
-    ],
-    "Government & Civic": [
-      "Council Office", "Post Office", "Revenue / Tax Office",
-      "Social Welfare Office"
-    ],
-    "Health Services": [
-      "Dentist", "GP & Medical Centre", "Health Centre",
-      "Hospital", "HSE Service", "Mental Health Service",
-      "Pharmacy", "Physiotherapy"
-    ],
-    "Libraries & Information": [
-      "Community Library", "County Library", "Mobile Library",
-      "Public Library", "School Library"
-    ],
-    "Voluntary & Community": [
-      "Community Council", "Community Development", "Meals on Wheels",
-      "St Vincent de Paul", "Tidy Towns", "Volunteer Centre"
-    ]
+    "Care & Support": {
+      "All Types": [
+        "Childminder", "Citizens Information", "Crèche",
+        "Day Care Centre", "Disability Services", "Home Help",
+        "Nursing Home", "Respite Care"
+      ]
+    },
+    "Emergency & Public Safety": {
+      "All Types": [
+        "Civil Defence", "Coast Guard", "Fire Station",
+        "Garda Station", "Mountain Rescue", "RNLI / Lifeboat"
+      ]
+    },
+    "Faith & Worship": {
+      "All Types": [
+        "Baptist", "Buddhist", "Catholic", "Church of Ireland",
+        "Evangelical", "Hindu", "Islamic / Mosque", "Jewish",
+        "Methodist", "Orthodox", "Presbyterian", "Quaker"
+      ]
+    },
+    "Government & Civic": {
+      "All Types": [
+        "Council Office", "Post Office", "Revenue / Tax Office",
+        "Social Welfare Office"
+      ]
+    },
+    "Health Services": {
+      "Medical": [
+        "Dentist", "GP & Medical Centre", "Health Centre", "Hospital",
+        "HSE Service", "Physiotherapy"
+      ],
+      "Mental Health & Pharmacy": [
+        "Mental Health Service", "Pharmacy"
+      ]
+    },
+    "Libraries & Information": {
+      "All Types": [
+        "Community Library", "County Library", "Mobile Library",
+        "Public Library", "School Library"
+      ]
+    },
+    "Voluntary & Community": {
+      "All Types": [
+        "Community Council", "Community Development", "Meals on Wheels",
+        "St Vincent de Paul", "Tidy Towns", "Volunteer Centre"
+      ]
+    }
   },
 
   "Education": {
-    "Early Years": [
-      "Childcare", "Crèche", "Montessori",
-      "Naíonra (Irish-medium playschool)", "Playschool / Preschool"
-    ],
-    "Primary": [
-      "Gaelscoil", "National School", "Special School"
-    ],
-    "Secondary": [
-      "Gaelcholáiste", "Secondary School", "Special Education",
-      "Vocational / ETB School"
-    ],
-    "Further & Higher Education": [
-      "Adult Education", "College of Further Education",
-      "Community Training Centre", "Institute of Technology",
-      "University", "Youthreach"
-    ],
-    "Training & Skills": [
-      "Arts & Drama Classes", "Craft Classes", "Language School",
-      "Music Lessons", "Sports Coaching", "Tutoring"
-    ]
+    "Early Years": {
+      "All Types": [
+        "Childcare", "Crèche", "Montessori",
+        "Naíonra (Irish-medium playschool)", "Playschool / Preschool"
+      ]
+    },
+    "Primary": {
+      "All Types": [
+        "Gaelscoil", "National School", "Special School"
+      ]
+    },
+    "Secondary": {
+      "All Types": [
+        "Gaelcholáiste", "Secondary School", "Special Education",
+        "Vocational / ETB School"
+      ]
+    },
+    "Further & Higher Education": {
+      "All Types": [
+        "Adult Education", "College of Further Education",
+        "Community Training Centre", "Institute of Technology",
+        "University", "Youthreach"
+      ]
+    },
+    "Training & Skills": {
+      "Arts & Leisure": [
+        "Arts & Drama Classes", "Craft Classes", "Music Lessons"
+      ],
+      "Academic & Professional": [
+        "Language School", "Sports Coaching", "Tutoring"
+      ]
+    }
   },
 
   "What's On": {
-    "Arts & Entertainment": [
-      "Comedy Night", "Concert", "Exhibition",
-      "Film Screening", "Open Mic", "Theatre"
-    ],
-    "Community": [
-      "AGM / Meeting", "Fundraiser", "Information Evening",
-      "Open Day", "Talk & Lecture", "Workshop"
-    ],
-    "Family & Kids": [
-      "Craft Fair", "Family Fun Day", "Kids Event",
-      "Pantomime", "Puppet Show"
-    ],
-    "Festivals & Markets": [
-      "Christmas Market", "Craft Market", "Farmers Market",
-      "Food Festival", "Music Festival", "Street Festival"
-    ],
-    "Sport & Recreation": [
-      "Fun Run / Walk", "Match / Game", "Sports Day",
-      "Tournament", "Triathlon"
-    ],
-    "Seasonal & Cultural": [
-      "Christmas Event", "Cultural Event", "Halloween Event",
-      "St Patrick's Day", "Summer Event"
-    ]
+    "Arts & Entertainment": {
+      "All Types": [
+        "Comedy Night", "Concert", "Exhibition",
+        "Film Screening", "Open Mic", "Theatre"
+      ]
+    },
+    "Community": {
+      "All Types": [
+        "AGM / Meeting", "Fundraiser", "Information Evening",
+        "Open Day", "Talk & Lecture", "Workshop"
+      ]
+    },
+    "Family & Kids": {
+      "All Types": [
+        "Craft Fair", "Family Fun Day", "Kids Event",
+        "Pantomime", "Puppet Show"
+      ]
+    },
+    "Festivals & Markets": {
+      "All Types": [
+        "Christmas Market", "Craft Market", "Farmers Market",
+        "Food Festival", "Music Festival", "Street Festival"
+      ]
+    },
+    "Sport & Recreation": {
+      "All Types": [
+        "Fun Run / Walk", "Match / Game", "Sports Day",
+        "Tournament", "Triathlon"
+      ]
+    },
+    "Seasonal & Cultural": {
+      "All Types": [
+        "Christmas Event", "Cultural Event", "Halloween Event",
+        "St Patrick's Day", "Summer Event"
+      ]
+    }
   }
 };
 
@@ -195,7 +297,9 @@ export function getGroups(type) {
 export function getAllCategories(type) {
   const groups = TAXONOMY[type] || {};
   const all = new Set();
-  Object.values(groups).forEach((cats) => cats.forEach((c) => all.add(c)));
+  Object.values(groups).forEach((subGroups) => {
+    Object.values(subGroups).forEach((cats) => cats.forEach((c) => all.add(c)));
+  });
   return [...all].sort();
 }
 
@@ -208,8 +312,10 @@ export function getGroupsForCategories(type, selectedCategories) {
   const groups = TAXONOMY[type] || {};
   const result = new Set();
   selectedCategories.forEach((cat) => {
-    Object.entries(groups).forEach(([group, cats]) => {
-      if (cats.includes(cat)) result.add(group);
+    Object.entries(groups).forEach(([group, subGroups]) => {
+      Object.values(subGroups).forEach((cats) => {
+        if (cats.includes(cat)) result.add(group);
+      });
     });
   });
   return [...result];
@@ -222,7 +328,24 @@ export function getCategoriesForGroups(type, selectedGroups) {
   const groups = TAXONOMY[type] || {};
   const all = new Set();
   selectedGroups.forEach((g) => {
-    (groups[g] || []).forEach((c) => all.add(c));
+    const subGroups = groups[g] || {};
+    Object.values(subGroups).forEach((cats) => cats.forEach((c) => all.add(c)));
   });
   return [...all].sort();
+}
+
+/**
+ * Get all subgroups for a given group and type.
+ */
+export function getSubGroupsForGroup(type, group) {
+  const groups = TAXONOMY[type] || {};
+  return Object.keys(groups[group] || {});
+}
+
+/**
+ * Get categories for a specific subgroup.
+ */
+export function getCategoriesForSubGroup(type, group, subGroup) {
+  const groups = TAXONOMY[type] || {};
+  return groups[group]?.[subGroup] || [];
 }
