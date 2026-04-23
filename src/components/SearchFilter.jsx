@@ -22,7 +22,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
       <div className="flex flex-wrap gap-2">
         <Select value={county || "all"} onValueChange={(v) => { setCounty(v === "all" ? "" : v); setTown(""); }}>
-          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
+          <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Counties" />
           </SelectTrigger>
           <SelectContent>
@@ -34,7 +34,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         </Select>
 
         <Select value={town || "all"} onValueChange={(v) => setTown(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
+          <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Towns" />
           </SelectTrigger>
           <SelectContent>
@@ -46,7 +46,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         </Select>
 
         <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup(""); setCategory(""); }}>
-          <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
+          <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
@@ -61,7 +61,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
         {type && groups && groups.length > 0 && (
           <Select value={group || "all"} onValueChange={(v) => { setGroup(v === "all" ? "" : v); setCategory(""); }}>
-            <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
+            <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
               <SelectValue placeholder="All Groups" />
             </SelectTrigger>
             <SelectContent>
@@ -75,7 +75,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
         {type && group && categories && categories.length > 0 && (
           <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
-            <SelectTrigger className="w-[160px] h-9 bg-card font-bold" style={{ color: '#097275' }}>
+            <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -88,7 +88,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         )}
 
         {isWhatsOn && setDateFrom && (
-          <div className="flex items-center gap-2 bg-card border rounded-md px-3 h-9">
+          <div className="flex items-center gap-2 bg-card border rounded-md px-3 h-11">
             <CalendarRange className="w-4 h-4 text-muted-foreground shrink-0" />
             <input
               type="date"
@@ -113,7 +113,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup(""); setCategory(""); setCounty(""); setTown(""); setNearbyCounties(null); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup(""); setCategory(""); setCounty(""); setTown(""); setNearbyCounties(null); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}

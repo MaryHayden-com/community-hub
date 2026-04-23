@@ -65,7 +65,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Top Header ── */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b">
+      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14 sm:h-16">
 
           {/* Mobile: back button OR logo */}
@@ -201,7 +201,7 @@ export default function Layout() {
       </footer>
 
       {/* ── Mobile Bottom Navigation ── */}
-      <nav className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t flex items-stretch">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t flex items-stretch" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}>
         {BOTTOM_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = tab.to === "/"
@@ -211,7 +211,7 @@ export default function Layout() {
             <Link
               key={tab.to}
               to={tab.to}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-3 min-h-[44px] text-[10px] font-medium transition-colors ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
             >

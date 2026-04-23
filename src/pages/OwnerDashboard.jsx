@@ -175,7 +175,7 @@ export default function OwnerDashboard() {
             <button
               key={l.id}
               onClick={() => setSelectedListing(l)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+              className={`px-4 h-11 rounded-lg text-sm font-medium border transition-colors ${
                 selectedListing?.id === l.id
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card text-foreground border-border hover:border-primary/40"

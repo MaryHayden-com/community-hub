@@ -28,12 +28,11 @@ export default function AdminClaimRequests() {
 
   const handleApprove = async (claim) => {
     setActionId(claim.id);
+    // Optimistic update
+    setClaims((prev) => prev.map((c) => c.id === claim.id ? { ...c, status: "approved" } : c));
     await base44.entities.ClaimRequest.update(claim.id, { status: "approved" });
-    // Link the owner email to the listing
     await base44.entities.CommunityListing.update(claim.listing_id, { owner_email: claim.email });
-    // Invite the user (valid role: "user")
     await base44.users.inviteUser(claim.email, "user");
-    // Send approval notification email to the claimant
     await base44.integrations.Core.SendEmail({
       to: claim.email,
       subject: `Your listing claim has been approved – ${claim.listing_name}`,
@@ -41,15 +40,15 @@ export default function AdminClaimRequests() {
     });
     toast({ title: "Approved & Invited", description: `${claim.email} has been approved and notified.` });
     setActionId(null);
-    load();
   };
 
   const handleReject = async (claim) => {
     setActionId(claim.id);
+    // Optimistic update
+    setClaims((prev) => prev.map((c) => c.id === claim.id ? { ...c, status: "rejected" } : c));
     await base44.entities.ClaimRequest.update(claim.id, { status: "rejected" });
     toast({ title: "Rejected", description: `Claim from ${claim.name} rejected.` });
     setActionId(null);
-    load();
   };
 
   if (loading) {
