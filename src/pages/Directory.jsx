@@ -2,10 +2,8 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
-import ListingCard from "../components/ListingCard";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2 } from "lucide-react";
-import ViewToggle from "../components/ViewToggle";
 import ListingListRow from "../components/ListingListRow";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
 
@@ -16,7 +14,6 @@ export default function Directory() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [viewMode, setViewMode] = useState("grid");
   const [type, setType] = useState(params.get("type") || "");
   const [subcategoryGroup, setSubcategoryGroup] = useState(params.get("group") || "");
   const [category, setCategory] = useState(params.get("category") || "");
@@ -230,7 +227,6 @@ export default function Directory() {
             {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
           </p>
         </div>
-        <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
       </div>
 
       <SearchFilter
@@ -262,12 +258,6 @@ export default function Directory() {
               listing={entry.listing}
               overrideDate={entry.date}
             />
-          ))}
-        </div>
-      ) : viewMode === "grid" ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          {filtered.map((l) => (
-            <ListingCard key={l.id} listing={l} />
           ))}
         </div>
       ) : (
