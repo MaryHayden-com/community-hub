@@ -5,8 +5,8 @@ module.exports = {
   theme: {
   	extend: {
   		fontFamily: {
-  			sans: ['var(--font-sans)'],
-  			display: ['var(--font-display)']
+  			sans: ['Lato', 'var(--font-sans)'],
+  			display: ['Lora', 'var(--font-display)']
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

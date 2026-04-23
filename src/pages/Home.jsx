@@ -77,36 +77,55 @@ export default function Home() {
     <div>
       <SubmitListingForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary/5 via-background to-accent/5 py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-            Your Local <span className="text-primary">Community</span>.
+      <section className="relative overflow-hidden" style={{ background: '#097275' }}>
+        {/* Decorative orange arc top-right */}
+        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20" style={{ background: '#E2701B' }} />
+        <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full opacity-10" style={{ background: '#E2701B' }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
+          {/* MH Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28">
+              {/* Teal circle base */}
+              <div className="absolute inset-0 rounded-full border-4 border-white/30 flex items-center justify-center"
+                style={{ background: '#097275' }}>
+                {/* Orange half-arc */}
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-full rounded-l-full"
+                  style={{ background: '#E2701B' }} />
+                <span className="relative z-10 font-display font-bold text-white text-3xl sm:text-4xl tracking-widest select-none">MH</span>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Mary Hayden · Business & Operations</p>
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
+            Your Local <span style={{ color: '#E2701B' }}>Community</span>.
           </h1>
-          <p className="mt-4 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed font-sans">
             Discover the businesses, clubs, schools and events that bring your town's community together.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/directory">
-              <Button size="lg" className="gap-2 h-12 px-6">
+              <Button size="lg" className="gap-2 h-12 px-6 text-white font-semibold" style={{ background: '#E2701B', border: 'none' }}>
                 <Search className="w-4 h-4" />
                 Explore Directory
               </Button>
             </Link>
             {ownedListing ? (
               <Link to={`/dashboard`}>
-                <Button size="lg" variant="outline" className="gap-2 h-12 px-6">
+                <Button size="lg" variant="outline" className="gap-2 h-12 px-6 border-white/50 text-white hover:bg-white/10 bg-transparent">
                   <PlusCircle className="w-4 h-4" />
                   Edit Your Listing
                 </Button>
               </Link>
             ) : (
-              <Button size="lg" variant="outline" className="gap-2 h-12 px-6" onClick={() => setShowSubmitForm(true)}>
+              <Button size="lg" variant="outline" className="gap-2 h-12 px-6 border-white/50 text-white hover:bg-white/10 bg-transparent" onClick={() => setShowSubmitForm(true)}>
                 <PlusCircle className="w-4 h-4" />
                 Add Your Listing
               </Button>
             )}
           </div>
-          <div className="mt-6 flex justify-center gap-6 text-sm text-muted-foreground">
+          <div className="mt-6 flex justify-center gap-6 text-sm text-white/60">
             <span className="font-medium">{listings.length} Listings</span>
             <span>·</span>
             <span className="font-medium">{countyData.length} Counties</span>
@@ -117,24 +136,27 @@ export default function Home() {
       </section>
 
       {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {categories.map((cat) => {
+          {categories.map((cat, i) => {
             const Icon = cat.icon;
+            const accent = i % 2 === 0 ? '#097275' : '#E2701B';
             return (
               <Link
                 key={cat.type}
                 to={`/directory?type=${encodeURIComponent(cat.type)}`}
-                className="group bg-card rounded-xl border p-4 sm:p-5 hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+                className="group bg-card rounded-xl border p-4 sm:p-5 hover:shadow-lg transition-all duration-300"
+                style={{ borderColor: 'hsl(var(--border))' }}
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Icon className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-opacity"
+                  style={{ background: `${accent}18` }}>
+                  <Icon className="w-5 h-5" style={{ color: accent }} />
                 </div>
-                <h3 className="mt-3 font-semibold text-sm sm:text-base group-hover:text-primary transition-colors">
+                <h3 className="mt-3 font-semibold text-sm sm:text-base transition-colors" style={{ color: 'hsl(var(--foreground))' }}>
                   {cat.label}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1 hidden sm:block">{cat.desc}</p>
-                <p className="text-xs text-muted-foreground mt-1 font-medium">
+                <p className="text-xs font-medium mt-1" style={{ color: accent }}>
                   {typeCounts[cat.type] || 0} listings
                 </p>
               </Link>
