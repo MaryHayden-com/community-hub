@@ -83,7 +83,7 @@ export default function Layout() {
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-lg sm:text-xl font-bold tracking-tight" style={{ color: '#097275' }}>Community Hub</span>
+              <span className="font-display text-lg sm:text-xl font-bold tracking-tight uppercase" style={{ color: '#097275' }}>Community Hub</span>
             </Link>
           </div>
 
@@ -99,7 +99,7 @@ export default function Layout() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 uppercase tracking-wide ${
                     isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
                   }`}
                   style={{ color: '#097275' }}
@@ -150,7 +150,7 @@ export default function Layout() {
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Link key={item.to} to={item.to} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors" style={{ color: '#097275' }}>
+                <Link key={item.to} to={item.to} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
                   <Icon className="w-4 h-4" style={{ color: '#097275' }} />
                   {item.label}
                   <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
