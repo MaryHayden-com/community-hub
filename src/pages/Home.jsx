@@ -85,16 +85,11 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
           {/* MH Logo */}
           <div className="flex justify-center mb-6">
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28">
-              {/* Teal circle base */}
-              <div className="absolute inset-0 rounded-full border-4 border-white/30 flex items-center justify-center"
-                style={{ background: '#097275' }}>
-                {/* Orange half-arc */}
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-full rounded-l-full"
-                  style={{ background: '#E2701B' }} />
-                <span className="relative z-10 font-display font-bold text-white text-3xl sm:text-4xl tracking-widest select-none">MH</span>
-              </div>
-            </div>
+            <img
+              src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/77590268e_MH.PNG"
+              alt="Mary Hayden Logo"
+              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-lg"
+            />
           </div>
 
           <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Mary Hayden · Business & Operations</p>
