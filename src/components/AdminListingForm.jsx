@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
-import { getAllCategories, getGroupsForCategories } from "@/utils/taxonomy";
+import { getAllCategories, getGroupsForCategories, TAXONOMY, getSubGroupsForGroup, getCategoriesForSubGroup } from "@/utils/taxonomy";
 
 function FieldRow({ label, field, isHidden, toggleHidden, children }) {
   const hidden = isHidden(field);
@@ -163,9 +163,13 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     subcategory_group: Array.isArray(listing?.subcategory_group)
       ? listing.subcategory_group
       : listing?.subcategory_group ? [listing.subcategory_group] : [],
+    subgroup: Array.isArray(listing?.subgroup)
+      ? listing.subgroup
+      : listing?.subgroup ? [listing.subgroup] : [],
     category: Array.isArray(listing?.category)
       ? listing.category
       : listing?.category ? [listing.category] : [],
+    category_text: listing?.category_text || "",
     country: listing?.country || "Ireland",
     county: listing?.county || "",
     town: listing?.town || "",
@@ -311,27 +315,75 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
           </div>
 
-          {form.type && categoryOptions.length > 0 && (
-            <div>
-              <Label>
-                Category / Categories
-                <span className="text-xs text-muted-foreground ml-1">— select all that apply (groups assigned automatically)</span>
-              </Label>
-              <MultiSelectDropdown
-                options={categoryOptions}
-                selected={form.category}
-                placeholder="Select category/categories..."
-                onChange={(selectedCats) => {
-                  const autoGroups = getGroupsForCategories(form.type, selectedCats);
-                  update("category", selectedCats);
-                  update("subcategory_group", autoGroups);
-                }}
-              />
-              {form.subcategory_group?.length > 0 && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Groups: {form.subcategory_group.join(", ")}
-                </p>
+          {form.type && (
+            <div className="space-y-4">
+              {/* Group Selection */}
+              <div>
+                <Label>Group</Label>
+                <Select
+                  value={form.subcategory_group?.[0] || ""}
+                  onValueChange={(group) => {
+                    update("subcategory_group", group ? [group] : []);
+                    update("subgroup", []); // Reset subgroup on group change
+                    update("category", []);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a group..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(TAXONOMY[form.type] || {}).map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* SubGroup Selection */}
+              {form.subcategory_group?.[0] && (
+                <div>
+                  <Label>SubGroup</Label>
+                  <Select
+                    value={form.subgroup?.[0] || ""}
+                    onValueChange={(sg) => {
+                      update("subgroup", sg ? [sg] : []);
+                      update("category", []); // Reset categories on subgroup change
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a subgroup..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getSubGroupsForGroup(form.type, form.subcategory_group[0]).map((sg) => (
+                        <SelectItem key={sg} value={sg}>{sg}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
+
+              {/* Category Multi-Select */}
+              {form.subgroup?.[0] && (
+                <div>
+                  <Label>Category / Categories</Label>
+                  <MultiSelectDropdown
+                    options={getCategoriesForSubGroup(form.type, form.subcategory_group[0], form.subgroup[0])}
+                    selected={form.category}
+                    placeholder="Select category/categories..."
+                    onChange={(selectedCats) => update("category", selectedCats)}
+                  />
+                </div>
+              )}
+
+              {/* Optional Custom Text Category */}
+              <div>
+                <Label className="text-xs">Custom Category (optional)</Label>
+                <Input
+                  value={form.category_text}
+                  onChange={(e) => update("category_text", e.target.value)}
+                  placeholder="Enter custom category if not listed above..."
+                />
+              </div>
             </div>
           )}
 

@@ -32,6 +32,14 @@
       },
       "description": "One or more groups this listing belongs to"
     },
+    "subgroup": {
+      "type": "array",
+      "title": "SubGroup(s)",
+      "items": {
+        "type": "string"
+      },
+      "description": "One or more subgroups within the selected group"
+    },
     "category": {
       "type": "array",
       "title": "Category / Categories",
@@ -39,6 +47,11 @@
         "type": "string"
       },
       "description": "One or more categories this listing belongs to"
+    },
+    "category_text": {
+      "type": "string",
+      "title": "Category (Custom Text)",
+      "description": "Optional: enter a custom category if not listed above"
     },
     "parent_listing_id": {
       "type": "string",

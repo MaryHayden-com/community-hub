@@ -35,12 +35,10 @@ export default function ImportExport({ listings, onImportComplete }) {
             properties: {
               Type: { type: "string" },
               Name: { type: "string" },
-              "Group 1": { type: "string" },
-              "Group 2": { type: "string" },
-              "Group 3": { type: "string" },
-              "Category 1": { type: "string" },
-              "Category 2": { type: "string" },
-              "Category 3": { type: "string" },
+              Group: { type: "string" },
+              SubGroup: { type: "string" },
+              Category: { type: "string" },
+              "Category (Custom)": { type: "string" },
               County: { type: "string" },
               Town: { type: "string" },
               "Nearest Town/Area": { type: "string" },
@@ -70,17 +68,18 @@ export default function ImportExport({ listings, onImportComplete }) {
       // Fields that are hidden by default on import — must be claimed to reveal
       const DEFAULT_HIDDEN = ["contact_name", "phone", "email", "address", "meeting_info"];
       const mapped = rows.map((r) => {
-        // Collect groups from separate columns
-        const groups = ["Group 1", "Group 2", "Group 3"]
-          .map(k => (r[k] || "").trim()).filter(Boolean);
-        // Collect categories from separate columns
-        const cats = ["Category 1", "Category 2", "Category 3"]
-          .map(k => (r[k] || "").trim()).filter(Boolean);
+        // Parse categories from semicolon-separated string
+        const cats = (r.Category || "")
+          .split(";")
+          .map(c => c.trim())
+          .filter(Boolean);
         return {
           name: r.Name || "",
           type: mapCsvType(r.Type),
-          subcategory_group: groups,
+          subcategory_group: r.Group ? [r.Group] : [],
+          subgroup: r.SubGroup ? [r.SubGroup] : [],
           category: cats,
+          category_text: r["Category (Custom)"] || "",
           county: r.County || "",
           town: r.Town || "",
           area: r["Nearest Town/Area"] || "",
@@ -118,14 +117,15 @@ export default function ImportExport({ listings, onImportComplete }) {
   const handleExport = () => {
     setExporting(true);
     try {
-      const headers = ["Type", "Name", "Group 1", "Group 2", "Group 3", "Category 1", "Category 2", "Category 3", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email", "Image URL"];
+      const headers = ["Type", "Name", "Group", "SubGroup", "Category", "Category (Custom)", "County", "Town", "Nearest Town/Area", "Description", "Address", "Phone", "Email", "Website", "Facebook URL", "Instagram URL", "LinkedIn URL", "Contact Name", "Meeting Info", "Is Featured", "Is Verified", "Plan", "Owner Email", "Image URL"];
       const rows = listings.map((l) => {
-        const groups = Array.isArray(l.subcategory_group) ? l.subcategory_group : (l.subcategory_group ? [l.subcategory_group] : []);
-        const cats = Array.isArray(l.category) ? l.category : (l.category ? [l.category] : []);
+        const group = Array.isArray(l.subcategory_group) ? l.subcategory_group[0] : l.subcategory_group;
+        const subgroup = Array.isArray(l.subgroup) ? l.subgroup[0] : l.subgroup;
+        const cats = Array.isArray(l.category) ? l.category.join("; ") : l.category;
         return [
           l.type, l.name,
-          groups[0] || "", groups[1] || "", groups[2] || "",
-          cats[0] || "", cats[1] || "", cats[2] || "",
+          group || "", subgroup || "",
+          cats || "", l.category_text || "",
           l.county, l.town, l.area || "", l.description || "", l.address || "",
           l.phone || "", l.email || "", l.website || "",
           l.facebook_url || "", l.instagram_url || "", l.linkedin_url || "",
