@@ -6,7 +6,6 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
-import Home from './pages/Home';
 import Directory from './pages/Directory';
 import CountyPage from './pages/CountyPage';
 import TownPage from './pages/TownPage';
@@ -44,7 +43,7 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Directory />} />
         <Route path="/directory" element={<Directory />} />
         <Route path="/county/:county" element={<CountyPage />} />
         <Route path="/town/:county/:town" element={<TownPage />} />

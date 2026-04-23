@@ -17,8 +17,8 @@ export default function Directory() {
   const [type, setType] = useState(params.get("type") || "");
   const [subcategoryGroup, setSubcategoryGroup] = useState(params.get("group") || "");
   const [category, setCategory] = useState(params.get("category") || "");
-  const [county, setCounty] = useState(params.get("county") || "");
-  const [town, setTown] = useState(params.get("town") || "");
+  const [county, setCounty] = useState(() => params.get("county") || localStorage.getItem("dir_county") || "");
+  const [town, setTown] = useState(() => params.get("town") || localStorage.getItem("dir_town") || "");
   const todayStr = new Date().toISOString().slice(0, 10);
   const [dateFrom, setDateFrom] = useState(todayStr);
   const [dateTo, setDateTo] = useState("");
@@ -32,8 +32,8 @@ export default function Directory() {
     setType(params.get("type") || "");
     setSubcategoryGroup(params.get("group") || "");
     setCategory(params.get("category") || "");
-    setCounty(params.get("county") || "");
-    setTown(params.get("town") || "");
+    setCounty(params.get("county") || localStorage.getItem("dir_county") || "");
+    setTown(params.get("town") || localStorage.getItem("dir_town") || "");
   }, [location.search]);
 
   const loadListings = useCallback(() => {

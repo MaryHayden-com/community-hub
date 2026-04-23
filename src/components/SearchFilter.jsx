@@ -21,7 +21,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Select value={county || "all"} onValueChange={(v) => { setCounty(v === "all" ? "" : v); setTown(""); }}>
+        <Select value={county || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCounty(val); setTown(""); localStorage.setItem("dir_county", val); localStorage.removeItem("dir_town"); }}>
           <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Counties" />
           </SelectTrigger>
@@ -33,7 +33,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           </SelectContent>
         </Select>
 
-        <Select value={town || "all"} onValueChange={(v) => setTown(v === "all" ? "" : v)}>
+        <Select value={town || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setTown(val); localStorage.setItem("dir_town", val); }}>
           <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Towns" />
           </SelectTrigger>
@@ -113,7 +113,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup(""); setCategory(""); setCounty(""); setTown(""); setNearbyCounties(null); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup(""); setCategory(""); setCounty(""); setTown(""); setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}

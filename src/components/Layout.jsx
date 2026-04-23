@@ -2,17 +2,17 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import {
-  Home, MapPin, Building2, Users, GraduationCap, Calendar,
+  MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
   Tag, ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/directory", label: "Directory", icon: MapPin },
+  { to: "/", label: "Directory", icon: MapPin },
   { to: "/directory?type=Business", label: "Businesses", icon: Building2 },
-  { to: "/directory?type=Club+%26+Group", label: "Groups", icon: Users },
+  { to: "/directory?type=Club+%26+Group", label: "Clubs & Groups", icon: Users },
+  { to: "/directory?type=Community+Services", label: "Services", icon: GraduationCap },
   { to: "/directory?type=Education", label: "Education", icon: GraduationCap },
   { to: "/directory?type=What%27s+On", label: "What's On", icon: Calendar },
 ];
@@ -22,8 +22,7 @@ const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard
 
 // Bottom nav tabs (mobile)
 const BOTTOM_TABS = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/directory", label: "Directory", icon: MapPin },
+  { to: "/", label: "Directory", icon: MapPin },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 
@@ -90,7 +89,7 @@ export default function Layout() {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.to === "/"
-                ? location.pathname === "/"
+                ? (location.pathname === "/" || location.pathname === "/directory") && !location.search
                 : location.pathname + location.search === item.to ||
                   (item.to === "/directory" && location.pathname === "/directory" && !location.search);
               return (
@@ -205,7 +204,7 @@ export default function Layout() {
         {BOTTOM_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = tab.to === "/"
-            ? location.pathname === "/"
+            ? (location.pathname === "/" || location.pathname === "/directory")
             : location.pathname.startsWith(tab.to.split("?")[0]) && tab.to !== "/";
           return (
             <button
