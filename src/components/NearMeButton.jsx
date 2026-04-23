@@ -62,7 +62,7 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1.5 bg-primary/10 text-primary text-sm font-medium px-3 h-9 rounded-md border border-primary/20">
           <MapPin className="w-4 h-4 shrink-0" />
-          Near me · {nearbyCounties.length} count{nearbyCounties.length === 1 ? "y" : "ies"}
+          Near me · {radius} km · {nearbyCounties.length} count{nearbyCounties.length === 1 ? "y" : "ies"}
         </div>
         <div className="flex gap-1">
           {RADIUS_OPTIONS.map((opt) => (
