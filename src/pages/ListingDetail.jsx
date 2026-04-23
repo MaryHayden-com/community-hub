@@ -116,7 +116,7 @@ export default function ListingDetail() {
         <ArrowLeft className="w-4 h-4" /> Back to {listing.town}
       </Link>
 
-      <div className="bg-card rounded-xl border overflow-hidden">
+      <div className="bg-card rounded-xl overflow-hidden" style={{ border: '2px solid #E2701B' }}>
         {listing.image_url && (
           <div className="h-56 sm:h-72 bg-white flex items-center justify-center">
             <img src={listing.image_url} alt={listing.name} className="w-full h-full object-contain" />
@@ -144,7 +144,7 @@ export default function ListingDetail() {
                   </Badge>
                 )}
               </div>
-              <h1 className="font-display text-2xl sm:text-3xl font-bold">{listing.name}</h1>
+              <h1 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>{listing.name}</h1>
               {listing.category && (
                 <p className="text-sm text-muted-foreground mt-1">{listing.category}</p>
               )}
