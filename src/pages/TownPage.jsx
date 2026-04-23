@@ -41,7 +41,10 @@ export default function TownPage() {
   const filtered = useMemo(() => {
     const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
     return [...base].sort((a, b) => {
-      if (activeType === "What's On" || (!activeType && a.type === "What's On" && b.type === "What's On")) {
+      const aIsEvent = a.type === "What's On";
+      const bIsEvent = b.type === "What's On";
+      // What's On always sorts by date
+      if (aIsEvent && bIsEvent) {
         const da = a.event_date || '9999';
         const db = b.event_date || '9999';
         return da.localeCompare(db);
