@@ -83,7 +83,7 @@ export default function Layout() {
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-lg sm:text-xl font-semibold tracking-tight">Community Hub</span>
+              <span className="font-display text-lg sm:text-xl font-bold tracking-tight" style={{ color: '#097275' }}>Community Hub</span>
             </Link>
           </div>
 
@@ -99,9 +99,10 @@ export default function Layout() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                    isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${
+                    isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
                   }`}
+                  style={{ color: '#097275' }}
                 >
                   <Icon className="w-4 h-4" />
                   {item.label}
@@ -109,22 +110,22 @@ export default function Layout() {
               );
             })}
             {isListingOwner && (
-              <Link to="/dashboard" className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${location.pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+              <Link to="/dashboard" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
                 <LayoutDashboard className="w-4 h-4" /> My Dashboard
               </Link>
             )}
             {isGroupAdmin && (
-              <Link to="/group-dashboard" className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${location.pathname === "/group-dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+              <Link to="/group-dashboard" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/group-dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
                 <Tag className="w-4 h-4" /> Group Dashboard
               </Link>
             )}
             {user && (
-              <Link to="/billing" className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${location.pathname === "/billing" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+              <Link to="/billing" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/billing" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
                 <CreditCard className="w-4 h-4" /> Billing
               </Link>
             )}
             {isAdmin && (
-              <Link to="/admin" className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${location.pathname === "/admin" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+              <Link to="/admin" className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${location.pathname === "/admin" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275' }}>
                 <Shield className="w-4 h-4" /> Admin
               </Link>
             )}
@@ -149,8 +150,8 @@ export default function Layout() {
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Link key={item.to} to={item.to} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
+                <Link key={item.to} to={item.to} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors" style={{ color: '#097275' }}>
+                  <Icon className="w-4 h-4" style={{ color: '#097275' }} />
                   {item.label}
                   <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
                 </Link>
