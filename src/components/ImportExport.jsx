@@ -1,15 +1,20 @@
 import { useState, useRef } from "react";
-import { Upload, Download, Loader2 } from "lucide-react";
+import { Upload, Download, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { toast } from "@/components/ui/use-toast";
 import * as XLSX from "xlsx";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
+} from "@/components/ui/alert-dialog";
 
 function mapCsvType(rawType) {
   const t = (rawType || "").trim().toLowerCase();
   if (t === "business") return "Business";
   if (t === "club & group" || t === "club" || t === "group") return "Club & Group";
   if (t === "education") return "Education";
+  if (t === "services") return "Community Services";
   if (t === "what's on" || t === "whats on" || t === "whats-on" || t === "event") return "What's On";
   return "Business";
 }
@@ -17,6 +22,8 @@ function mapCsvType(rawType) {
 export default function ImportExport({ listings, onImportComplete }) {
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
   const fileRef = useRef();
 
   const handleImport = async (e) => {
@@ -65,10 +72,8 @@ export default function ImportExport({ listings, onImportComplete }) {
       }
 
       const rows = Array.isArray(result.output) ? result.output : [];
-      // Fields that are hidden by default on import — must be claimed to reveal
       const DEFAULT_HIDDEN = ["contact_name", "phone", "email", "address", "meeting_info"];
       const mapped = rows.map((r) => {
-        // Parse categories from semicolon-separated string
         const cats = (r.Category || "")
           .split(";")
           .map(c => c.trim())
@@ -98,6 +103,12 @@ export default function ImportExport({ listings, onImportComplete }) {
         };
       }).filter((r) => r.name && r.town);
 
+      if (mapped.length === 0) {
+        toast({ title: "No valid records", description: "File must have Name and Town columns.", variant: "destructive" });
+        setImporting(false);
+        return;
+      }
+
       // Bulk create in batches of 50
       for (let i = 0; i < mapped.length; i += 50) {
         const batch = mapped.slice(i, i + 50);
@@ -107,6 +118,7 @@ export default function ImportExport({ listings, onImportComplete }) {
       toast({ title: "Import Complete", description: `${mapped.length} listings imported successfully.` });
       onImportComplete?.();
     } catch (err) {
+      console.error("Import error:", err);
       toast({ title: "Import Error", description: err.message, variant: "destructive" });
     } finally {
       setImporting(false);
@@ -139,7 +151,6 @@ export default function ImportExport({ listings, onImportComplete }) {
       });
 
       const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-      // Auto-width columns
       ws["!cols"] = headers.map((h, i) => ({
         wch: Math.max(h.length, ...rows.map(r => String(r[i] || "").length), 10)
       }));
@@ -148,39 +159,94 @@ export default function ImportExport({ listings, onImportComplete }) {
       XLSX.writeFile(wb, `community-hub-export-${new Date().toISOString().split("T")[0]}.xlsx`);
       toast({ title: "Export Complete", description: `${listings.length} listings exported to Excel.` });
     } catch (err) {
+      console.error("Export error:", err);
       toast({ title: "Export Error", description: err.message, variant: "destructive" });
     } finally {
       setExporting(false);
     }
   };
 
+  const handleDeleteAll = async () => {
+    setDeletingAll(true);
+    try {
+      for (let i = 0; i < listings.length; i += 50) {
+        const batch = listings.slice(i, i + 50);
+        for (const listing of batch) {
+          await base44.entities.CommunityListing.delete(listing.id);
+        }
+      }
+      toast({ title: "Deleted", description: `All ${listings.length} listings deleted.` });
+      setDeleteAllOpen(false);
+      onImportComplete?.();
+    } catch (err) {
+      console.error("Delete all error:", err);
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setDeletingAll(false);
+    }
+  };
+
   return (
-    <div className="flex items-center gap-2">
-      <input
-        ref={fileRef}
-        type="file"
-        accept=".csv,.xlsx,.json"
-        className="hidden"
-        onChange={handleImport}
-      />
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => fileRef.current?.click()}
-        disabled={importing}
-      >
-        {importing ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Upload className="w-4 h-4 mr-1.5" />}
-        {importing ? "Importing..." : "Import"}
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleExport}
-        disabled={exporting || !listings?.length}
-      >
-        {exporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Download className="w-4 h-4 mr-1.5" />}
-        Export Excel
-      </Button>
-    </div>
+    <>
+      <div className="flex items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,.xlsx,.json"
+          className="hidden"
+          onChange={handleImport}
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fileRef.current?.click()}
+          disabled={importing}
+        >
+          {importing ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Upload className="w-4 h-4 mr-1.5" />}
+          {importing ? "Importing..." : "Import"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExport}
+          disabled={exporting || !listings?.length}
+        >
+          {exporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Download className="w-4 h-4 mr-1.5" />}
+          Export Excel
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setDeleteAllOpen(true)}
+          disabled={!listings?.length}
+          className="text-destructive hover:text-destructive"
+        >
+          <Trash2 className="w-4 h-4 mr-1.5" />
+          Delete All
+        </Button>
+      </div>
+
+      <AlertDialog open={deleteAllOpen} onOpenChange={setDeleteAllOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete All Listings?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all {listings.length} listings. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAll}
+              disabled={deletingAll}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {deletingAll ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin inline" /> : null}
+              {deletingAll ? "Deleting..." : "Delete All"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
