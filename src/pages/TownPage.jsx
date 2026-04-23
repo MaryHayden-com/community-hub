@@ -80,25 +80,31 @@ export default function TownPage() {
        <div className="mb-6">
        {types.length > 1 && (
          <div className="flex flex-wrap gap-2">
-           <Badge
-             variant={activeType === "" ? "default" : "outline"}
-             className="cursor-pointer"
+           <button
              onClick={() => setActiveType("")}
+             className={`px-3 py-1.5 rounded-md text-sm font-medium cursor-pointer transition-colors ${
+               activeType === "" 
+                 ? "bg-primary text-primary-foreground" 
+                 : "bg-secondary text-secondary-foreground hover:bg-accent"
+             }`}
            >
              All ({listings.length})
-           </Badge>
+           </button>
            {types.map(([t, count]) => {
              const Icon = typeIcons[t] || Building2;
              return (
-               <Badge
+               <button
                  key={t}
-                 variant={activeType === t ? "default" : "outline"}
-                 className="cursor-pointer flex items-center gap-1"
                  onClick={() => setActiveType(activeType === t ? "" : t)}
+                 className={`px-3 py-1.5 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-1 ${
+                   activeType === t 
+                     ? "bg-primary text-primary-foreground" 
+                     : "bg-secondary text-secondary-foreground hover:bg-accent"
+                 }`}
                >
                  <Icon className="w-3 h-3" />
                  {t} ({count})
-               </Badge>
+               </button>
              );
            })}
          </div>
