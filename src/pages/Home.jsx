@@ -88,7 +88,7 @@ export default function Home() {
             <img
               src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/77590268e_MH.PNG"
               alt="Mary Hayden Logo"
-              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-lg"
+              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-lg rounded-full"
             />
           </div>
 
