@@ -30,19 +30,30 @@ export default function ListingListRow({ listing }) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Line 1: Name */}
+        <div className="flex items-center gap-2">
           <span className="font-bold text-sm truncate" style={{ color: '#097275' }}>{listing.name}</span>
           {listing.is_featured && <Star className="w-3.5 h-3.5 text-accent fill-accent shrink-0" />}
+        </div>
+        {/* Line 2: Type, Group, SubGroup */}
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
           <Badge variant="outline" className={`text-xs shrink-0 ${config.color}`}>
             <Icon className="w-3 h-3 mr-1" />{listing.type}
           </Badge>
+          {listing.subcategory_group?.[0] && (
+            <span className="text-xs text-muted-foreground">{listing.subcategory_group[0]}</span>
+          )}
+          {listing.subgroup?.[0] && listing.subgroup[0] !== "All Types" && (
+            <>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground">{listing.subgroup[0]}</span>
+            </>
+          )}
         </div>
-        <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-3 h-3" />
-            {listing.town}{listing.area && listing.area !== listing.town ? ` · ${listing.area}` : ""}, {listing.county}
-          </span>
-          {listing.category && <span>{listing.category}</span>}
+        {/* Line 3: Address */}
+        <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
+          <MapPin className="w-3 h-3 shrink-0" />
+          <span>{listing.town}{listing.area && listing.area !== listing.town ? ` · ${listing.area}` : ""}, {listing.county}</span>
         </div>
         {listing.description && (
           <p className="text-xs text-muted-foreground mt-1 truncate">{listing.description}</p>
