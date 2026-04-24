@@ -13,6 +13,14 @@ export default function ListingListRow({ listing }) {
   const config = typeConfig[listing.type] || typeConfig["Business"];
   const Icon = config.icon;
 
+  // Normalise fields that may be stored as a string or an array
+  const group = Array.isArray(listing.subcategory_group)
+    ? listing.subcategory_group[0]
+    : listing.subcategory_group || null;
+  const subgroup = Array.isArray(listing.subgroup)
+    ? listing.subgroup[0]
+    : listing.subgroup || null;
+
   return (
     <Link
       to={`/listing/${listing.id}`}
@@ -40,14 +48,14 @@ export default function ListingListRow({ listing }) {
           <Badge variant="outline" className={`text-xs shrink-0 ${config.color}`}>
             <Icon className="w-3 h-3 mr-1" />{listing.type}
           </Badge>
-          {listing.subcategory_group?.[0] && (
+          {group && (
             <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {listing.subcategory_group[0]}
+              {group}
             </Badge>
           )}
-          {listing.subgroup?.[0] && listing.subgroup[0] !== "All Types" && (
+          {subgroup && subgroup !== "All Types" && (
             <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {listing.subgroup[0]}
+              {subgroup}
             </Badge>
           )}
         </div>
