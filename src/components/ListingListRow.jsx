@@ -41,14 +41,14 @@ export default function ListingListRow({ listing }) {
             <Icon className="w-3 h-3 mr-1" />{listing.type}
           </Badge>
           {listing.subcategory_group?.[0] && (
-            <Badge variant="outline" className="text-xs shrink-0 bg-slate-50 text-slate-600 border-slate-200">
+            <span className="text-xs border rounded-full px-2 py-0.5 bg-slate-50 text-slate-600 border-slate-200 truncate max-w-[110px]">
               {listing.subcategory_group[0]}
-            </Badge>
+            </span>
           )}
           {listing.subgroup?.[0] && listing.subgroup[0] !== "All Types" && (
-            <Badge variant="outline" className="text-xs shrink-0 bg-slate-50 text-slate-600 border-slate-200">
+            <span className="text-xs border rounded-full px-2 py-0.5 bg-slate-50 text-slate-600 border-slate-200 truncate max-w-[110px]">
               {listing.subgroup[0]}
-            </Badge>
+            </span>
           )}
         </div>
         {/* Line 3: Address */}
