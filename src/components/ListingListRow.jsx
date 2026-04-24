@@ -41,52 +41,42 @@ export default function ListingListRow({ listing }) {
           <span className="font-bold text-sm truncate" style={{ color: '#097275' }}>{listing.name}</span>
           {listing.is_featured && <Star className="w-3.5 h-3.5 text-accent fill-accent shrink-0" />}
         </div>
-        {/* Line 2: Type (mobile: own line, desktop: inline with Group › Subgroup › Category) */}
-        {/* Mobile: Type on its own line */}
-        <div className="flex items-center gap-1.5 mt-0.5 md:hidden">
-          <Badge variant="outline" className={`text-xs shrink-0 ${config.color}`}>
-            <Icon className="w-3 h-3 mr-1" />{listing.type}
-          </Badge>
-        </div>
-        {/* Mobile: Group / Subgroup / Category on next line */}
-        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap md:hidden">
-          {group && (
+        {/* Badges row — shared data */}
+        {(() => {
+          const hasSub = (group || (subgroup && subgroup !== "All Types") || (category && category !== subgroup));
+          const SlateTag = ({ children }) => (
             <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {group}
+              {children}
             </Badge>
-          )}
-          {subgroup && subgroup !== "All Types" && (
-            <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {subgroup}
+          );
+          const TypeTag = () => (
+            <Badge variant="outline" className={`text-xs shrink-0 ${config.color}`}>
+              <Icon className="w-3 h-3 mr-1" />{listing.type}
             </Badge>
-          )}
-          {category && category !== subgroup && (
-            <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {category}
-            </Badge>
-          )}
-        </div>
-        {/* Desktop: all badges inline */}
-        <div className="hidden md:flex items-center gap-1.5 mt-0.5 flex-wrap">
-          <Badge variant="outline" className={`text-xs shrink-0 ${config.color}`}>
-            <Icon className="w-3 h-3 mr-1" />{listing.type}
-          </Badge>
-          {group && (
-            <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {group}
-            </Badge>
-          )}
-          {subgroup && subgroup !== "All Types" && (
-            <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {subgroup}
-            </Badge>
-          )}
-          {category && category !== subgroup && (
-            <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200 shrink-0">
-              {category}
-            </Badge>
-          )}
-        </div>
+          );
+          return (
+            <>
+              {/* Mobile: Type alone, then sub-badges on next line only if they exist */}
+              <div className="flex items-center gap-1.5 mt-0.5 md:hidden">
+                <TypeTag />
+              </div>
+              {hasSub && (
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap md:hidden">
+                  {group && <SlateTag>{group}</SlateTag>}
+                  {subgroup && subgroup !== "All Types" && <SlateTag>{subgroup}</SlateTag>}
+                  {category && category !== subgroup && <SlateTag>{category}</SlateTag>}
+                </div>
+              )}
+              {/* Desktop: all inline */}
+              <div className="hidden md:flex items-center gap-1.5 mt-0.5 flex-wrap">
+                <TypeTag />
+                {group && <SlateTag>{group}</SlateTag>}
+                {subgroup && subgroup !== "All Types" && <SlateTag>{subgroup}</SlateTag>}
+                {category && category !== subgroup && <SlateTag>{category}</SlateTag>}
+              </div>
+            </>
+          );
+        })()}
         {/* Line 3: Address */}
         <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
           <MapPin className="w-3 h-3 shrink-0" />
