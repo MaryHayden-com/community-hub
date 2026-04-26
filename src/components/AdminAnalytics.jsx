@@ -1,17 +1,14 @@
 import { useMemo, useState } from "react";
 import {
   LayoutGrid, Calendar, TrendingUp, TrendingDown, Users, Star,
-  CheckCircle2, Flag, MapPin, Globe, Phone, Mail, Image, FileText,
+  CheckCircle2, Flag, Globe, Phone, Mail, Image,
   CreditCard, BarChart2, Activity, Building2, ChevronDown, ChevronUp,
-  BadgeCheck, AlertCircle
+  BadgeCheck, AlertCircle, X, Filter
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ─── helpers ───────────────────────────────────────────────────────────────
-
-function startOfMonth(d) {
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-}
 
 function monthKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -49,7 +46,7 @@ function Metric({ label, value, sub, icon: Icon, color = "text-primary", bg = "b
   return (
     <div className="bg-card border rounded-xl p-4 flex items-start gap-3">
       <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center shrink-0 mt-0.5`}>
-        <Icon className={`w-4.5 h-4.5 ${color}`} />
+        <Icon className={`w-4 h-4 ${color}`} />
       </div>
       <div className="min-w-0">
         <p className="text-xl font-bold leading-tight">{value}</p>
@@ -68,7 +65,6 @@ function Metric({ label, value, sub, icon: Icon, color = "text-primary", bg = "b
     </div>
   );
 }
-
 
 function ProgressBar({ label, value, max, color = "bg-primary" }) {
   const w = max ? Math.round((value / max) * 100) : 0;
@@ -109,16 +105,49 @@ export default function AdminAnalytics({ listings }) {
   const currentMonthKey = monthKeys[monthKeys.length - 1];
   const prevMonthKey = monthKeys[monthKeys.length - 2];
 
+  // ── Filter state ──
+  const [filterCounty, setFilterCounty] = useState("");
+  const [filterTown, setFilterTown] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterPlan, setFilterPlan] = useState("");
+
+  // ── Derived filter options ──
+  const allCounties = useMemo(() =>
+    [...new Set(listings.map(l => l.county).filter(Boolean))].sort(), [listings]);
+
+  const allTowns = useMemo(() =>
+    [...new Set(
+      listings
+        .filter(l => !filterCounty || l.county === filterCounty)
+        .map(l => l.town)
+        .filter(Boolean)
+    )].sort(), [listings, filterCounty]);
+
+  const allTypes = useMemo(() =>
+    [...new Set(listings.map(l => l.type).filter(Boolean))].sort(), [listings]);
+
+  const hasFilters = filterCounty || filterTown || filterType || filterPlan;
+
+  // ── Apply filters to raw listings ──
+  const filteredListings = useMemo(() => {
+    return listings.filter(l => {
+      if (filterCounty && l.county !== filterCounty) return false;
+      if (filterTown && l.town !== filterTown) return false;
+      if (filterType && l.type !== filterType) return false;
+      if (filterPlan && l.plan !== filterPlan) return false;
+      return true;
+    });
+  }, [listings, filterCounty, filterTown, filterType, filterPlan]);
+
+  // ── Analytics computed on filtered set ──
   const analytics = useMemo(() => {
-    const nonEvents = listings.filter(l => l.type !== "What's On");
-    const events = listings.filter(l => l.type === "What's On");
+    const nonEvents = filteredListings.filter(l => l.type !== "What's On");
+    const events = filteredListings.filter(l => l.type === "What's On");
     const businesses = nonEvents.filter(l => l.type === "Business");
     const clubs = nonEvents.filter(l => l.type === "Club & Group");
     const education = nonEvents.filter(l => l.type === "Education");
-    const services = nonEvents.filter(l => l.type === "Community Services");
 
-    // ── Supply: listings per month ──
-    // Count cumulative totals and new per month
+    // Growth
     const sortedNonEvents = [...nonEvents].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
     let running = 0;
     const monthlyCreated = {};
@@ -131,29 +160,26 @@ export default function AdminAnalytics({ listings }) {
       return { month: monthLabel(k), new: monthlyCreated[k] || 0, total: running };
     });
 
-    // ── Events per month ──
+    // Events per month
     const eventsByMonth = {};
     events.forEach(l => {
       const k = monthKey(new Date(l.created_date));
       eventsByMonth[k] = (eventsByMonth[k] || 0) + 1;
     });
 
-    // ── This month vs last month ──
     const thisMonthNew = monthlyCreated[currentMonthKey] || 0;
     const lastMonthNew = monthlyCreated[prevMonthKey] || 0;
     const thisMonthEvents = eventsByMonth[currentMonthKey] || 0;
     const lastMonthEvents = eventsByMonth[prevMonthKey] || 0;
 
-    // ── Claimed / Ownership ──
     const claimed = nonEvents.filter(l => l.owner_email);
     const verified = nonEvents.filter(l => l.is_verified);
-    const featured = listings.filter(l => l.is_featured);
+    const featured = filteredListings.filter(l => l.is_featured);
 
-    // ── Profile completeness ──
+    // Profile completeness
     const fields = ["phone", "email", "description", "image_url", "website", "address"];
     const completenessScores = nonEvents.map(l => {
-      const filled = fields.filter(f => l[f] && l[f].toString().trim() !== "");
-      return filled.length;
+      return fields.filter(f => l[f] && l[f].toString().trim() !== "").length;
     });
     const avgCompleteness = nonEvents.length
       ? Math.round((completenessScores.reduce((a, b) => a + b, 0) / nonEvents.length / fields.length) * 100)
@@ -163,39 +189,34 @@ export default function AdminAnalytics({ listings }) {
       count: nonEvents.filter(l => l[f] && l[f].toString().trim() !== "").length
     }));
 
-    // ── By type ──
+    // By type / county / town / group
     const byType = {};
     nonEvents.forEach(l => { byType[l.type] = (byType[l.type] || 0) + 1; });
 
-    // ── By county ──
     const byCounty = {};
     nonEvents.forEach(l => { if (l.county) byCounty[l.county] = (byCounty[l.county] || 0) + 1; });
     const topCounties = Object.entries(byCounty).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
-    // ── By town ──
     const byTown = {};
     nonEvents.forEach(l => { if (l.area || l.town) { const k = l.area || l.town; byTown[k] = (byTown[k] || 0) + 1; } });
     const topTowns = Object.entries(byTown).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
-    // ── Town activation (≥20 listings) ──
     const activatedTowns = Object.entries(byTown).filter(([, c]) => c >= 20);
     const growingTowns = Object.entries(byTown).filter(([, c]) => c >= 5 && c < 20);
 
-    // ── Revenue ──
+    // Revenue
     const standard = nonEvents.filter(l => l.plan === "standard" && l.plan_status === "active");
     const premium = nonEvents.filter(l => l.plan === "premium" && l.plan_status === "active");
     const paid = [...standard, ...premium];
-    const mrr = standard.length * 49 + premium.length * 99;
-    const arr = mrr * 12;
 
-    // ── Engagement proxy: listings with social/contact info ──
+    // Contact presence
     const withPhone = nonEvents.filter(l => l.phone).length;
     const withEmail = nonEvents.filter(l => l.email).length;
     const withWebsite = nonEvents.filter(l => l.website).length;
     const withSocial = nonEvents.filter(l => l.facebook_url || l.instagram_url || l.linkedin_url).length;
     const withImage = nonEvents.filter(l => l.image_url).length;
 
-    // ── Group-level breakdown ──
+    // Groups
     const byGroup = {};
     nonEvents.forEach(l => {
       const gs = Array.isArray(l.subcategory_group) ? l.subcategory_group : [l.subcategory_group].filter(Boolean);
@@ -204,18 +225,20 @@ export default function AdminAnalytics({ listings }) {
     const topGroups = Object.entries(byGroup).sort((a, b) => b[1] - a[1]).slice(0, 12);
 
     return {
-      total: nonEvents.length, events: events.length, businesses, clubs, education, services,
+      total: nonEvents.length, events: events.length, businesses, clubs, education,
       thisMonthNew, lastMonthNew, thisMonthEvents, lastMonthEvents,
       claimed, verified, featured, avgCompleteness, fieldFill, fields,
       byType, topCounties, topTowns, activatedTowns, growingTowns,
-      standard, premium, paid, mrr, arr,
+      standard, premium, paid,
       withPhone, withEmail, withWebsite, withSocial, withImage,
-      topGroups, growthChartData, nonEvents
+      topGroups, growthChartData
     };
-  }, [listings, monthKeys, currentMonthKey, prevMonthKey]);
+  }, [filteredListings, monthKeys, currentMonthKey, prevMonthKey]);
 
   const newListingTrend = delta(analytics.thisMonthNew, analytics.lastMonthNew);
   const newEventTrend = delta(analytics.thisMonthEvents, analytics.lastMonthEvents);
+  const mrrVal = analytics.standard.length * 49 + analytics.premium.length * 99;
+  const arrVal = mrrVal * 12;
 
   const fieldLabels = {
     phone: "Phone", email: "Email", description: "Description",
@@ -223,28 +246,90 @@ export default function AdminAnalytics({ listings }) {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
 
-      {/* ── 1. Supply: Core Listing Metrics ── */}
+      {/* ── Filter Bar ── */}
+      <div className="bg-card border rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <p className="text-sm font-semibold">Filter Analytics</p>
+          {hasFilters && (
+            <button
+              onClick={() => { setFilterCounty(""); setFilterTown(""); setFilterType(""); setFilterPlan(""); }}
+              className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border rounded-md px-2 py-1 bg-muted/50 hover:border-primary/40 transition-colors"
+            >
+              <X className="w-3 h-3" /> Clear filters
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Select value={filterCounty} onValueChange={v => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
+            <SelectTrigger className="w-[150px] h-8 text-xs bg-background">
+              <SelectValue placeholder="All Counties" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Counties</SelectItem>
+              {allCounties.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filterTown} onValueChange={v => setFilterTown(v === "__all__" ? "" : v)} disabled={!filterCounty}>
+            <SelectTrigger className="w-[160px] h-8 text-xs bg-background">
+              <SelectValue placeholder={filterCounty ? "All Towns" : "Select county first"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Towns</SelectItem>
+              {allTowns.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filterType} onValueChange={v => setFilterType(v === "__all__" ? "" : v)}>
+            <SelectTrigger className="w-[160px] h-8 text-xs bg-background">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Types</SelectItem>
+              {allTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filterPlan} onValueChange={v => setFilterPlan(v === "__all__" ? "" : v)}>
+            <SelectTrigger className="w-[140px] h-8 text-xs bg-background">
+              <SelectValue placeholder="All Plans" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Plans</SelectItem>
+              <SelectItem value="basic">Basic (Free)</SelectItem>
+              <SelectItem value="standard">Standard</SelectItem>
+              <SelectItem value="premium">Premium</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {hasFilters && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {filterCounty && <span className="text-xs bg-primary/10 text-primary rounded-full px-2 py-0.5 font-medium">County: {filterCounty}</span>}
+            {filterTown && <span className="text-xs bg-primary/10 text-primary rounded-full px-2 py-0.5 font-medium">Town: {filterTown}</span>}
+            {filterType && <span className="text-xs bg-primary/10 text-primary rounded-full px-2 py-0.5 font-medium">Type: {filterType}</span>}
+            {filterPlan && <span className="text-xs bg-primary/10 text-primary rounded-full px-2 py-0.5 font-medium">Plan: {filterPlan}</span>}
+            <span className="text-xs text-muted-foreground ml-1">→ {filteredListings.length} listings</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── 1. Supply ── */}
       <CollapsibleSection title="Supply — Listings" sub="How much content is in the directory">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
           <Metric icon={LayoutGrid} label="Total Listings Live" value={analytics.total} sub="Excl. What's On" />
           <Metric icon={Calendar} label="Total Events" value={analytics.events} sub="What's On entries" color="text-violet-600" bg="bg-violet-50" />
-          <Metric
-            icon={TrendingUp} label="New This Month" value={analytics.thisMonthNew}
-            sub="Non-event listings" trend={newListingTrend} color="text-emerald-600" bg="bg-emerald-50"
-          />
-          <Metric
-            icon={Calendar} label="Events Added" value={analytics.thisMonthEvents}
-            sub="This month" trend={newEventTrend} color="text-violet-600" bg="bg-violet-50"
-          />
-          <Metric icon={Flag} label="Claimed" value={analytics.claimed.length} sub={pct(analytics.claimed.length, analytics.total) + " of all listings"} color="text-blue-600" bg="bg-blue-50" />
+          <Metric icon={TrendingUp} label="New This Month" value={analytics.thisMonthNew} sub="Non-event listings" trend={newListingTrend} color="text-emerald-600" bg="bg-emerald-50" />
+          <Metric icon={Calendar} label="Events Added" value={analytics.thisMonthEvents} sub="This month" trend={newEventTrend} color="text-violet-600" bg="bg-violet-50" />
+          <Metric icon={Flag} label="Claimed" value={analytics.claimed.length} sub={pct(analytics.claimed.length, analytics.total) + " of listings"} color="text-blue-600" bg="bg-blue-50" />
           <Metric icon={CheckCircle2} label="Verified" value={analytics.verified.length} sub={pct(analytics.verified.length, analytics.total) + " verified"} color="text-emerald-600" bg="bg-emerald-50" />
           <Metric icon={Star} label="Featured" value={analytics.featured.length} sub="Highlighted listings" color="text-amber-600" bg="bg-amber-50" />
           <Metric icon={Building2} label="Businesses" value={analytics.businesses.length} sub={`${analytics.clubs.length} clubs · ${analytics.education.length} edu`} />
         </div>
 
-        {/* Growth chart */}
         <div className="bg-card border rounded-xl p-4">
           <p className="text-sm font-semibold mb-4">Listing Growth — Last 12 Months</p>
           <ResponsiveContainer width="100%" height={200}>
@@ -252,16 +337,12 @@ export default function AdminAnalytics({ listings }) {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid hsl(var(--border))" }}
-                labelStyle={{ fontWeight: 600 }}
-              />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid hsl(var(--border))" }} labelStyle={{ fontWeight: 600 }} />
               <Bar dataKey="new" name="New this month" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Cumulative total chart */}
         <div className="bg-card border rounded-xl p-4 mt-3">
           <p className="text-sm font-semibold mb-4">Cumulative Total Listings</p>
           <ResponsiveContainer width="100%" height={160}>
@@ -276,7 +357,7 @@ export default function AdminAnalytics({ listings }) {
         </div>
       </CollapsibleSection>
 
-      {/* ── 2. Quality: Profile Completeness ── */}
+      {/* ── 2. Quality ── */}
       <CollapsibleSection title="Quality — Profile Completeness" sub="How well-filled listings are across key fields">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
           <Metric
@@ -300,12 +381,11 @@ export default function AdminAnalytics({ listings }) {
               label={fieldLabels[field] || field}
               value={count}
               max={analytics.total}
-              color={count / analytics.total >= 0.7 ? "bg-emerald-500" : count / analytics.total >= 0.4 ? "bg-amber-400" : "bg-red-400"}
+              color={analytics.total && count / analytics.total >= 0.7 ? "bg-emerald-500" : analytics.total && count / analytics.total >= 0.4 ? "bg-amber-400" : "bg-red-400"}
             />
           ))}
         </div>
 
-        {/* Listings missing key data */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-3">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="w-4 h-4 text-amber-600" />
@@ -325,33 +405,36 @@ export default function AdminAnalytics({ listings }) {
         </div>
       </CollapsibleSection>
 
-      {/* ── 3. Geographic breakdown ── */}
+      {/* ── 3. Geographic ── */}
       <CollapsibleSection title="Geographic Reach" sub="Coverage by county and town">
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm font-semibold mb-3">Top Counties</p>
             <div className="space-y-2">
-              {analytics.topCounties.map(([county, count]) => (
-                <ProgressBar key={county} label={county} value={count} max={analytics.topCounties[0]?.[1] || 1} />
-              ))}
+              {analytics.topCounties.length === 0
+                ? <p className="text-xs text-muted-foreground">No data for this filter</p>
+                : analytics.topCounties.map(([county, count]) => (
+                  <ProgressBar key={county} label={county} value={count} max={analytics.topCounties[0]?.[1] || 1} />
+                ))}
             </div>
           </div>
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm font-semibold mb-3">Top Towns / Areas</p>
             <div className="space-y-2">
-              {analytics.topTowns.map(([town, count]) => (
-                <ProgressBar key={town} label={town} value={count} max={analytics.topTowns[0]?.[1] || 1} color="bg-accent" />
-              ))}
+              {analytics.topTowns.length === 0
+                ? <p className="text-xs text-muted-foreground">No data for this filter</p>
+                : analytics.topTowns.map(([town, count]) => (
+                  <ProgressBar key={town} label={town} value={count} max={analytics.topTowns[0]?.[1] || 1} color="bg-accent" />
+                ))}
             </div>
           </div>
         </div>
 
-        {/* Town activation */}
         <div className="grid sm:grid-cols-2 gap-3 mt-3">
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
             <p className="text-sm font-semibold text-emerald-900 mb-1">✅ Activated Towns <span className="text-xs font-normal">(20+ listings)</span></p>
             {analytics.activatedTowns.length === 0
-              ? <p className="text-xs text-emerald-700">None yet — keep growing!</p>
+              ? <p className="text-xs text-emerald-700">None yet</p>
               : <div className="flex flex-wrap gap-1.5 mt-1">
                   {analytics.activatedTowns.map(([t, c]) => (
                     <span key={t} className="text-xs bg-emerald-100 text-emerald-800 rounded-full px-2 py-0.5 font-medium">{t} ({c})</span>
@@ -362,7 +445,7 @@ export default function AdminAnalytics({ listings }) {
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
             <p className="text-sm font-semibold text-amber-900 mb-1">🔄 Growing Towns <span className="text-xs font-normal">(5–19 listings)</span></p>
             {analytics.growingTowns.length === 0
-              ? <p className="text-xs text-amber-700">No towns in this range yet</p>
+              ? <p className="text-xs text-amber-700">No towns in this range</p>
               : <div className="flex flex-wrap gap-1.5 mt-1">
                   {analytics.growingTowns.map(([t, c]) => (
                     <span key={t} className="text-xs bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 font-medium">{t} ({c})</span>
@@ -373,17 +456,15 @@ export default function AdminAnalytics({ listings }) {
         </div>
       </CollapsibleSection>
 
-      {/* ── 4. Category breakdown ── */}
+      {/* ── 4. Category ── */}
       <CollapsibleSection title="Category Breakdown" sub="Listings by type and group">
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm font-semibold mb-3">By Type</p>
             <div className="space-y-2">
-              {Object.entries(analytics.byType)
-                .sort((a, b) => b[1] - a[1])
-                .map(([type, count]) => (
-                  <ProgressBar key={type} label={type} value={count} max={analytics.total} color="bg-primary" />
-                ))}
+              {Object.entries(analytics.byType).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
+                <ProgressBar key={type} label={type} value={count} max={analytics.total} color="bg-primary" />
+              ))}
             </div>
           </div>
           <div className="bg-card border rounded-xl p-4">
@@ -397,36 +478,20 @@ export default function AdminAnalytics({ listings }) {
         </div>
       </CollapsibleSection>
 
-      {/* ── 5. Retention / Ownership ── */}
+      {/* ── 5. Ownership ── */}
       <CollapsibleSection title="Ownership & Retention" sub="Self-managed listings and engagement signals">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <Metric
-            icon={Flag} label="Claimed Listings" value={analytics.claimed.length}
-            sub={pct(analytics.claimed.length, analytics.total) + " claimed"}
-            color="text-blue-600" bg="bg-blue-50"
-          />
-          <Metric
-            icon={Users} label="Unclaimed" value={analytics.total - analytics.claimed.length}
-            sub="No owner yet" color="text-muted-foreground" bg="bg-muted"
-          />
-          <Metric
-            icon={CheckCircle2} label="Verified" value={analytics.verified.length}
-            sub={pct(analytics.verified.length, analytics.total) + " verified"}
-            color="text-emerald-600" bg="bg-emerald-50"
-          />
-          <Metric
-            icon={Star} label="Featured" value={analytics.featured.length}
-            sub={pct(analytics.featured.length, analytics.total) + " featured"}
-            color="text-amber-600" bg="bg-amber-50"
-          />
+          <Metric icon={Flag} label="Claimed" value={analytics.claimed.length} sub={pct(analytics.claimed.length, analytics.total) + " claimed"} color="text-blue-600" bg="bg-blue-50" />
+          <Metric icon={Users} label="Unclaimed" value={analytics.total - analytics.claimed.length} sub="No owner yet" color="text-muted-foreground" bg="bg-muted" />
+          <Metric icon={CheckCircle2} label="Verified" value={analytics.verified.length} sub={pct(analytics.verified.length, analytics.total) + " verified"} color="text-emerald-600" bg="bg-emerald-50" />
+          <Metric icon={Star} label="Featured" value={analytics.featured.length} sub={pct(analytics.featured.length, analytics.total) + " featured"} color="text-amber-600" bg="bg-amber-50" />
         </div>
-
         <div className="grid grid-cols-2 gap-3 mt-3">
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm font-semibold mb-2">Claimed Rate</p>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-blue-600">{pct(analytics.claimed.length, analytics.total)}</span>
-              <span className="text-sm text-muted-foreground mb-0.5">of listings have an owner</span>
+              <span className="text-sm text-muted-foreground mb-0.5">have an owner</span>
             </div>
             <div className="mt-2 bg-muted rounded-full h-3 overflow-hidden">
               <div className="bg-blue-500 h-3 rounded-full" style={{ width: pct(analytics.claimed.length, analytics.total) }} />
@@ -436,7 +501,7 @@ export default function AdminAnalytics({ listings }) {
             <p className="text-sm font-semibold mb-2">Verification Rate</p>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-emerald-600">{pct(analytics.verified.length, analytics.total)}</span>
-              <span className="text-sm text-muted-foreground mb-0.5">of listings verified</span>
+              <span className="text-sm text-muted-foreground mb-0.5">verified</span>
             </div>
             <div className="mt-2 bg-muted rounded-full h-3 overflow-hidden">
               <div className="bg-emerald-500 h-3 rounded-full" style={{ width: pct(analytics.verified.length, analytics.total) }} />
@@ -448,29 +513,16 @@ export default function AdminAnalytics({ listings }) {
       {/* ── 6. Revenue ── */}
       <CollapsibleSection title="Revenue" sub="Subscription and plan metrics">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <Metric
-            icon={CreditCard} label="MRR" value={`€${mrr(analytics)}`}
-            sub="Monthly recurring revenue" color="text-emerald-600" bg="bg-emerald-50"
-          />
-          <Metric
-            icon={TrendingUp} label="ARR" value={`€${arr(analytics)}`}
-            sub="Annualised run rate" color="text-primary" bg="bg-primary/10"
-          />
-          <Metric
-            icon={Star} label="Standard Plans" value={analytics.standard.length}
-            sub="€49/yr each" color="text-blue-600" bg="bg-blue-50"
-          />
-          <Metric
-            icon={BarChart2} label="Premium Plans" value={analytics.premium.length}
-            sub="€99/yr each" color="text-purple-600" bg="bg-purple-50"
-          />
+          <Metric icon={CreditCard} label="MRR" value={`€${mrrVal}`} sub="Monthly recurring" color="text-emerald-600" bg="bg-emerald-50" />
+          <Metric icon={TrendingUp} label="ARR" value={`€${arrVal}`} sub="Annualised run rate" color="text-primary" bg="bg-primary/10" />
+          <Metric icon={Star} label="Standard Plans" value={analytics.standard.length} sub="€49/yr each" color="text-blue-600" bg="bg-blue-50" />
+          <Metric icon={BarChart2} label="Premium Plans" value={analytics.premium.length} sub="€99/yr each" color="text-purple-600" bg="bg-purple-50" />
         </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm font-semibold mb-1">Paid Listings</p>
             <p className="text-2xl font-bold">{analytics.paid.length}</p>
-            <p className="text-xs text-muted-foreground">{pct(analytics.paid.length, analytics.total)} of all listings</p>
+            <p className="text-xs text-muted-foreground">{pct(analytics.paid.length, analytics.total)} of listings</p>
           </div>
           <div className="bg-card border rounded-xl p-4">
             <p className="text-sm font-semibold mb-1">Free → Paid Rate</p>
@@ -485,7 +537,6 @@ export default function AdminAnalytics({ listings }) {
             <p className="text-xs text-muted-foreground">Per paid listing per year</p>
           </div>
         </div>
-
         {analytics.paid.length === 0 && (
           <div className="bg-muted/50 border rounded-xl p-4 mt-3 text-center text-sm text-muted-foreground">
             No paid plans yet — revenue metrics will populate once listings upgrade.
@@ -495,12 +546,4 @@ export default function AdminAnalytics({ listings }) {
 
     </div>
   );
-}
-
-// helper fns to avoid calling analytics.x before it's set
-function mrr(a) {
-  return a.standard.length * 49 + a.premium.length * 99;
-}
-function arr(a) {
-  return mrr(a) * 12;
 }
