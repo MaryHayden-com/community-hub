@@ -182,7 +182,11 @@ export default function AdminActionStream({ listings, onListingUpdated, currentU
             <Button size="sm" variant="outline" onClick={async () => {
               for (const id of selectedIds) {
                 const listing = listings.find(l => l.id === id);
-                if (listing) await base44.entities.CommunityListing.update(id, { is_verified: true });
+                if (listing) await base44.entities.CommunityListing.update(id, {
+                  is_verified: true,
+                  subcategory_group: Array.isArray(listing.subcategory_group) ? listing.subcategory_group : (listing.subcategory_group ? [listing.subcategory_group] : []),
+                  category: Array.isArray(listing.category) ? listing.category : (listing.category ? [listing.category] : []),
+                });
               }
               onListingUpdated?.();
               setSelectedIds([]);

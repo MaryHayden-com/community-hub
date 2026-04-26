@@ -79,7 +79,11 @@ export default function ListingDetailPanel({ listing, onClose, onListingUpdated,
   const handleVerifyToggle = async () => {
     const newVal = !optimisticVerified;
     setOptimisticVerified(newVal); // optimistic
-    await base44.entities.CommunityListing.update(listing.id, { is_verified: newVal });
+    await base44.entities.CommunityListing.update(listing.id, {
+      is_verified: newVal,
+      subcategory_group: Array.isArray(listing.subcategory_group) ? listing.subcategory_group : (listing.subcategory_group ? [listing.subcategory_group] : []),
+      category: Array.isArray(listing.category) ? listing.category : (listing.category ? [listing.category] : []),
+    });
     await base44.entities.ListingAction.create({
       listing_id: listing.id, listing_name: listing.name,
       action_type: newVal ? "verified" : "unverified",
