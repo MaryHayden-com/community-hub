@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2 } from "lucide-react";
 
+const IRISH_COUNTIES = [
+  "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down","Dublin",
+  "Fermanagh","Galway","Kerry","Kildare","Kilkenny","Laois","Leitrim","Limerick",
+  "Longford","Louth","Mayo","Meath","Monaghan","Offaly","Roscommon","Sligo",
+  "Tipperary","Tyrone","Waterford","Westmeath","Wexford","Wicklow"
+];
+
 const RESPONDENT_TYPES = ["Local business owner", "Community group / club", "Event organiser", "Public sector / council", "Local resident"];
 const PROMOTION_METHODS = ["Facebook", "Word of mouth", "Local newspaper", "Flyers", "My own website", "Nothing / not sure"];
 const FEATURES = ["Being found by locals searching online", "Listing events / What's On", "Contact details visible", "Profile page with photos", "Analytics (who viewed my listing)", "Mobile-friendly"];
@@ -18,12 +25,17 @@ function MultiCheck({ options, value, onChange }) {
   return (
     <div className="space-y-2">
       {options.map(opt => (
-        <label key={opt} className="flex items-center gap-3 cursor-pointer group">
-          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${value.includes(opt) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
+        <button
+          key={opt}
+          type="button"
+          onClick={() => toggle(opt)}
+          className="flex items-center gap-3 cursor-pointer group w-full text-left"
+        >
+          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors shrink-0 ${value.includes(opt) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
             {value.includes(opt) && <CheckCircle2 className="w-4 h-4 text-white" />}
           </div>
           <span className="text-sm">{opt}</span>
-        </label>
+        </button>
       ))}
     </div>
   );
@@ -131,7 +143,14 @@ export default function Survey() {
           </div>
           <div>
             <p className="font-medium mb-2">2. Where are you based?</p>
-            <Input placeholder="Town / Area" value={form.location} onChange={e => set("location", e.target.value)} />
+            <select
+              value={form.location}
+              onChange={e => set("location", e.target.value)}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="">Select your county…</option>
+              {IRISH_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
         </div>
       )
