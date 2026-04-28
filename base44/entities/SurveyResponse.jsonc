@@ -1,0 +1,68 @@
+{
+  "name": "SurveyResponse",
+  "type": "object",
+  "properties": {
+    "respondent_type": {
+      "type": "string",
+      "title": "Respondent Type"
+    },
+    "location": {
+      "type": "string",
+      "title": "Location (Town/Area)"
+    },
+    "current_promotion": {
+      "type": "array",
+      "title": "Current Promotion Methods",
+      "items": {
+        "type": "string"
+      }
+    },
+    "difficulty_finding_local": {
+      "type": "number",
+      "title": "Difficulty Finding Local Info (1-5)"
+    },
+    "directory_useful": {
+      "type": "string",
+      "title": "Would Directory Be Useful?"
+    },
+    "important_features": {
+      "type": "array",
+      "title": "Important Features",
+      "items": {
+        "type": "string"
+      }
+    },
+    "willing_to_pay": {
+      "type": "string",
+      "title": "Willing to Pay?"
+    },
+    "price_preference": {
+      "type": "string",
+      "title": "Price Preference"
+    },
+    "trust_factors": {
+      "type": "array",
+      "title": "Trust Factors",
+      "items": {
+        "type": "string"
+      }
+    },
+    "would_share": {
+      "type": "string",
+      "title": "Would Share?"
+    },
+    "essential_feature": {
+      "type": "string",
+      "title": "One Essential Thing"
+    },
+    "follow_up_name": {
+      "type": "string",
+      "title": "Follow-up Name"
+    },
+    "follow_up_email": {
+      "type": "string",
+      "title": "Follow-up Email"
+    }
+  },
+  "required": []
+}

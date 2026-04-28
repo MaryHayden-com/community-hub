@@ -16,6 +16,7 @@ import MergeListingsDialog from "../components/MergeListingsDialog";
 import AdminListingForm from "../components/AdminListingForm";
 import BulkEditBar from "../components/BulkEditBar";
 import AdminWhatsOnTab from "../components/AdminWhatsOnTab";
+import AdminSurveyResults from "../components/AdminSurveyResults";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
@@ -351,6 +352,7 @@ export default function Admin() {
           { key: "stream", label: "Action Stream", icon: <Zap className="w-4 h-4" /> },
           { key: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
           { key: "analytics", label: "📊 Analytics" },
+          { key: "survey", label: "📋 Survey Results" },
         ].map(({ key, label, icon, badge, badgeColor }) => (
           <button
             key={key}
@@ -399,6 +401,7 @@ export default function Admin() {
         />
       )}
       {activeTab === "analytics" && <AdminAnalytics listings={listings} />}
+      {activeTab === "survey" && <AdminSurveyResults />}
       {activeTab === "claims" && <AdminClaimRequests />}
       {activeTab === "users" && <AdminUsersTab />}
       {activeTab === "stream" && (
