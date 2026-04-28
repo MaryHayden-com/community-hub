@@ -253,184 +253,118 @@ export default function Admin() {
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          {/* Always-visible utility buttons */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleBulkFetchImages}
             disabled={bulkFetchingImages}
+            title="Bulk fetch images for all listings missing one"
           >
             {bulkFetchingImages
               ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" />{bulkFetchProgress ? `${bulkFetchProgress.done}/${bulkFetchProgress.total}` : "Fetching…"}</>
-              : "Bulk Fetch Images"}
+              : <><ImagePlus className="w-4 h-4 mr-1" />Fetch Images</>}
           </Button>
-        {activeTab === "listings" && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center border rounded-lg overflow-hidden">
-              <Button
-                variant={viewMode === "list" ? "secondary" : "ghost"}
-                size="sm"
-                className="rounded-none h-9"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "grid" ? "secondary" : "ghost"}
-                size="sm"
-                className="rounded-none h-9"
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
-            <Button
-                variant={selectMode ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => { setSelectMode(!selectMode); setSelectedIds([]); }}
-              >
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleFetchWhatsOn}
+            disabled={fetchingWhatsOn}
+          >
+            {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+            {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              setExpandingRecurring(true);
+              try {
+                const res = await base44.functions.invoke('expandRecurringEvents', {});
+                toast({ title: "Recurring Events Expanded", description: res.data.message });
+                loadListings();
+              } catch (err) {
+                toast({ title: "Error", description: err.message, variant: "destructive" });
+              } finally {
+                setExpandingRecurring(false);
+              }
+            }}
+            disabled={expandingRecurring}
+          >
+            {expandingRecurring ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+            {expandingRecurring ? "Expanding…" : "Expand Recurring"}
+          </Button>
+
+          {/* Listings-tab specific buttons */}
+          {activeTab === "listings" && (
+            <>
+              <div className="flex items-center border rounded-lg overflow-hidden">
+                <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" className="rounded-none h-9" onClick={() => setViewMode("list")}>
+                  <List className="w-4 h-4" />
+                </Button>
+                <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" className="rounded-none h-9" onClick={() => setViewMode("grid")}>
+                  <LayoutGrid className="w-4 h-4" />
+                </Button>
+              </div>
+              <Button variant={selectMode ? "secondary" : "outline"} size="sm" onClick={() => { setSelectMode(!selectMode); setSelectedIds([]); }}>
                 <CheckSquare className="w-4 h-4 mr-1" />
                 {selectMode ? "Cancel Select" : "Select"}
               </Button>
-            <Button
-                variant={mergeMode ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}
-              >
+              <Button variant={mergeMode ? "secondary" : "outline"} size="sm" onClick={() => { setMergeMode(!mergeMode); setMergeSelected([]); }}>
                 {mergeMode ? `Select 2 to merge (${mergeSelected.length}/2)` : "Merge Duplicates"}
               </Button>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  setExpandingRecurring(true);
-                  try {
-                    const res = await base44.functions.invoke('expandRecurringEvents', {});
-                    toast({ title: "Recurring Events Expanded", description: res.data.message });
-                    loadListings();
-                  } catch (err) {
-                    toast({ title: "Error", description: err.message, variant: "destructive" });
-                  } finally {
-                    setExpandingRecurring(false);
-                  }
-                }}
-                disabled={expandingRecurring}
-              >
-                {expandingRecurring ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
-                {expandingRecurring ? "Expanding…" : "Expand Recurring"}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Columns3 className="w-4 h-4 mr-1" /> Columns
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-52 p-3">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Show Columns</p>
+                  <div className="space-y-1.5">
+                    {ALL_COLUMNS.map(({ key, label }) => (
+                      <label key={key} className="flex items-center gap-2 cursor-pointer text-sm">
+                        <input type="checkbox" checked={!!visibleColumns[key]} onChange={() => toggleColumn(key)} className="cursor-pointer" />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <ImportExport listings={listings} onImportComplete={loadListings} />
+              <Button onClick={() => setEditing({})} className="gap-1.5">
+                <Plus className="w-4 h-4" /> Add Listing
               </Button>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={handleFetchWhatsOn}
-                disabled={fetchingWhatsOn}
-              >
-                {fetchingWhatsOn ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
-                {fetchingWhatsOn ? "Searching…" : "Fetch What's On"}
-              </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Columns3 className="w-4 h-4 mr-1" /> Columns
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-52 p-3">
-                <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Show Columns</p>
-                <div className="space-y-1.5">
-                  {ALL_COLUMNS.map(({ key, label }) => (
-                    <label key={key} className="flex items-center gap-2 cursor-pointer text-sm">
-                      <input
-                        type="checkbox"
-                        checked={!!visibleColumns[key]}
-                        onChange={() => toggleColumn(key)}
-                        className="cursor-pointer"
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            <ImportExport listings={listings} onImportComplete={loadListings} />
-            <Button onClick={() => setEditing({})} className="gap-1.5">
-              <Plus className="w-4 h-4" /> Add Listing
-            </Button>
-          </div>
-        )}
+            </>
+          )}
         </div>
       </div>
 
       {/* Tab Navigation */}
       <div className="flex gap-1 border-b mb-6 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab("overview")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === "overview" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Overview
-        </button>
-        <button
-          onClick={() => setActiveTab("listings")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === "listings" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Listings
-        </button>
-        <button
-          onClick={() => setActiveTab("claims")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-            activeTab === "claims" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Inbox className="w-4 h-4" />
-          Claim Requests
-          {pendingClaimsCount > 0 && (
-            <span className="bg-primary text-primary-foreground text-xs rounded-full px-1.5 py-0.5 leading-none">
-              {pendingClaimsCount}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab("users")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-            activeTab === "users" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          Users
-        </button>
-        <button
-          onClick={() => setActiveTab("stream")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-            activeTab === "stream" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Zap className="w-4 h-4" />
-          Action Stream
-        </button>
-        <button
-          onClick={() => setActiveTab("whatson")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1 ${
-            activeTab === "whatson" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          🗓️ What's On
-          {listings.filter(l => l.type === "What's On" && !l.is_verified).length > 0 && (
-            <span className="bg-amber-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
-              {listings.filter(l => l.type === "What's On" && !l.is_verified).length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab("analytics")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === "analytics" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          📊 Analytics
-        </button>
+        {[
+          { key: "overview", label: "Overview" },
+          { key: "listings", label: "Listings" },
+          { key: "whatson", label: "🗓️ What's On", badge: listings.filter(l => l.type === "What's On" && !l.is_verified).length, badgeColor: "bg-amber-500 text-white" },
+          { key: "claims", label: "Claim Requests", icon: <Inbox className="w-4 h-4" />, badge: pendingClaimsCount, badgeColor: "bg-primary text-primary-foreground" },
+          { key: "stream", label: "Action Stream", icon: <Zap className="w-4 h-4" /> },
+          { key: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
+          { key: "analytics", label: "📊 Analytics" },
+        ].map(({ key, label, icon, badge, badgeColor }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {icon}{label}
+            {badge > 0 && (
+              <span className={`${badgeColor} text-xs rounded-full px-1.5 py-0.5 leading-none`}>{badge}</span>
+            )}
+          </button>
+        ))}
       </div>
 
       {activeTab === "overview" && (
