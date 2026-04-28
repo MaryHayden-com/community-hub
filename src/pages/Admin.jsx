@@ -15,6 +15,7 @@ import ImportExport from "../components/ImportExport";
 import MergeListingsDialog from "../components/MergeListingsDialog";
 import AdminListingForm from "../components/AdminListingForm";
 import BulkEditBar from "../components/BulkEditBar";
+import AdminWhatsOnTab from "../components/AdminWhatsOnTab";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
@@ -214,7 +215,7 @@ export default function Admin() {
     );
   }
 
-  const allTypes = [...new Set(listings.map((l) => l.type).filter(Boolean))].sort();
+  const allTypes = [...new Set(listings.filter(l => l.type !== "What's On").map((l) => l.type).filter(Boolean))].sort();
   const allCounties = [...new Set(listings.map((l) => l.county).filter(Boolean))].sort();
   const allTowns = [...new Set(
     listings.filter((l) => !filterCounty || l.county === filterCounty).map((l) => l.town).filter(Boolean)
@@ -222,6 +223,7 @@ export default function Admin() {
 
   const filtered = listings
     .filter((l) => {
+      if (l.type === "What's On") return false; // What's On has its own tab
       if (filterType && l.type !== filterType) return false;
       if (filterCounty && l.county !== filterCounty) return false;
       if (filterTown && l.town !== filterTown) return false;
@@ -409,6 +411,19 @@ export default function Admin() {
           Action Stream
         </button>
         <button
+          onClick={() => setActiveTab("whatson")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1 ${
+            activeTab === "whatson" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          🗓️ What's On
+          {listings.filter(l => l.type === "What's On" && !l.is_verified).length > 0 && (
+            <span className="bg-amber-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
+              {listings.filter(l => l.type === "What's On" && !l.is_verified).length}
+            </span>
+          )}
+        </button>
+        <button
           onClick={() => setActiveTab("analytics")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
             activeTab === "analytics" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -424,7 +439,7 @@ export default function Admin() {
           pendingClaimsCount={pendingClaimsCount}
           onAddListing={() => { setEditing({}); }}
           onAddEvent={() => { setEditing({ type: "What's On" }); }}
-          onGoToTab={(tab) => { if (tab === "whatson") { setActiveTab("listings"); setFilterType("What's On"); } else setActiveTab(tab); }}
+          onGoToTab={(tab) => setActiveTab(tab)}
           onImport={() => setTriggerImport(true)}
           onExport={() => {
             const headers = ["Type","Name","Category/Trade Type","County","Town","Description","Address","Phone","Email","Website","Facebook URL","Instagram URL","LinkedIn URL","Contact Name","Meeting Info","Is Featured"];
@@ -438,6 +453,17 @@ export default function Admin() {
         />
       )}
 
+      {activeTab === "whatson" && (
+        <AdminWhatsOnTab
+          listings={listings}
+          loading={loading}
+          onEdit={setEditing}
+          onDelete={setDeleteId}
+          onListingUpdated={loadListings}
+          onFetchWhatsOn={handleFetchWhatsOn}
+          fetchingWhatsOn={fetchingWhatsOn}
+        />
+      )}
       {activeTab === "analytics" && <AdminAnalytics listings={listings} />}
       {activeTab === "claims" && <AdminClaimRequests />}
       {activeTab === "users" && <AdminUsersTab />}
