@@ -29,6 +29,40 @@ function MultiCheck({ options, value, onChange }) {
   );
 }
 
+// Ranked selection — shows a number badge as each item is ticked in order
+function RankedCheck({ options, value, onChange, maxRank }) {
+  const toggle = (opt) => {
+    if (value.includes(opt)) {
+      // Remove it, keeping order of remaining
+      onChange(value.filter(v => v !== opt));
+    } else if (!maxRank || value.length < maxRank) {
+      onChange([...value, opt]);
+    }
+  };
+  return (
+    <div className="space-y-2">
+      {options.map(opt => {
+        const rank = value.indexOf(opt) + 1; // 0 means not selected
+        const selected = rank > 0;
+        const atMax = maxRank && value.length >= maxRank && !selected;
+        return (
+          <label key={opt} className={`flex items-center gap-3 cursor-pointer group ${atMax ? "opacity-40 cursor-not-allowed" : ""}`}>
+            <div
+              onClick={() => !atMax && toggle(opt)}
+              className={`w-7 h-7 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-colors shrink-0
+                ${selected ? "bg-primary border-primary text-white" : "border-border group-hover:border-primary/50 text-muted-foreground"}`}
+            >
+              {selected ? rank : ""}
+            </div>
+            <span className="text-sm">{opt}</span>
+          </label>
+        );
+      })}
+      {maxRank && <p className="text-xs text-muted-foreground mt-2">Tick in order of importance — {value.length}/{maxRank} selected</p>}
+    </div>
+  );
+}
+
 function RadioGroup({ options, value, onChange }) {
   return (
     <div className="space-y-2">
@@ -128,8 +162,8 @@ export default function Survey() {
             <RadioGroup options={["Yes", "No", "Maybe"]} value={form.directory_useful} onChange={v => set("directory_useful", v)} />
           </div>
           <div>
-            <p className="font-medium mb-3">6. What features matter most to you? <span className="text-muted-foreground font-normal">(pick your top 3)</span></p>
-            <MultiCheck options={FEATURES} value={form.important_features} onChange={v => set("important_features", v)} />
+            <p className="font-medium mb-3">6. What features matter most to you? <span className="text-muted-foreground font-normal">(tick in order — 1 = most important)</span></p>
+            <RankedCheck options={FEATURES} value={form.important_features} onChange={v => set("important_features", v)} maxRank={6} />
           </div>
         </div>
       )
@@ -148,12 +182,9 @@ export default function Survey() {
             />
           </div>
           <div>
-            <p className="font-medium mb-3">8. What would feel like fair value for a full-year enhanced listing?</p>
-            <RadioGroup
-              options={["Under €30/yr", "€30–€50/yr", "€50–€100/yr", "Over €100/yr — if the value is there"]}
-              value={form.price_preference}
-              onChange={v => set("price_preference", v)}
-            />
+            <p className="font-medium mb-2">8. What would feel like fair value for a full-year enhanced listing?</p>
+            <p className="text-xs text-muted-foreground mb-3">e.g. €40/yr, €75/yr — whatever feels right to you</p>
+            <Input placeholder="Your suggestion (e.g. €50/yr)" value={form.price_preference} onChange={e => set("price_preference", e.target.value)} />
           </div>
         </div>
       )
@@ -164,8 +195,8 @@ export default function Survey() {
       content: (
         <div className="space-y-6">
           <div>
-            <p className="font-medium mb-3">9. What would make you trust and use this platform? <span className="text-muted-foreground font-normal">(select all that apply)</span></p>
-            <MultiCheck options={TRUST_FACTORS} value={form.trust_factors} onChange={v => set("trust_factors", v)} />
+            <p className="font-medium mb-3">9. What would make you trust and use this platform? <span className="text-muted-foreground font-normal">(tick in order — 1 = most important)</span></p>
+            <RankedCheck options={TRUST_FACTORS} value={form.trust_factors} onChange={v => set("trust_factors", v)} maxRank={5} />
           </div>
           <div>
             <p className="font-medium mb-3">10. Would you share it with others in your community?</p>
