@@ -65,11 +65,29 @@ export default function AdminSurveyResults() {
       .finally(() => setLoading(false));
   }, []);
 
+  const surveyLinkBanner = (
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4">
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">Survey Link — share this to collect responses</p>
+        <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" className="font-mono text-sm text-primary hover:underline break-all">{SURVEY_URL}</a>
+      </div>
+      <button
+        onClick={handleCopy}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-card text-sm font-medium hover:bg-muted transition-colors shrink-0"
+      >
+        {copied ? <><Check className="w-4 h-4 text-green-600" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy Link</>}
+      </button>
+    </div>
+  );
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   if (!responses.length) return (
-    <div className="text-center py-20 text-muted-foreground">
-      <p className="text-lg font-medium">No survey responses yet</p>
-      <p className="text-sm mt-1">Share the link <span className="font-mono text-primary">/survey</span> to start collecting responses</p>
+    <div className="space-y-6">
+      {surveyLinkBanner}
+      <div className="text-center py-20 text-muted-foreground">
+        <p className="text-lg font-medium">No survey responses yet</p>
+        <p className="text-sm mt-1">Share the link above to start collecting responses</p>
+      </div>
     </div>
   );
 
@@ -90,18 +108,7 @@ export default function AdminSurveyResults() {
   return (
     <div className="space-y-8">
       {/* Survey Link Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4">
-        <div className="flex-1 min-w-0">
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">Survey Link — share this to collect responses</p>
-          <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" className="font-mono text-sm text-primary hover:underline break-all">{SURVEY_URL}</a>
-        </div>
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-card text-sm font-medium hover:bg-muted transition-colors shrink-0"
-        >
-          {copied ? <><Check className="w-4 h-4 text-green-600" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy Link</>}
-        </button>
-      </div>
+      {surveyLinkBanner}
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
