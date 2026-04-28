@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 import { Loader2, Users, TrendingUp, DollarSign, Share2, Copy, Check } from "lucide-react";
-import { useState, useEffect } from "react";
 
 const COLORS = ["#097275", "#E2701B", "#911B1B", "#4f86c6", "#6ab04c", "#8e44ad"];
 
