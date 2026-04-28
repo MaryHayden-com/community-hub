@@ -227,6 +227,9 @@ export default function Directory() {
     });
   }, [listings, search, type, subcategoryGroup, category, county, town, nearbyCounties]);
 
+  const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
+  const hasMore = pagedItems.length < filtered.length;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -234,9 +237,6 @@ export default function Directory() {
       </div>
     );
   }
-
-  const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
-  const hasMore = pagedItems.length < filtered.length;
 
   return (
     <div
