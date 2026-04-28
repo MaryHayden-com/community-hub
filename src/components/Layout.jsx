@@ -78,8 +78,8 @@ export default function Layout() {
               </button>
             ) : null}
             <Link to="/" className="flex items-center gap-2.5">
-              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/a942382d3_MH.PNG" alt="MH Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
-              <span className="font-display text-lg sm:text-xl font-bold tracking-tight uppercase" style={{ color: '#097275' }}>Community Hub</span>
+              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/960f0b76a_generated_image.png" alt="H4C Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
+              <span className="font-display text-lg sm:text-xl font-bold tracking-tight uppercase" style={{ color: '#097275' }}>Hub4Community</span>
             </Link>
           </div>
 
@@ -189,7 +189,7 @@ export default function Layout() {
       {/* ── Footer (desktop only) ── */}
       <footer className="hidden md:block border-t bg-card mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Community Hub. Connecting communities across Ireland.</p>
+          <p>© {new Date().getFullYear()} Hub4Community. Connecting communities across Ireland.</p>
           <p className="mt-2">
             <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
             {" · "}
