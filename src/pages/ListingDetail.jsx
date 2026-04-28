@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import {
   MapPin, Phone, Mail, Globe, Facebook, Instagram, Linkedin,
   ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User, ShieldCheck, Flag,
-  Megaphone, HandHeart, Briefcase, Bell
+  Megaphone, HandHeart, Briefcase, Bell, Share2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -275,8 +275,48 @@ export default function ListingDetail() {
             </div>
           )}
 
-          {/* Claim / Removal */}
+          {/* Share + Claim / Removal */}
           <div className="mt-6 pt-6 border-t flex flex-wrap gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const url = window.location.href;
+                if (navigator.share) {
+                  navigator.share({ title: listing.name, url });
+                } else {
+                  navigator.clipboard.writeText(url);
+                  alert("Link copied to clipboard!");
+                }
+              }}
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Share
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const text = `Check out ${listing.name} on Community Hub: ${window.location.href}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+              }}
+            >
+              <span className="text-base leading-none">📱</span>
+              WhatsApp
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(listing.name);
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&t=${title}`, "_blank");
+              }}
+            >
+              <Facebook className="w-3.5 h-3.5 text-blue-600" />
+              Facebook
+            </Button>
+            <div className="flex-1" />
             <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
               <Flag className="w-3.5 h-3.5" />
               Claim this listing

@@ -115,7 +115,7 @@ export default function Layout() {
                 <Tag className="w-4 h-4" /> Group Dashboard
               </Link>
             )}
-            {user && (
+            {isListingOwner && (
               <Link to="/billing" className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${location.pathname === "/billing" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275', borderColor: '#E2701B' }}>
                 <CreditCard className="w-4 h-4" /> Billing
               </Link>
@@ -165,7 +165,7 @@ export default function Layout() {
                 <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
               </Link>
             )}
-            {user && (
+            {isListingOwner && (
               <Link to="/billing" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors">
                 <CreditCard className="w-4 h-4 text-muted-foreground" /> Billing
                 <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />

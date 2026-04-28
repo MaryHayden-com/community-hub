@@ -83,12 +83,15 @@ export default function Home() {
         <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full opacity-10" style={{ background: '#E2701B' }} />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 text-center">
-          <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Mary Hayden · Business & Operations</p>
+          <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Bandon · West Cork · Ireland</p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
-            Your Local <span style={{ color: '#E2701B' }}>Community</span>.
+            Welcome to <span style={{ color: '#E2701B' }}>Community Hub</span>.
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed font-sans">
-            Discover the businesses, clubs, schools and events that bring your town's community together.
+            Your free local directory for Bandon and the surrounding area. Find businesses, clubs, schools, community services and upcoming events — all in one place.
+          </p>
+          <p className="mt-2 text-white/60 text-sm max-w-xl mx-auto">
+            Listing your business or group is free and only takes a minute. ✓ No account needed to browse.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/directory">

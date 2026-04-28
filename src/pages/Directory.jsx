@@ -3,11 +3,12 @@ import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import SearchFilter from "../components/SearchFilter";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Download, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ListingListRow from "../components/ListingListRow";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
+import SubmitListingForm from "../components/SubmitListingForm";
 
 export default function Directory() {
   const location = useLocation();
@@ -31,6 +32,9 @@ export default function Directory() {
   const [pullIndicator, setPullIndicator] = useState(0); // 0-1 progress
   const [exporting, setExporting] = useState(false);
   const [user, setUser] = useState(null);
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const PAGE_SIZE = 50;
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => setUser(null));
@@ -162,6 +166,9 @@ export default function Directory() {
     return todayStr;
   }
 
+  // Reset to page 1 whenever filters change
+  useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, county, town, nearbyCounties, dateFrom, dateTo]);
+
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
@@ -228,6 +235,9 @@ export default function Directory() {
     );
   }
 
+  const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
+  const hasMore = pagedItems.length < filtered.length;
+
   return (
     <div
       className="max-w-7xl mx-auto px-4 sm:px-6 py-8"
@@ -235,6 +245,8 @@ export default function Directory() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      <SubmitListingForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
+
       {/* Pull-to-refresh indicator */}
       {pullIndicator > 0 && (
         <div
@@ -244,7 +256,8 @@ export default function Directory() {
           <div className={`w-6 h-6 border-2 border-primary border-t-transparent rounded-full ${refreshing ? "animate-spin" : ""}`} />
         </div>
       )}
-      <div className="flex items-center justify-between mb-8">
+
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="font-display text-3xl font-bold" style={{ color: '#097275' }}>Directory</h1>
           <p className="text-muted-foreground mt-1">
@@ -254,17 +267,18 @@ export default function Directory() {
             {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
           </p>
         </div>
-        {user?.role === 'admin' && (
-          <Button
-            onClick={handleExport}
-            disabled={exporting}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download className="w-4 h-4" />
-            {exporting ? 'Exporting...' : 'Export Excel'}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
+            <PlusCircle className="w-4 h-4" />
+            Add Your Listing
           </Button>
-        )}
+          {user?.role === 'admin' && (
+            <Button onClick={handleExport} disabled={exporting} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              {exporting ? 'Exporting...' : 'Export Excel'}
+            </Button>
+          )}
+        </div>
       </div>
 
       <SearchFilter
@@ -287,10 +301,13 @@ export default function Directory() {
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
+          <Button className="mt-4 gap-2" style={{ background: '#E2701B', border: 'none' }} onClick={() => setShowSubmitForm(true)}>
+            <PlusCircle className="w-4 h-4" /> Add Your Listing
+          </Button>
         </div>
       ) : type === "What's On" ? (
         <div className="flex flex-col gap-3 mt-6">
-          {filtered.map((entry, i) => (
+          {pagedItems.map((entry, i) => (
             <WhatsOnEventRow
               key={entry.listing.id + (entry.sortKey || i)}
               listing={entry.listing}
@@ -300,9 +317,29 @@ export default function Directory() {
         </div>
       ) : (
         <div className="flex flex-col gap-2 mt-6">
-          {filtered.map((l) => (
+          {pagedItems.map((l) => (
             <ListingListRow key={l.id} listing={l} />
           ))}
+        </div>
+      )}
+
+      {/* Load More */}
+      {hasMore && (
+        <div className="flex justify-center mt-8">
+          <Button variant="outline" className="gap-2 px-8" onClick={() => setPage(p => p + 1)}>
+            Load more listings ({filtered.length - pagedItems.length} remaining)
+          </Button>
+        </div>
+      )}
+
+      {/* Bottom CTA to add listing */}
+      {!hasMore && filtered.length > 0 && (
+        <div className="mt-10 rounded-xl p-6 text-center" style={{ background: '#097275' }}>
+          <p className="text-white font-display text-xl font-bold mb-1">Is your business or group missing?</p>
+          <p className="text-white/80 text-sm mb-4">Add your free listing to the directory today — it only takes a minute.</p>
+          <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
+            <PlusCircle className="w-4 h-4" /> Add Your Listing — It's Free
+          </Button>
         </div>
       )}
     </div>
