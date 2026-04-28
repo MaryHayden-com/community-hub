@@ -102,7 +102,7 @@ export default function Survey() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    respondent_type: "",
+    respondent_type: [],
     location: "",
     current_promotion: [],
     difficulty_finding_local: 0,
@@ -126,8 +126,8 @@ export default function Survey() {
       content: (
         <div className="space-y-6">
           <div>
-            <p className="font-medium mb-3">1. What best describes you?</p>
-            <RadioGroup options={RESPONDENT_TYPES} value={form.respondent_type} onChange={v => set("respondent_type", v)} />
+            <p className="font-medium mb-3">1. What best describes you? <span className="text-muted-foreground font-normal">(tick in order — 1 = most relevant)</span></p>
+            <RankedCheck options={RESPONDENT_TYPES} value={form.respondent_type} onChange={v => set("respondent_type", v)} maxRank={5} />
           </div>
           <div>
             <p className="font-medium mb-2">2. Where are you based?</p>
