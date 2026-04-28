@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
-import { Loader2, Users, TrendingUp, DollarSign, Share2 } from "lucide-react";
+import { Loader2, Users, TrendingUp, DollarSign, Share2, Copy, Check } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const COLORS = ["#097275", "#E2701B", "#911B1B", "#4f86c6", "#6ab04c", "#8e44ad"];
 
@@ -46,9 +47,18 @@ function countField(responses, field) {
   return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
 }
 
+const SURVEY_URL = `${window.location.origin}/survey`;
+
 export default function AdminSurveyResults() {
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(SURVEY_URL);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     base44.entities.SurveyResponse.list("-created_date", 500)
@@ -80,6 +90,20 @@ export default function AdminSurveyResults() {
 
   return (
     <div className="space-y-8">
+      {/* Survey Link Banner */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">Survey Link — share this to collect responses</p>
+          <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" className="font-mono text-sm text-primary hover:underline break-all">{SURVEY_URL}</a>
+        </div>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-card text-sm font-medium hover:bg-muted transition-colors shrink-0"
+        >
+          {copied ? <><Check className="w-4 h-4 text-green-600" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy Link</>}
+        </button>
+      </div>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={Users} label="Total Responses" value={total} sub={`${followUps} left contact details`} />
