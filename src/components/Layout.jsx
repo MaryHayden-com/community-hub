@@ -79,7 +79,10 @@ export default function Layout() {
             ) : null}
             <Link to="/" className="flex items-center gap-2.5">
               <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/960f0b76a_generated_image.png" alt="Local Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
-              <span className="font-display text-lg sm:text-xl font-bold tracking-tight uppercase" style={{ color: '#097275' }}>Local Community Hub</span>
+              <span className="font-display font-bold tracking-tight uppercase text-base sm:text-xl" style={{ color: '#097275' }}>
+                <span className="sm:hidden">Local Community</span>
+                <span className="hidden sm:inline">Local Community Hub</span>
+              </span>
             </Link>
           </div>
 
