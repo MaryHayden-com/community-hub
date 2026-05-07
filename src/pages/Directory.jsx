@@ -18,8 +18,8 @@ export default function Directory() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(params.get("type") || "");
-  const [subcategoryGroup, setSubcategoryGroup] = useState(params.get("group") || "");
-  const [category, setCategory] = useState(params.get("category") || "");
+  const [subcategoryGroup, setSubcategoryGroup] = useState(params.get("group") ? [params.get("group")] : []);
+  const [category, setCategory] = useState(params.get("category") ? [params.get("category")] : []);
   const [county, setCounty] = useState(() => params.get("county") || localStorage.getItem("dir_county") || "");
   const [town, setTown] = useState(() => params.get("town") || localStorage.getItem("dir_town") || "");
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -42,8 +42,8 @@ export default function Directory() {
 
   useEffect(() => {
     setType(params.get("type") || "");
-    setSubcategoryGroup(params.get("group") || "");
-    setCategory(params.get("category") || "");
+    setSubcategoryGroup(params.get("group") ? [params.get("group")] : []);
+    setCategory(params.get("category") ? [params.get("category")] : []);
     setCounty(params.get("county") || localStorage.getItem("dir_county") || "");
     setTown(params.get("town") || localStorage.getItem("dir_town") || "");
   }, [location.search]);
@@ -97,9 +97,9 @@ export default function Directory() {
     return [...new Set(grps)].sort();
   }, [listings, type]);
   const categories = useMemo(() => {
-    if (!type || !subcategoryGroup) return [];
+    if (!type || !subcategoryGroup || subcategoryGroup.length === 0) return [];
     const cats = listings
-      .filter((l) => l.type === type && toArr(l.subcategory_group).includes(subcategoryGroup))
+      .filter((l) => l.type === type && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
       .flatMap((l) => toArr(l.category)).filter(Boolean);
     return [...new Set(cats)].sort();
   }, [listings, type, subcategoryGroup]);
@@ -148,14 +148,14 @@ export default function Directory() {
   }
 
   // Reset to page 1 whenever filters change
-  useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, county, town, nearbyCounties, dateFrom, dateTo]);
+  useEffect(() => { setPage(1); }, [search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, nearbyCounties, dateFrom, dateTo]);
 
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
       if (type && l.type !== type) return false;
-      if (subcategoryGroup && !toArr(l.subcategory_group).includes(subcategoryGroup)) return false;
-      if (category && !toArr(l.category).includes(category)) return false;
+      if (subcategoryGroup && subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
+      if (category && category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
       if (nearbyCounties && !nearbyCounties.includes(l.county)) return false;
       if (!nearbyCounties && county && l.county !== county) return false;
       if (town && l.town !== town) return false;

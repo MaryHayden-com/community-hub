@@ -3,10 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import NearMeButton from "@/components/NearMeButton";
+import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
 export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const isWhatsOn = type === "What's On";
-  const hasFilters = search || type || group || category || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
+  const hasFilters = search || type || (group && group.length > 0) || (category && category.length > 0) || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
 
   return (
     <div className="space-y-3">
@@ -60,31 +61,25 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         </Select>
 
         {type && groups && groups.length > 0 && (
-          <Select value={group || "all"} onValueChange={(v) => { setGroup(v === "all" ? "" : v); setCategory(""); }}>
-            <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
-              <SelectValue placeholder="All Groups" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Groups</SelectItem>
-              {groups.map((g) => (
-                <SelectItem key={g} value={g} className="font-bold" style={{ color: '#097275' }}>{g}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="w-[200px]">
+            <MultiSelectDropdown
+              options={groups}
+              selected={group || []}
+              onChange={(v) => { setGroup(v); setCategory([]); }}
+              placeholder="All Groups"
+            />
+          </div>
         )}
 
-        {type && group && categories && categories.length > 0 && (
-          <Select value={category || "all"} onValueChange={(v) => setCategory(v === "all" ? "" : v)}>
-            <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat} className="font-bold" style={{ color: '#097275' }}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {type && group && group.length > 0 && categories && categories.length > 0 && (
+          <div className="w-[200px]">
+            <MultiSelectDropdown
+              options={categories}
+              selected={category || []}
+              onChange={setCategory}
+              placeholder="All Categories"
+            />
+          </div>
         )}
 
         {isWhatsOn && setDateFrom && (
@@ -113,7 +108,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup(""); setCategory(""); setCounty(""); setTown(""); setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCounty(""); setTown(""); setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}
