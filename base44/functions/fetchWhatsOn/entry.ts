@@ -89,7 +89,7 @@ Return as a JSON array of event objects.`;
     const base = {
       name: e.name,
       type: "What's On",
-      category: e.category || 'Community Event',
+      category: e.category ? [e.category] : ['Community Event'],
       county: e.county,
       town: e.town,
       country: 'Ireland',
