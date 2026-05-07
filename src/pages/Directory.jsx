@@ -221,7 +221,7 @@ export default function Directory() {
 
   return (
     <div
-      className="max-w-7xl mx-auto px-4 sm:px-6 py-8"
+      className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -238,22 +238,22 @@ export default function Directory() {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-        <div>
-          <h1 className="font-display text-3xl font-bold" style={{ color: '#097275' }}>Directory</h1>
-          <p className="text-muted-foreground mt-1">
-            Discover the businesses, clubs, schools and events that bring your community together.
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
+      <div className="mb-5">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>Directory</h1>
+            <p className="text-muted-foreground mt-0.5 text-sm sm:text-base hidden sm:block">
+              Discover the businesses, clubs, schools and events that bring your community together.
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
+            </p>
+          </div>
+          <Button onClick={() => setShowSubmitForm(true)} className="gap-2 shrink-0" style={{ background: '#E2701B', border: 'none' }}>
             <PlusCircle className="w-4 h-4" />
-            Add Your Listing
+            <span className="hidden sm:inline">Add Your Listing</span>
+            <span className="sm:hidden">Add Listing</span>
           </Button>
-
         </div>
       </div>
 

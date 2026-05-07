@@ -21,9 +21,10 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {/* Row 1: County + Town */}
+      <div className="grid grid-cols-2 gap-2">
         <Select value={county || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCounty(val); setTown(""); localStorage.setItem("dir_county", val); localStorage.removeItem("dir_town"); }}>
-          <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
+          <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Counties" />
           </SelectTrigger>
           <SelectContent>
@@ -35,7 +36,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         </Select>
 
         <Select value={town || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setTown(val); localStorage.setItem("dir_town", val); }}>
-          <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
+          <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Towns" />
           </SelectTrigger>
           <SelectContent>
@@ -45,9 +46,12 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
             ))}
           </SelectContent>
         </Select>
+      </div>
 
-        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup(""); setCategory(""); }}>
-          <SelectTrigger className="w-[160px] h-11 bg-card font-bold" style={{ color: '#097275' }}>
+      {/* Row 2: Type + Near Me + Clear */}
+      <div className="flex gap-2 flex-wrap items-center">
+        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup([]); setCategory([]); }}>
+          <SelectTrigger className="h-11 bg-card font-bold flex-1 min-w-[130px]" style={{ color: '#097275' }}>
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
@@ -60,8 +64,19 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           </SelectContent>
         </Select>
 
-        {type && groups && groups.length > 0 && (
-          <div className="w-[200px]">
+        <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
+
+        {hasFilters && (
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCounty(""); setTown(""); setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+            <X className="w-3 h-3 mr-1" /> Clear
+          </Button>
+        )}
+      </div>
+
+      {/* Row 3: Group / Category (conditional) */}
+      {type && groups && groups.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          <div className="flex-1 min-w-[150px]">
             <MultiSelectDropdown
               options={groups}
               selected={group || []}
@@ -69,50 +84,42 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
               placeholder="All Groups"
             />
           </div>
-        )}
+          {group && group.length > 0 && categories && categories.length > 0 && (
+            <div className="flex-1 min-w-[150px]">
+              <MultiSelectDropdown
+                options={categories}
+                selected={category || []}
+                onChange={setCategory}
+                placeholder="All Categories"
+              />
+            </div>
+          )}
+        </div>
+      )}
 
-        {type && group && group.length > 0 && categories && categories.length > 0 && (
-          <div className="w-[200px]">
-            <MultiSelectDropdown
-              options={categories}
-              selected={category || []}
-              onChange={setCategory}
-              placeholder="All Categories"
-            />
-          </div>
-        )}
-
-        {isWhatsOn && setDateFrom && (
-          <div className="flex items-center gap-2 bg-card border rounded-md px-3 h-11">
-            <CalendarRange className="w-4 h-4 text-muted-foreground shrink-0" />
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="bg-transparent text-sm outline-none w-[130px]"
-              title="From date"
-            />
-            <span className="text-muted-foreground text-xs">–</span>
-            <input
-              type="date"
-              value={dateTo}
-              min={dateFrom}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="bg-transparent text-sm outline-none w-[130px]"
-              placeholder="End date"
-              title="To date"
-            />
-          </div>
-        )}
-
-        <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
-
-        {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCounty(""); setTown(""); setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
-            <X className="w-3 h-3 mr-1" /> Clear
-          </Button>
-        )}
-      </div>
+      {/* Row 4: Date range (What's On only) */}
+      {isWhatsOn && setDateFrom && (
+        <div className="flex items-center gap-2 bg-card border rounded-md px-3 h-11 w-full">
+          <CalendarRange className="w-4 h-4 text-muted-foreground shrink-0" />
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="bg-transparent text-sm outline-none flex-1 min-w-0"
+            title="From date"
+          />
+          <span className="text-muted-foreground text-xs">–</span>
+          <input
+            type="date"
+            value={dateTo}
+            min={dateFrom}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="bg-transparent text-sm outline-none flex-1 min-w-0"
+            placeholder="End date"
+            title="To date"
+          />
+        </div>
+      )}
     </div>
   );
 }
