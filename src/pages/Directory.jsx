@@ -158,6 +158,7 @@ export default function Directory() {
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
+      if (l.status === "pending" || l.status === "rejected") return false;
       if (type && l.type !== type) return false;
       if (subcategoryGroup && subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
       if (category && category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;

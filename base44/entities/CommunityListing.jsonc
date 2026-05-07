@@ -24,6 +24,21 @@
         "What's On"
       ]
     },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "enumNames": [
+        "Pending Approval",
+        "Approved",
+        "Rejected"
+      ],
+      "default": "approved"
+    },
     "subcategory_group": {
       "type": "array",
       "title": "Group(s)",

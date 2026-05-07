@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, CheckCircle2, PlusCircle } from "lucide-react";
+import { Loader2, CheckCircle2, PlusCircle, Clock } from "lucide-react";
 
 const LISTING_TYPES = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
 const COUNTIES = [
@@ -17,15 +17,23 @@ const COUNTIES = [
 ].sort();
 
 export default function SubmitListingForm({ open, onClose }) {
-  const [step, setStep] = useState(1); // 1 = details, 2 = payment
+  const [step, setStep] = useState(1); // 1 = details, 2 = plan, 3 = success
   const [form, setForm] = useState({
     name: "", type: "", county: "", town: "", description: "",
     phone: "", email: "", website: "", contact_name: ""
   });
-  const [plan, setPlan] = useState(null); // 'monthly' or 'annual'
+  const [plan, setPlan] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const handleClose = () => {
+    setForm({ name: "", type: "", county: "", town: "", description: "", phone: "", email: "", website: "", contact_name: "" });
+    setStep(1);
+    setPlan(null);
+    setSaving(false);
+    onClose();
+  };
 
   const handleDetailsNext = () => {
     if (!form.name || !form.type || !form.county || !form.town || !form.contact_name || !form.email) {
@@ -35,11 +43,30 @@ export default function SubmitListingForm({ open, onClose }) {
     setStep(2);
   };
 
+  // Free basic listing — save as pending, no payment
+  const handleFreeSubmit = async () => {
+    setSaving(true);
+    try {
+      await base44.entities.CommunityListing.create({
+        ...form,
+        status: "pending",
+        plan: "basic",
+        plan_status: "active",
+        country: "Ireland",
+      });
+      setStep(3);
+    } catch (err) {
+      alert("Something went wrong: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Paid plan — save as pending then go to Stripe
   const handlePayment = async (selectedPlan) => {
     setPlan(selectedPlan);
     setSaving(true);
 
-    // Check if running in iframe (preview mode)
     if (window.self !== window.top) {
       alert("Payment checkout only works from the published app, not the preview.");
       setSaving(false);
@@ -47,19 +74,14 @@ export default function SubmitListingForm({ open, onClose }) {
     }
 
     try {
-      // First send notification email
-      await base44.integrations.Core.SendEmail({
-        to: "mary@maryhayden.com",
-        subject: `New Listing Submission: ${form.name}`,
-        body: `A new listing has been submitted:\n\n` +
-          `Name: ${form.name}\nType: ${form.type}\nCounty: ${form.county}\nTown: ${form.town}\n\n` +
-          `Contact Name: ${form.contact_name}\nContact Email: ${form.email}\nPhone: ${form.phone || "N/A"}\nWebsite: ${form.website || "N/A"}\n\n` +
-          `Description:\n${form.description || "N/A"}\n\n` +
-          `Plan selected: ${selectedPlan === 'monthly' ? '€20/month' : '€200/year'}\n\n` +
-          `Please log in to the admin panel to review and publish this listing.`,
+      await base44.entities.CommunityListing.create({
+        ...form,
+        status: "pending",
+        plan: selectedPlan === "annual" ? "standard" : "basic",
+        plan_status: "active",
+        country: "Ireland",
       });
 
-      // Create Stripe checkout session
       const response = await base44.functions.invoke('createCheckoutSession', {
         plan: selectedPlan,
         listing_name: form.name,
@@ -80,28 +102,21 @@ export default function SubmitListingForm({ open, onClose }) {
     }
   };
 
-  const handleClose = () => {
-    setForm({ name: "", type: "", county: "", town: "", description: "", phone: "", email: "", website: "", contact_name: "" });
-    setStep(1);
-    setPlan(null);
-    setSaving(false);
-    onClose();
-  };
-
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PlusCircle className="w-5 h-5 text-primary" />
-            {step === 1 ? "Submit Your Listing" : "Choose Your Plan"}
+            {step === 1 ? "Submit Your Listing" : step === 2 ? "Choose Your Plan" : "Submission Received!"}
           </DialogTitle>
         </DialogHeader>
 
+        {/* Step 1: Details */}
         {step === 1 && (
           <div className="space-y-4 mt-1">
             <p className="text-sm text-muted-foreground">
-              Fill in the details below. You'll choose your subscription plan on the next step.
+              Fill in the details below. You'll choose your plan on the next step.
             </p>
 
             <div>
@@ -164,18 +179,39 @@ export default function SubmitListingForm({ open, onClose }) {
 
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleDetailsNext}>
-                Next: Choose Plan →
-              </Button>
+              <Button onClick={handleDetailsNext}>Next: Choose Plan →</Button>
             </div>
           </div>
         )}
 
+        {/* Step 2: Plan */}
         {step === 2 && (
-          <div className="space-y-5 mt-1">
+          <div className="space-y-4 mt-1">
             <p className="text-sm text-muted-foreground">
-              Your listing will go live once payment is confirmed. Choose the plan that suits you best.
+              Your listing will be reviewed before going live. Choose the plan that suits you best.
             </p>
+
+            {/* Free */}
+            <div className="border rounded-xl p-5 space-y-3 hover:border-primary transition-colors">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-lg">Free Basic Listing</p>
+                  <p className="text-muted-foreground text-sm">Get listed at no cost</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">€0</p>
+                  <p className="text-xs text-muted-foreground">forever free</p>
+                </div>
+              </div>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>✓ Name, location & description</li>
+                <li>✓ Visible in the directory</li>
+                <li>✓ Contact details</li>
+              </ul>
+              <Button variant="outline" className="w-full" onClick={handleFreeSubmit} disabled={saving}>
+                {saving && !plan ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting…</> : "Submit Free Listing"}
+              </Button>
+            </div>
 
             {/* Monthly */}
             <div className="border rounded-xl p-5 space-y-3 hover:border-primary transition-colors">
@@ -191,14 +227,9 @@ export default function SubmitListingForm({ open, onClose }) {
               </div>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>✓ Full listing profile</li>
-                <li>✓ Visible to local searchers</li>
-                <li>✓ Contact details & social links</li>
+                <li>✓ Social links & featured placement</li>
               </ul>
-              <Button
-                className="w-full"
-                onClick={() => handlePayment('monthly')}
-                disabled={saving && plan === 'monthly'}
-              >
+              <Button className="w-full" onClick={() => handlePayment('monthly')} disabled={saving}>
                 {saving && plan === 'monthly' ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Redirecting…</> : "Subscribe Monthly — €20/mo"}
               </Button>
             </div>
@@ -220,21 +251,32 @@ export default function SubmitListingForm({ open, onClose }) {
               </div>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>✓ Full listing profile</li>
-                <li>✓ Visible to local searchers</li>
-                <li>✓ Contact details & social links</li>
+                <li>✓ Social links & featured placement</li>
                 <li>✓ 2 months free vs monthly</li>
               </ul>
-              <Button
-                className="w-full"
-                onClick={() => handlePayment('annual')}
-                disabled={saving && plan === 'annual'}
-              >
+              <Button className="w-full" onClick={() => handlePayment('annual')} disabled={saving}>
                 {saving && plan === 'annual' ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Redirecting…</> : "Subscribe Annually — €200/yr"}
               </Button>
             </div>
 
             <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => setStep(1)}>
               ← Back to listing details
+            </Button>
+          </div>
+        )}
+
+        {/* Step 3: Success */}
+        {step === 3 && (
+          <div className="py-8 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: "#097275" }}>
+              <Clock className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold">Submission Received!</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Thank you, <strong>{form.contact_name || "there"}</strong>! Your listing for <strong>{form.name}</strong> has been submitted and is awaiting review. We'll have it live in the directory shortly.
+            </p>
+            <Button onClick={handleClose} className="w-full" style={{ background: "#097275" }}>
+              <CheckCircle2 className="w-4 h-4 mr-2" /> Done
             </Button>
           </div>
         )}

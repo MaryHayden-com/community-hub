@@ -17,6 +17,7 @@ import AdminListingForm from "../components/AdminListingForm";
 import BulkEditBar from "../components/BulkEditBar";
 import AdminWhatsOnTab from "../components/AdminWhatsOnTab";
 import AdminSurveyResults from "../components/AdminSurveyResults";
+import AdminPendingTab from "../components/AdminPendingTab";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
@@ -50,6 +51,7 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState("overview");
   const [triggerImport, setTriggerImport] = useState(false);
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
+  const pendingListingsCount = listings.filter(l => l.status === "pending").length;
   const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: true });
 
 
@@ -346,6 +348,7 @@ export default function Admin() {
       <div className="flex gap-1 border-b mb-6 overflow-x-auto">
         {[
           { key: "overview", label: "Overview" },
+          { key: "pending", label: "Pending Approval", badge: pendingListingsCount, badgeColor: "bg-amber-500 text-white" },
           { key: "listings", label: "Listings" },
           { key: "whatson", label: "🗓️ What's On", badge: listings.filter(l => l.type === "What's On" && !l.is_verified).length, badgeColor: "bg-amber-500 text-white" },
           { key: "claims", label: "Claim Requests", icon: <Inbox className="w-4 h-4" />, badge: pendingClaimsCount, badgeColor: "bg-primary text-primary-foreground" },
@@ -386,6 +389,14 @@ export default function Admin() {
             a.download = `community-hub-export-${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
           }}
+        />
+      )}
+
+      {activeTab === "pending" && (
+        <AdminPendingTab
+          listings={listings}
+          onListingUpdated={loadListings}
+          onEdit={setEditing}
         />
       )}
 

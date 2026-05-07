@@ -22,13 +22,14 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: 'mary@maryhayden.com',
       from_name: 'Community Hub',
-      subject: `New listing added: ${name}`,
-      body: `A new listing has been added to the Community Hub directory.\n\n` +
+      subject: `New listing awaiting approval: ${name}`,
+      body: `A new listing has been submitted and is awaiting your approval.\n\n` +
         `Name: ${name}\n` +
         `Type: ${type}\n` +
         `Location: ${location}\n` +
-        `Added by: ${createdBy}\n\n` +
-        `Log in to review it: https://app.base44.com`
+        `Submitted by: ${createdBy}\n\n` +
+        `👉 Review and approve it here: https://localcommunityhub.base44.app/admin\n` +
+        `(Go to the "Pending Approval" tab)`
     });
 
     console.log(`[notifyNewListing] Email sent for new listing: ${name}`);
