@@ -67,7 +67,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCounty(""); setTown(""); setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCounty(""); setTown(""); if (setNearbyCounties) setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}

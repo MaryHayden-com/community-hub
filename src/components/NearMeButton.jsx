@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { MapPin, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCountiesNearby } from "@/utils/countyCoordinates";
 
 const RADIUS_OPTIONS = [
   { label: "10 km", km: 10 },
@@ -11,6 +10,7 @@ const RADIUS_OPTIONS = [
   { label: "100 km", km: 100 },
 ];
 
+// nearbyCounties is now { lat, lng, km } or null
 export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,22 +25,13 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
     setError(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        let counties = getCountiesNearby(pos.coords.latitude, pos.coords.longitude, km);
-        // Always return at least the nearest county even if centroid is > km away
-        if (counties.length === 0) {
-          counties = getCountiesNearby(pos.coords.latitude, pos.coords.longitude, 999).slice(0, 1);
-        }
-        onNearbyChange(counties.map((c) => c.county));
+        onNearbyChange({ lat: pos.coords.latitude, lng: pos.coords.longitude, km });
         setLoading(false);
       },
-      (error) => {
-        if (error.code === 1) {
-          setError("Location access denied. Please enable in browser settings.");
-        } else if (error.code === 3) {
-          setError("Location request timed out. Try again or check your connection.");
-        } else {
-          setError("Could not determine your location. Try again.");
-        }
+      (err) => {
+        if (err.code === 1) setError("Location access denied. Please enable in browser settings.");
+        else if (err.code === 3) setError("Location request timed out. Try again.");
+        else setError("Could not determine your location. Try again.");
         setLoading(false);
       },
       { timeout: 20000, enableHighAccuracy: false }
@@ -49,7 +40,7 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
 
   const handleRadiusChange = (km) => {
     setRadius(km);
-    if (nearbyCounties) locate(km);
+    if (nearbyCounties) onNearbyChange({ ...nearbyCounties, km });
   };
 
   const clear = () => {
@@ -62,7 +53,7 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1.5 bg-primary/10 text-primary text-sm font-medium px-3 h-9 rounded-md border border-primary/20">
           <MapPin className="w-4 h-4 shrink-0" />
-          Near me · {radius} km · {nearbyCounties.length} count{nearbyCounties.length === 1 ? "y" : "ies"}
+          Near me · {nearbyCounties.km} km
         </div>
         <div className="flex gap-1">
           {RADIUS_OPTIONS.map((opt) => (
@@ -70,7 +61,7 @@ export default function NearMeButton({ nearbyCounties, onNearbyChange }) {
               key={opt.km}
               onClick={() => handleRadiusChange(opt.km)}
               className={`px-2 py-1 rounded text-xs font-medium border transition-colors ${
-                radius === opt.km
+                nearbyCounties.km === opt.km
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card text-muted-foreground border-border hover:border-primary/50"
               }`}

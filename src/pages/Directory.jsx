@@ -4,6 +4,9 @@ import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2, PlusCircle, List, Map } from "lucide-react";
+import { haversineKm } from "../utils/countyCoordinates";
+import { TOWN_COORDINATES } from "../utils/townCoordinates";
+import { COUNTY_CENTROIDS } from "../utils/countyCoordinates";
 import DirectoryMapView from "../components/DirectoryMapView";
 import { Button } from "@/components/ui/button";
 import ListingListRow from "../components/ListingListRow";
@@ -150,7 +153,7 @@ export default function Directory() {
   }
 
   // Reset to page 1 whenever filters change
-  useEffect(() => { setPage(1); }, [search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, nearbyCounties, dateFrom, dateTo]);
+  useEffect(() => { setPage(1); }, [search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, JSON.stringify(nearbyCounties), dateFrom, dateTo]);
 
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
@@ -158,7 +161,15 @@ export default function Directory() {
       if (type && l.type !== type) return false;
       if (subcategoryGroup && subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
       if (category && category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
-      if (nearbyCounties && !nearbyCounties.includes(l.county)) return false;
+      if (nearbyCounties) {
+        // Filter by actual listing coordinates vs user GPS location
+        const townCoords = TOWN_COORDINATES[l.town] || TOWN_COORDINATES[l.area];
+        const countyCoords = COUNTY_CENTROIDS.find(c => c.county === l.county);
+        const coords = townCoords || countyCoords;
+        if (!coords) return false;
+        const dist = haversineKm(nearbyCounties.lat, nearbyCounties.lng, coords.lat, coords.lng);
+        if (dist > nearbyCounties.km) return false;
+      }
       if (!nearbyCounties && county && l.county !== county) return false;
       if (town && l.town !== town) return false;
       if (search) {
@@ -208,7 +219,7 @@ export default function Directory() {
       if (dateTo && key > dateTo) return false;
       return true;
     });
-  }, [listings, search, type, subcategoryGroup, category, county, town, nearbyCounties]);
+  }, [listings, search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, JSON.stringify(nearbyCounties)]);
 
   const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = pagedItems.length < filtered.length;
