@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
 import SearchFilter from "../components/SearchFilter";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle, List, Map } from "lucide-react";
+import DirectoryMapView from "../components/DirectoryMapView";
 import { Button } from "@/components/ui/button";
 import ListingListRow from "../components/ListingListRow";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
@@ -32,6 +33,7 @@ export default function Directory() {
   const [pullIndicator, setPullIndicator] = useState(0); // 0-1 progress
   const [user, setUser] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [viewMode, setViewMode] = useState("list"); // "list" | "map"
   const PAGE_SIZE = 50;
   const [page, setPage] = useState(1);
 
@@ -249,11 +251,30 @@ export default function Directory() {
               {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
             </p>
           </div>
-          <Button onClick={() => setShowSubmitForm(true)} className="gap-2 shrink-0" style={{ background: '#E2701B', border: 'none' }}>
-            <PlusCircle className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Your Listing</span>
-            <span className="sm:hidden">Add Listing</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* List / Map toggle */}
+            <div className="flex rounded-lg border overflow-hidden bg-card">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold transition-colors ${viewMode === "list" ? "text-white" : "text-muted-foreground hover:bg-muted"}`}
+                style={viewMode === "list" ? { background: "#097275" } : {}}
+              >
+                <List className="w-3.5 h-3.5" /> <span className="hidden sm:inline">List</span>
+              </button>
+              <button
+                onClick={() => setViewMode("map")}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold transition-colors ${viewMode === "map" ? "text-white" : "text-muted-foreground hover:bg-muted"}`}
+                style={viewMode === "map" ? { background: "#097275" } : {}}
+              >
+                <Map className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Map</span>
+              </button>
+            </div>
+            <Button onClick={() => setShowSubmitForm(true)} className="gap-2 shrink-0" style={{ background: '#E2701B', border: 'none' }}>
+              <PlusCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Add Your Listing</span>
+              <span className="sm:hidden">Add</span>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -273,7 +294,11 @@ export default function Directory() {
         nearbyCounties={nearbyCounties} setNearbyCounties={setNearbyCounties}
       />
 
-      {filtered.length === 0 ? (
+      {viewMode === "map" ? (
+        <div className="mt-4">
+          <DirectoryMapView listings={type === "What's On" ? filtered.map(e => e.listing || e) : filtered} />
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
@@ -300,7 +325,7 @@ export default function Directory() {
       )}
 
       {/* Load More */}
-      {hasMore && (
+      {viewMode === "list" && hasMore && (
         <div className="flex justify-center mt-8">
           <Button variant="outline" className="gap-2 px-8" onClick={() => setPage(p => p + 1)}>
             Load more listings ({filtered.length - pagedItems.length} remaining)
@@ -309,7 +334,7 @@ export default function Directory() {
       )}
 
       {/* Bottom CTA to add listing */}
-      {!hasMore && filtered.length > 0 && (
+      {viewMode === "list" && !hasMore && filtered.length > 0 && (
         <div className="mt-10 rounded-xl p-6 text-center" style={{ background: '#097275' }}>
           <p className="text-white font-display text-xl font-bold mb-1">Is your business or group missing?</p>
           <p className="text-white/80 text-sm mb-4">Add your free listing to the directory today — it only takes a minute.</p>
