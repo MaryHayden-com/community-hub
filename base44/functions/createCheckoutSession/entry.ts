@@ -4,6 +4,15 @@ import Stripe from 'npm:stripe@14.21.0';
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
 const PLANS = {
+  monthly: {
+    price_id: 'price_1TUXDOD3Hb4wOTs9UyylABgH',
+    name: 'Monthly Listing — €20/month',
+  },
+  annual: {
+    price_id: 'price_1TUXDOD3Hb4wOTs9XXNQzmDF',
+    name: 'Annual Listing — €200/year',
+  },
+  // Legacy plans (keep for existing subscribers)
   standard: {
     price_id: 'price_1TMcSjD3Hb4wOTs9FfJ3vMhF',
     name: 'Standard Plan',
@@ -17,23 +26,23 @@ const PLANS = {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { plan, listing_id, success_url, cancel_url } = await req.json();
+    const { plan, listing_name, contact_name, email, success_url, cancel_url } = await req.json();
 
     const planConfig = PLANS[plan];
     if (!planConfig) return Response.json({ error: 'Invalid plan' }, { status: 400 });
 
-    // Look up existing Stripe customer by email
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    if (!email) return Response.json({ error: 'Email is required' }, { status: 400 });
+
+    // Look up or create Stripe customer by email
+    const customers = await stripe.customers.list({ email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     } else {
       const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.full_name,
+        email,
+        name: contact_name || '',
       });
       customerId = customer.id;
     }
@@ -43,19 +52,20 @@ Deno.serve(async (req) => {
       payment_method_types: ['card'],
       line_items: [{ price: planConfig.price_id, quantity: 1 }],
       mode: 'subscription',
-      success_url: success_url || 'https://app.base44.com',
-      cancel_url: cancel_url || 'https://app.base44.com',
+      success_url: success_url || `${Deno.env.get('BASE44_APP_URL') || 'https://hub4community.ie'}?submitted=1`,
+      cancel_url: cancel_url || `${Deno.env.get('BASE44_APP_URL') || 'https://hub4community.ie'}`,
+      customer_email: customers.data.length === 0 ? email : undefined,
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
-        listing_id,
+        listing_name: listing_name || '',
         plan,
-        user_email: user.email,
+        user_email: email,
       },
       subscription_data: {
         metadata: {
-          listing_id,
+          listing_name: listing_name || '',
           plan,
-          user_email: user.email,
+          user_email: email,
         },
       },
     });
