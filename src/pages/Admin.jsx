@@ -94,6 +94,8 @@ export default function Admin() {
         }
       } catch {}
       setBulkFetchProgress({ done: i + 1, total: needsImage.length, updated });
+      // Small delay to avoid hitting API rate limits
+      await new Promise(r => setTimeout(r, 300));
     }
     setBulkFetchingImages(false);
     setBulkFetchProgress(null);
@@ -164,7 +166,7 @@ export default function Admin() {
   const handleSort = (key) => {
     if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
     else { setSortKey(key); setSortDir("asc"); }
-  };; // "list" or "grid"
+  };
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -179,10 +181,18 @@ export default function Admin() {
 
   useEffect(() => { loadListings(); }, []);
 
-  useEffect(() => {
+  const refreshClaimsCount = () => {
     base44.entities.ClaimRequest.filter({ status: "pending" })
       .then((r) => setPendingClaimsCount(r.length))
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    refreshClaimsCount();
+    // Refresh when the tab regains focus (admin may leave and come back)
+    const handleFocus = () => refreshClaimsCount();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   const handleToggleVerified = async (listing, e) => {
@@ -382,7 +392,7 @@ export default function Admin() {
           onImport={() => setTriggerImport(true)}
           onExport={() => {
             const headers = ["Type","Name","Category/Trade Type","County","Town","Description","Address","Phone","Email","Website","Facebook URL","Instagram URL","LinkedIn URL","Contact Name","Meeting Info","Is Featured"];
-            const rows = listings.map((l) => [l.type,l.name, Array.isArray(l.category) ? l.category.join(";") : (l.category||""),l.county,l.town,l.description,l.address,l.phone,l.email,l.website,l.facebook_url,l.instagram_url,l.instagram_url,l.linkedin_url,l.contact_name,l.meeting_info,l.is_featured?"Yes":"No"]);
+            const rows = listings.map((l) => [l.type,l.name, Array.isArray(l.category) ? l.category.join(";") : (l.category||""),l.county,l.town,l.description,l.address,l.phone,l.email,l.website,l.facebook_url,l.instagram_url,l.linkedin_url,l.contact_name,l.meeting_info,l.is_featured?"Yes":"No"]);
             const csv = [headers,...rows].map((r)=>r.map((c)=>{const val = Array.isArray(c) ? c.join(";") : (c||""); return `"${String(val).replace(/"/g,'""')}"`}).join(",")).join("\n");
             const a = document.createElement("a");
             a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
