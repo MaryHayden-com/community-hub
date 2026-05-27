@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WhatsOnEventRow from "@/components/WhatsOnEventRow";
-import SubmitListingForm from "@/components/SubmitListingForm";
+import SubmitEventForm from "@/components/SubmitEventForm";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
   eachDayOfInterval, isSameDay, isSameMonth, isToday,
@@ -212,7 +212,7 @@ export default function WhatsOn() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-      <SubmitListingForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
+      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
 
       {/* Header + view toggle */}
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
