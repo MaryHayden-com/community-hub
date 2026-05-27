@@ -16,6 +16,7 @@ import Billing from './pages/Billing';
 import OwnerDashboard from './pages/OwnerDashboard';
 import GroupAdminDashboard from './pages/GroupAdminDashboard.jsx';
 import Survey from './pages/Survey';
+import CalendarView from './pages/CalendarView';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
         <Route path="/dashboard" element={<OwnerDashboard />} />
         <Route path="/group-dashboard" element={<GroupAdminDashboard />} />
         <Route path="/survey" element={<Survey />} />
+        <Route path="/calendar" element={<CalendarView />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

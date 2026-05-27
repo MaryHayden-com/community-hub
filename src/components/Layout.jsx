@@ -15,10 +15,11 @@ const navItems = [
   { to: "/directory?type=Community+Services", label: "Services", icon: GraduationCap },
   { to: "/directory?type=Education", label: "Education", icon: GraduationCap },
   { to: "/directory?type=What%27s+On", label: "What's On", icon: Calendar },
+  { to: "/calendar", label: "Calendar", icon: Calendar },
 ];
 
 // Root paths that show the app title (no back button)
-const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard", "/billing"];
+const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard", "/billing", "/calendar"];
 
 // Bottom nav tabs (mobile)
 const BOTTOM_TABS = [
