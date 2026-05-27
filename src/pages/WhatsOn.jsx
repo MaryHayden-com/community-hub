@@ -2,11 +2,12 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
-  ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2
+  ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WhatsOnEventRow from "@/components/WhatsOnEventRow";
+import SubmitListingForm from "@/components/SubmitListingForm";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
   eachDayOfInterval, isSameDay, isSameMonth, isToday,
@@ -105,6 +106,8 @@ export default function WhatsOn() {
   const [viewMode, setViewMode] = useState("list"); // "list" | "calendar"
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
+  const [user, setUser] = useState(null);
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
 
   // List view state
   const [dateFrom, setDateFrom] = useState(TODAY_STR);
@@ -117,6 +120,7 @@ export default function WhatsOn() {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
     base44.entities.CommunityListing.filter({ status: "approved" }, "-created_date", 2000)
       .then(data => setListings(data.filter(l => l.type === "What's On")))
       .finally(() => setLoading(false));
@@ -204,8 +208,12 @@ export default function WhatsOn() {
     : `All events in ${format(currentMonth, "MMMM yyyy")}`;
 
   // ── Render ─────────────────────────────────────────────────────────────────
+  const isPaidUser = user && (user.role === "listing_owner" || user.role === "admin" || user.role === "group_admin");
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <SubmitListingForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
+
       {/* Header + view toggle */}
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
         <div>
@@ -213,8 +221,17 @@ export default function WhatsOn() {
           <p className="text-muted-foreground mt-0.5 text-sm">Upcoming events and activities across Ireland</p>
         </div>
 
+        <div className="flex items-center gap-2 shrink-0">
+          {isPaidUser && (
+            <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
+              <PlusCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Add an Event</span>
+              <span className="sm:hidden">Add</span>
+            </Button>
+          )}
+
         {/* List / Calendar toggle */}
-        <div className="flex rounded-lg border overflow-hidden bg-card shrink-0">
+        <div className="flex rounded-lg border overflow-hidden bg-card">
           <button
             onClick={() => setViewMode("list")}
             className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${viewMode === "list" ? "text-white" : "text-muted-foreground hover:bg-muted"}`}
@@ -229,6 +246,7 @@ export default function WhatsOn() {
           >
             <Calendar className="w-3.5 h-3.5" /> Calendar
           </button>
+        </div>
         </div>
       </div>
 
