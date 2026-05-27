@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap, ImagePlus } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap, ImagePlus, Clock, CalendarDays, MoreHorizontal, SlidersHorizontal } from "lucide-react";
 import AdminActionStream from "../components/AdminActionStream";
 import AdminAnalytics from "../components/AdminAnalytics";
 import AdminClaimRequests from "../components/AdminClaimRequests";
@@ -51,6 +51,8 @@ export default function Admin() {
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [triggerImport, setTriggerImport] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
   const pendingListingsCount = listings.filter(l => l.status === "pending").length;
   const DEFAULT_COLUMNS = { image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: true };
@@ -263,7 +265,7 @@ export default function Admin() {
     });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-14 sm:pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold flex items-center gap-2">
@@ -360,24 +362,25 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Pending alert bar */}
+      {/* Sticky pending alert bar */}
       {pendingListingsCount > 0 && (
-        <button
+        <div
           onClick={() => setActiveTab("pending")}
-          className="w-full flex items-center justify-between gap-3 px-4 py-3 mb-4 rounded-xl bg-amber-50 border border-amber-300 hover:bg-amber-100 transition-colors text-left"
+          className="flex items-center justify-between px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors mb-4"
         >
-          <div className="flex items-center gap-2">
-            <span className="bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0">{pendingListingsCount}</span>
-            <span className="text-sm font-semibold text-amber-900">
-              {pendingListingsCount} listing{pendingListingsCount !== 1 ? "s" : ""} awaiting approval
+          <span className="text-sm font-medium text-amber-900 flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Pending approval
+            <span className="bg-amber-400 text-amber-950 text-xs font-semibold rounded-full px-2 py-0.5">
+              {pendingListingsCount}
             </span>
-          </div>
-          <span className="text-xs font-medium text-amber-700 underline underline-offset-2 shrink-0">Review now →</span>
-        </button>
+          </span>
+          <span className="text-xs text-amber-700 font-medium">Review →</span>
+        </div>
       )}
 
-      {/* Tab Navigation */}
-      <div className="flex gap-1 border-b mb-6 overflow-x-auto">
+      {/* Tab Navigation — desktop only */}
+      <div className="hidden sm:flex gap-1 border-b mb-6 overflow-x-auto">
         {[
           { key: "overview", label: "Overview" },
           { key: "pending", label: "Pending Approval", badge: pendingListingsCount, badgeColor: "bg-amber-500 text-white" },
@@ -403,6 +406,55 @@ export default function Admin() {
           </button>
         ))}
       </div>
+
+      {/* Mobile bottom nav */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 flex sm:hidden bg-background border-t h-14">
+        {[
+          { key: "overview", icon: <LayoutGrid className="w-5 h-5" />, label: "Overview" },
+          { key: "pending", icon: <Clock className="w-5 h-5" />, label: "Pending", badge: pendingListingsCount },
+          { key: "listings", icon: <List className="w-5 h-5" />, label: "Listings" },
+          { key: "whatson", icon: <CalendarDays className="w-5 h-5" />, label: "Events", badge: listings.filter(l => l.type === "What's On" && !l.is_verified).length },
+          { key: "more", icon: <MoreHorizontal className="w-5 h-5" />, label: "More" },
+        ].map(({ key, icon, label, badge }) => (
+          <button
+            key={key}
+            onClick={() => key === "more" ? setShowMoreMenu(true) : setActiveTab(key)}
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors ${activeTab === key ? "text-primary" : "text-muted-foreground"}`}
+          >
+            {icon}
+            <span className="text-[10px]">{label}</span>
+            {badge > 0 && (
+              <span className="absolute top-1.5 right-[calc(50%-14px)] bg-amber-400 text-amber-950 text-[9px] font-semibold rounded-full px-1 min-w-[14px] text-center">{badge}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile "More" menu */}
+      {showMoreMenu && (
+        <div className="fixed inset-0 z-50 sm:hidden" onClick={() => setShowMoreMenu(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl p-5" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+            <h3 className="font-medium mb-3">More</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: "claims", label: "Claim Requests", badge: pendingClaimsCount },
+                { key: "stream", label: "Action Stream" },
+                { key: "users", label: "Users" },
+                { key: "analytics", label: "Analytics" },
+                { key: "survey", label: "Survey Results" },
+              ].map(({ key, label, badge }) => (
+                <button key={key} onClick={() => { setActiveTab(key); setShowMoreMenu(false); }}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl border bg-card text-sm font-medium hover:bg-muted transition-colors">
+                  {label}
+                  {badge > 0 && <span className="bg-primary text-primary-foreground text-xs rounded-full px-1.5">{badge}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeTab === "overview" && (
         <AdminOverview
@@ -464,67 +516,95 @@ export default function Admin() {
         />
       )}
 
-      {activeTab === "listings" && <div className="flex flex-wrap gap-2 mb-4 items-center">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search listings..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-card"
-          />
+      {activeTab === "listings" && <>
+        {/* Mobile: search + filter button */}
+        <div className="flex sm:hidden gap-2 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)} className="pl-10 bg-card" />
+          </div>
+          <Button variant="outline" onClick={() => setFilterSheetOpen(true)} className="gap-1.5 shrink-0">
+            <SlidersHorizontal className="w-4 h-4" />
+            Filter
+            {(filterType || filterCounty || filterFeatured) && (
+              <span className="bg-primary text-primary-foreground text-xs rounded-full px-1.5">{[filterType, filterCounty, filterFeatured].filter(Boolean).length}</span>
+            )}
+          </Button>
         </div>
 
-        <Select value={filterType} onValueChange={(v) => setFilterType(v === "__all__" ? "" : v)}>
-          <SelectTrigger className="w-[140px] bg-card">
-            <SelectValue placeholder="All Types" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">All Types</SelectItem>
-            {allTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-          </SelectContent>
-        </Select>
-
-        <Select value={filterCounty} onValueChange={(v) => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
-          <SelectTrigger className="w-[150px] bg-card">
-            <SelectValue placeholder="All Counties" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">All Counties</SelectItem>
-            {allCounties.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-          </SelectContent>
-        </Select>
-
-        <Select value={filterTown} onValueChange={(v) => setFilterTown(v === "__all__" ? "" : v)} disabled={!filterCounty}>
-          <SelectTrigger className="w-[160px] bg-card">
-            <SelectValue placeholder={filterCounty ? "All Towns" : "Select county first"} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">All Towns</SelectItem>
-            {allTowns.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-          </SelectContent>
-        </Select>
-
-        {(
-          <button
-            onClick={() => setFilterFeatured(!filterFeatured)}
-            className={`flex items-center gap-1 text-xs border rounded-md px-2 py-1.5 transition-colors ${filterFeatured ? "bg-amber-100 border-amber-400 text-amber-700 font-semibold" : "bg-card text-muted-foreground hover:text-foreground"}`}
-          >
+        {/* Desktop: full filter row */}
+        <div className="hidden sm:flex flex-wrap gap-2 mb-4 items-center">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Search listings..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-card" />
+          </div>
+          <Select value={filterType} onValueChange={(v) => setFilterType(v === "__all__" ? "" : v)}>
+            <SelectTrigger className="w-[140px] bg-card"><SelectValue placeholder="All Types" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Types</SelectItem>
+              {allTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={filterCounty} onValueChange={(v) => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
+            <SelectTrigger className="w-[150px] bg-card"><SelectValue placeholder="All Counties" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Counties</SelectItem>
+              {allCounties.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={filterTown} onValueChange={(v) => setFilterTown(v === "__all__" ? "" : v)} disabled={!filterCounty}>
+            <SelectTrigger className="w-[160px] bg-card"><SelectValue placeholder={filterCounty ? "All Towns" : "Select county first"} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Towns</SelectItem>
+              {allTowns.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <button onClick={() => setFilterFeatured(!filterFeatured)}
+            className={`flex items-center gap-1 text-xs border rounded-md px-2 py-1.5 transition-colors ${filterFeatured ? "bg-amber-100 border-amber-400 text-amber-700 font-semibold" : "bg-card text-muted-foreground hover:text-foreground"}`}>
             ★ Featured only
           </button>
-        )}
+          {(filterType || filterCounty || filterTown || search || filterFeatured) && (
+            <button onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); setSearch(""); setFilterFeatured(false); }}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border rounded-md px-2 py-1.5 bg-card hover:border-primary/40 transition-colors">
+              <X className="w-3 h-3" /> Clear
+            </button>
+          )}
+          <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
+        </div>
 
-        {(filterType || filterCounty || filterTown || search || filterFeatured) && (
-          <button
-            onClick={() => { setFilterType(""); setFilterCounty(""); setFilterTown(""); setSearch(""); setFilterFeatured(false); }}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border rounded-md px-2 py-1.5 bg-card hover:border-primary/40 transition-colors"
-          >
-            <X className="w-3 h-3" /> Clear
-          </button>
+        {/* Filter bottom sheet (mobile) */}
+        {filterSheetOpen && (
+          <div className="fixed inset-0 z-50 sm:hidden" onClick={() => setFilterSheetOpen(false)}>
+            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl p-5" onClick={e => e.stopPropagation()}>
+              <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+              <h3 className="font-medium mb-4">Filter listings</h3>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Type</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {allTypes.map(t => (
+                  <button key={t} onClick={() => setFilterType(filterType === t ? "" : t)}
+                    className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${filterType === t ? "bg-primary text-primary-foreground border-primary" : "border-border"}`}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">County</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {allCounties.map(c => (
+                  <button key={c} onClick={() => setFilterCounty(filterCounty === c ? "" : c)}
+                    className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${filterCounty === c ? "bg-primary text-primary-foreground border-primary" : "border-border"}`}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" className="flex-1" onClick={() => { setFilterType(""); setFilterCounty(""); setFilterFeatured(false); setFilterSheetOpen(false); }}>Clear all</Button>
+                <Button className="flex-1" onClick={() => setFilterSheetOpen(false)}>Show {filtered.length} results</Button>
+              </div>
+            </div>
+          </div>
         )}
-
-        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
-      </div>}
+      </>}
 
 
 
@@ -691,6 +771,16 @@ export default function Admin() {
         </div>
       ))}
 
+      {/* Quick-add FAB */}
+      {activeTab === "listings" && (
+        <button
+          onClick={() => setEditing({})}
+          className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+      )}
+
       {/* Merge Dialog */}
       {mergeListings && (
         <MergeListingsDialog
@@ -715,7 +805,11 @@ export default function Admin() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete "{listings.find(l => l.id === deleteId)?.name}"?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription>
+              This will permanently remove{" "}
+              <span className="font-medium text-foreground">"{listings.find(l => l.id === deleteId)?.name}"</span>{" "}
+              from the directory. This cannot be undone.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
