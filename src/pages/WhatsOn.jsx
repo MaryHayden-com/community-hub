@@ -222,13 +222,11 @@ export default function WhatsOn() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {isPaidUser && (
-            <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
-              <PlusCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Add an Event</span>
-              <span className="sm:hidden">Add</span>
-            </Button>
-          )}
+          <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
+            <PlusCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">Add an Event</span>
+            <span className="sm:hidden">Add</span>
+          </Button>
 
         {/* List / Calendar toggle */}
         <div className="flex rounded-lg border overflow-hidden bg-card">
