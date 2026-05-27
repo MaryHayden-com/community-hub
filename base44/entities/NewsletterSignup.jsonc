@@ -1,0 +1,26 @@
+{
+  "name": "NewsletterSignup",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "county": {
+      "type": "string",
+      "title": "County"
+    },
+    "source": {
+      "type": "string",
+      "title": "Source",
+      "description": "Where they signed up from (footer, homepage, etc.)"
+    }
+  },
+  "required": [
+    "email"
+  ]
+}

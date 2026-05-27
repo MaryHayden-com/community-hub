@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import {
@@ -191,13 +192,20 @@ export default function Layout() {
 
       {/* ── Footer (desktop only) ── */}
       <footer className="hidden md:block border-t bg-card mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Local Community Hub. Connecting communities across Ireland.</p>
-          <p className="mt-2">
-            <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
-            {" · "}
-            <a href="mailto:privacy@communityhub.ie" className="hover:text-foreground underline underline-offset-2 transition-colors">privacy@communityhub.ie</a>
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          <div className="mb-6 p-5 rounded-xl bg-primary/5 border border-primary/20">
+            <p className="text-sm font-semibold mb-1" style={{ color: '#097275' }}>📬 Stay updated on local events & news</p>
+            <p className="text-xs text-muted-foreground mb-3">Get the latest listings, events and community news delivered to your inbox.</p>
+            <NewsletterSignup source="footer" />
+          </div>
+          <div className="text-center text-sm text-muted-foreground">
+            <p>© {new Date().getFullYear()} Local Community Hub. Connecting communities across Ireland.</p>
+            <p className="mt-2">
+              <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
+              {" · "}
+              <a href="mailto:privacy@communityhub.ie" className="hover:text-foreground underline underline-offset-2 transition-colors">privacy@communityhub.ie</a>
+            </p>
+          </div>
         </div>
       </footer>
 

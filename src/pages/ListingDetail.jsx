@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import {
   MapPin, Phone, Mail, Globe, Facebook, Instagram, Linkedin,
   ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User, ShieldCheck, Flag,
-  Megaphone, HandHeart, Briefcase, Bell, Share2
+  Megaphone, HandHeart, Briefcase, Bell, Share2, RefreshCw
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -275,8 +275,29 @@ export default function ListingDetail() {
             </div>
           )}
 
-          {/* Share + Claim / Removal */}
-          <div className="mt-6 pt-6 border-t flex flex-wrap gap-3">
+          {/* Last updated */}
+          {listing.updated_date && (
+            <p className="mt-4 text-xs text-muted-foreground flex items-center gap-1">
+              <RefreshCw className="w-3 h-3" />
+              Last updated {new Date(listing.updated_date).toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          )}
+
+          {/* Claim this listing — prominent CTA */}
+          {!listing.owner_email && (
+            <div className="mt-5 p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-sm font-semibold text-amber-800">Is this your listing?</p>
+                <p className="text-xs text-amber-700 mt-0.5">Claim it to manage your details and keep your community updated.</p>
+              </div>
+              <Button size="sm" onClick={() => setShowClaim(true)} style={{ background: '#E2701B', border: 'none', color: '#fff' }}>
+                <Flag className="w-3.5 h-3.5" /> Claim this listing
+              </Button>
+            </div>
+          )}
+
+          {/* Share + Actions */}
+          <div className="mt-5 pt-5 border-t flex flex-wrap gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -297,7 +318,7 @@ export default function ListingDetail() {
               variant="outline"
               size="sm"
               onClick={() => {
-                const text = `Check out ${listing.name} on Community Hub: ${window.location.href}`;
+                const text = `Check out ${listing.name} on Local Community Hub: ${window.location.href}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
               }}
             >
@@ -313,14 +334,16 @@ export default function ListingDetail() {
                 window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&t=${title}`, "_blank");
               }}
             >
-              <Facebook className="w-3.5 h-3.5 text-blue-600" />
+              <Facebook className="w-3.5 h-4 text-blue-600" />
               Facebook
             </Button>
             <div className="flex-1" />
-            <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
-              <Flag className="w-3.5 h-3.5" />
-              Claim this listing
-            </Button>
+            {listing.owner_email && (
+              <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
+                <Flag className="w-3.5 h-3.5" />
+                Claim this listing
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={() => setShowRemoval(true)}>
               <ShieldCheck className="w-3.5 h-3.5" />
               Request removal
