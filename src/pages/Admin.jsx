@@ -30,6 +30,7 @@ export default function Admin() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState(null); // null = closed, {} = new, {id,...} = edit
   const [deleteId, setDeleteId] = useState(null);
+  const [flashId, setFlashId] = useState(null);
   const [viewMode, setViewMode] = useState("list");
   const [mergeMode, setMergeMode] = useState(false);
   const [mergeSelected, setMergeSelected] = useState([]);
@@ -52,7 +53,10 @@ export default function Admin() {
   const [triggerImport, setTriggerImport] = useState(false);
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
   const pendingListingsCount = listings.filter(l => l.status === "pending").length;
-  const [visibleColumns, setVisibleColumns] = useState({ image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: true });
+  const DEFAULT_COLUMNS = { image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: true };
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("admin_columns")) || DEFAULT_COLUMNS; } catch { return DEFAULT_COLUMNS; }
+  });
 
 
   const ALL_COLUMNS = [
@@ -72,7 +76,11 @@ export default function Admin() {
     { key: "is_featured", label: "Featured" },
   ];
 
-  const toggleColumn = (key) => setVisibleColumns((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggleColumn = (key) => setVisibleColumns((prev) => {
+    const next = { ...prev, [key]: !prev[key] };
+    localStorage.setItem("admin_columns", JSON.stringify(next));
+    return next;
+  });
 
   const handleBulkFetchImages = async () => {
     const needsImage = listings.filter((l) => !l.image_url && (l.website || l.facebook_url || l.instagram_url));
@@ -197,14 +205,12 @@ export default function Admin() {
 
   const handleToggleVerified = async (listing, e) => {
     e.stopPropagation();
-    // Optimistic UI update
     const newVerified = !listing.is_verified;
     setListings(prev => prev.map(l => l.id === listing.id ? { ...l, is_verified: newVerified } : l));
-    toast({ title: newVerified ? "Verified" : "Unverified", description: `${listing.name} marked as ${newVerified ? "verified" : "unverified"}.` });
+    if (newVerified) { setFlashId(listing.id); setTimeout(() => setFlashId(null), 1000); }
     try {
       await base44.entities.CommunityListing.update(listing.id, { is_verified: newVerified });
     } catch (err) {
-      // Revert optimistic update on error
       setListings(prev => prev.map(l => l.id === listing.id ? { ...l, is_verified: listing.is_verified } : l));
       toast({ title: "Error", description: "Failed to update verification status.", variant: "destructive" });
     }
@@ -353,6 +359,22 @@ export default function Admin() {
           )}
         </div>
       </div>
+
+      {/* Pending alert bar */}
+      {pendingListingsCount > 0 && (
+        <button
+          onClick={() => setActiveTab("pending")}
+          className="w-full flex items-center justify-between gap-3 px-4 py-3 mb-4 rounded-xl bg-amber-50 border border-amber-300 hover:bg-amber-100 transition-colors text-left"
+        >
+          <div className="flex items-center gap-2">
+            <span className="bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0">{pendingListingsCount}</span>
+            <span className="text-sm font-semibold text-amber-900">
+              {pendingListingsCount} listing{pendingListingsCount !== 1 ? "s" : ""} awaiting approval
+            </span>
+          </div>
+          <span className="text-xs font-medium text-amber-700 underline underline-offset-2 shrink-0">Review now →</span>
+        </button>
+      )}
 
       {/* Tab Navigation */}
       <div className="flex gap-1 border-b mb-6 overflow-x-auto">
@@ -537,7 +559,9 @@ export default function Admin() {
                 {filtered.map((l) => (
                   <tr
                     key={l.id}
-                    className={`border-b hover:bg-muted/30 transition-colors cursor-pointer ${
+                    className={`border-b transition-colors cursor-pointer ${
+                      flashId === l.id ? "bg-emerald-100" : "hover:bg-muted/30"
+                    } ${
                       mergeMode && mergeSelected.find((x) => x.id === l.id) ? "bg-primary/10" : ""
                     } ${
                       selectMode && selectedIds.includes(l.id) ? "bg-primary/10" : ""
@@ -690,7 +714,7 @@ export default function Admin() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Listing?</AlertDialogTitle>
+            <AlertDialogTitle>Delete "{listings.find(l => l.id === deleteId)?.name}"?</AlertDialogTitle>
             <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
