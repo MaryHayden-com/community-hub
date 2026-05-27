@@ -114,6 +114,49 @@ export default function AdminOverview({ listings, pendingClaimsCount, onAddListi
         )}
       </div>
 
+      {/* Breakdown by Type */}
+      <div>
+        <SectionHeading>Listings by Category</SectionHeading>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Object.entries(stats.byType).sort((a, b) => b[1] - a[1]).map(([type, count]) => {
+            const subCats = {};
+            listings.filter(l => l.type === type).forEach(l => {
+              const cats = Array.isArray(l.subcategory_group) ? l.subcategory_group : (l.subcategory_group ? [l.subcategory_group] : []);
+              if (cats.length === 0) { subCats["Uncategorised"] = (subCats["Uncategorised"] || 0) + 1; }
+              else cats.forEach(c => { subCats[c] = (subCats[c] || 0) + 1; });
+            });
+            return (
+              <div key={type} className="bg-card border rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="font-semibold text-sm">{type}</p>
+                  <span className="text-2xl font-bold text-primary">{count}</span>
+                </div>
+                <div className="space-y-1.5">
+                  {Object.entries(subCats).sort((a, b) => b[1] - a[1]).map(([cat, n]) => (
+                    <div key={cat} className="flex items-center gap-2">
+                      <div className="flex-1 bg-muted rounded-full h-1.5 overflow-hidden">
+                        <div className="bg-primary h-full rounded-full" style={{ width: `${Math.round((n / count) * 100)}%` }} />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-5 text-right font-medium">{n}</span>
+                      <span className="text-xs text-muted-foreground w-28 truncate">{cat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          {/* Events card */}
+          <div className="bg-card border rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-semibold text-sm">What's On</p>
+              <span className="text-2xl font-bold text-violet-600">{stats.events.length}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">{stats.upcomingWeek.length} upcoming this week</p>
+            <p className="text-xs text-muted-foreground">{stats.upcomingMonth.length} upcoming this month</p>
+          </div>
+        </div>
+      </div>
+
       {/* Events Stats */}
       <div>
         <SectionHeading>What's On</SectionHeading>
