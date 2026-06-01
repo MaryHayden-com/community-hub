@@ -11,7 +11,8 @@ import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 import { getAllCategories, getGroupsForCategories, TAXONOMY, getSubGroupsForGroup, getCategoriesForSubGroup } from "@/utils/taxonomy";
-import { IRELAND_COUNTIES, getTownsForCounty } from "@/utils/irelandData";
+import { IRELAND_COUNTIES, getTownsAndVillagesForCounty } from "@/utils/irelandData";
+import { getVillagesNearTown } from "@/utils/townVillageCoords";
 
 function FieldRow({ label, field, isHidden, toggleHidden, children }) {
   const hidden = isHidden(field);
@@ -173,6 +174,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     category_text: listing?.category_text || "",
     country: listing?.country || "Ireland",
     county: listing?.county || "",
+    nearest_town: listing?.nearest_town || "",
     town: listing?.town || "",
     description: listing?.description || "",
     address: listing?.address || "",
@@ -234,8 +236,8 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
-    if (!form.name || !form.type || !form.county || !form.town) {
-      toast({ title: "Missing fields", description: "Name, type, county and town are required.", variant: "destructive" });
+    if (!form.name || !form.type || !form.county || !form.nearest_town || !form.town || form.town === "__other__") {
+      toast({ title: "Missing fields", description: "Name, type, county, nearest town and village are all required.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -392,44 +394,67 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
 
 
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>County *</Label>
-              <Select value={form.county} onValueChange={(v) => { update("county", v); update("town", ""); }}>
-                <SelectTrigger><SelectValue placeholder="Select county..." /></SelectTrigger>
-                <SelectContent>
-                  {IRELAND_COUNTIES.map(c => <SelectItem key={c.county} value={c.county}>{c.county}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Country</Label>
-              <Input value={form.country} onChange={(e) => update("country", e.target.value)} />
-            </div>
-          </div>
+          {/* Location: County → Town → Village (3-step) */}
+          <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+            <p className="text-sm font-semibold">Location *</p>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Townland / Village *</Label>
-              {form.county ? (
-                <Select value={form.town} onValueChange={(v) => update("town", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select town..." /></SelectTrigger>
+            {/* Step 1: County */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>County *</Label>
+                <Select value={form.county} onValueChange={(v) => { update("county", v); update("nearest_town", ""); update("town", ""); }}>
+                  <SelectTrigger><SelectValue placeholder="Select county..." /></SelectTrigger>
                   <SelectContent>
-                    {getTownsForCounty(form.county).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                    <SelectItem value="__other__">Other (type below)</SelectItem>
+                    {IRELAND_COUNTIES.map(c => <SelectItem key={c.county} value={c.county}>{c.county}</SelectItem>)}
                   </SelectContent>
                 </Select>
-              ) : (
-                <Input value={form.town} onChange={(e) => update("town", e.target.value)} placeholder="Select a county first" disabled />
-              )}
-              {form.town === "__other__" && (
-                <Input className="mt-1.5" placeholder="Enter town name..." onChange={(e) => update("town", e.target.value)} autoFocus />
-              )}
+              </div>
+              <div>
+                <Label>Country</Label>
+                <Input value={form.country} onChange={(e) => update("country", e.target.value)} />
+              </div>
             </div>
-            <div>
-              <Label>Nearest Town / Area</Label>
-              <Input value={form.area} onChange={(e) => update("area", e.target.value)} placeholder="e.g. Bandon — shows under this area" />
-            </div>
+
+            {/* Step 2: Nearest Town */}
+            {form.county && (() => {
+              const { towns: countyTowns } = getTownsAndVillagesForCounty(form.county);
+              return (
+                <div>
+                  <Label>Nearest Town *</Label>
+                  <Select value={form.nearest_town || ""} onValueChange={(v) => { update("nearest_town", v); update("town", v); }}>
+                    <SelectTrigger><SelectValue placeholder="Select nearest town..." /></SelectTrigger>
+                    <SelectContent>
+                      {countyTowns.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">The main town this listing is closest to.</p>
+                </div>
+              );
+            })()}
+
+            {/* Step 3: Village (proximity-filtered) */}
+            {form.nearest_town && (() => {
+              const { villages: countyVillages } = getTownsAndVillagesForCounty(form.county);
+              const nearbyVillages = getVillagesNearTown(form.county, form.nearest_town, countyVillages, 20);
+              // Also include the town itself as an option
+              const villageOptions = [form.nearest_town, ...nearbyVillages].filter((v, i, arr) => arr.indexOf(v) === i).sort();
+              return (
+                <div>
+                  <Label>Village / Townland *</Label>
+                  <Select value={form.town === "__other__" ? "__other__" : (form.town || "")} onValueChange={(v) => update("town", v)}>
+                    <SelectTrigger><SelectValue placeholder="Select village or townland..." /></SelectTrigger>
+                    <SelectContent>
+                      {villageOptions.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                      <SelectItem value="__other__">Other (type below)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.town === "__other__" && (
+                    <Input className="mt-1.5" placeholder="Enter village / townland name..." onChange={(e) => update("town", e.target.value)} autoFocus />
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">Showing villages within ~20km of {form.nearest_town}.</p>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Contact Details Section */}

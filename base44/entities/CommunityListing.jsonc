@@ -82,6 +82,10 @@
       "type": "string",
       "title": "County"
     },
+    "nearest_town": {
+      "type": "string",
+      "title": "Nearest Town"
+    },
     "town": {
       "type": "string",
       "title": "Townland / Village"
@@ -245,6 +249,7 @@
     "name",
     "type",
     "county",
+    "nearest_town",
     "town"
   ]
 }
