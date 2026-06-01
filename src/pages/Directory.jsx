@@ -92,7 +92,7 @@ export default function Directory() {
     pullDelta.current = 0;
   }, [refreshing, loadListings]);
 
-  const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county), []);
+  const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county).sort(), []);
   // Helper: normalise a field that may be a string or array
   const toArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);
 
@@ -114,6 +114,8 @@ export default function Directory() {
     const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
     return [...new Set([...staticTowns, ...listingTowns])].sort();
   }, [listings, county]);
+
+  const allCounties = useMemo(() => IRELAND_COUNTIES.map(c => c.county).sort(), []);
 
   function getNextOccurrence(listing) {
     const t = listing.recurring_type || "weekly";
