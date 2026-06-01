@@ -27,5 +27,8 @@
       },
       "description": "Tags scoping what this group admin can manage, e.g. county:Leitrim, type:What's On, town:Carrick-on-Shannon"
     }
-  }
+  },
+  "required": [
+    "managed_tags"
+  ]
 }

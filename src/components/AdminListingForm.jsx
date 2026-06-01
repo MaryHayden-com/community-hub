@@ -11,6 +11,7 @@ import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 import { getAllCategories, getGroupsForCategories, TAXONOMY, getSubGroupsForGroup, getCategoriesForSubGroup } from "@/utils/taxonomy";
+import { IRELAND_COUNTIES, getTownsForCounty } from "@/utils/irelandData";
 
 function FieldRow({ label, field, isHidden, toggleHidden, children }) {
   const hidden = isHidden(field);
@@ -394,7 +395,12 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>County *</Label>
-              <Input value={form.county} onChange={(e) => update("county", e.target.value)} />
+              <Select value={form.county} onValueChange={(v) => { update("county", v); update("town", ""); }}>
+                <SelectTrigger><SelectValue placeholder="Select county..." /></SelectTrigger>
+                <SelectContent>
+                  {IRELAND_COUNTIES.map(c => <SelectItem key={c.county} value={c.county}>{c.county}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Country</Label>
@@ -405,7 +411,20 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Townland / Village *</Label>
-              <Input value={form.town} onChange={(e) => update("town", e.target.value)} placeholder="e.g. Crossmahon, Laragh" />
+              {form.county ? (
+                <Select value={form.town} onValueChange={(v) => update("town", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select town..." /></SelectTrigger>
+                  <SelectContent>
+                    {getTownsForCounty(form.county).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    <SelectItem value="__other__">Other (type below)</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input value={form.town} onChange={(e) => update("town", e.target.value)} placeholder="Select a county first" disabled />
+              )}
+              {form.town === "__other__" && (
+                <Input className="mt-1.5" placeholder="Enter town name..." onChange={(e) => update("town", e.target.value)} autoFocus />
+              )}
             </div>
             <div>
               <Label>Nearest Town / Area</Label>
