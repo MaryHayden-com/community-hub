@@ -1,11 +1,11 @@
 import { Search, X, CalendarRange } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
-export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
+export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const isWhatsOn = type === "What's On";
   const hasFilters = search || type || (group && group.length > 0) || (category && category.length > 0) || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
 
@@ -40,10 +40,31 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
             <SelectValue placeholder="All Towns" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns</SelectItem>
-            {[...towns].sort().map((t) => (
-              <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-            ))}
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns & Villages</SelectItem>
+            {townGroups ? (
+              <>
+                {townGroups.towns.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Towns</SelectLabel>
+                    {townGroups.towns.map((t) => (
+                      <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+                {townGroups.villages.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Villages</SelectLabel>
+                    {townGroups.villages.map((t) => (
+                      <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+              </>
+            ) : (
+              [...towns].sort().map((t) => (
+                <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>

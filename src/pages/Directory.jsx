@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { IRELAND_COUNTIES, getTownsForCounty } from "../utils/irelandData";
+import { IRELAND_COUNTIES, getTownsForCounty, getTownsAndVillagesForCounty } from "../utils/irelandData";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2, PlusCircle, List, Map } from "lucide-react";
 import { haversineKm } from "../utils/countyCoordinates";
@@ -113,6 +113,22 @@ export default function Directory() {
     const staticTowns = getTownsForCounty(county);
     const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
     return [...new Set([...staticTowns, ...listingTowns])].sort();
+  }, [listings, county]);
+
+  const townGroups = useMemo(() => {
+    if (!county) return null;
+    const { towns: staticTowns, villages: staticVillages } = getTownsAndVillagesForCounty(county);
+    const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
+    const allStaticTowns = new Set(staticTowns);
+    const allStaticVillages = new Set(staticVillages);
+    // Any listing town not in static data goes into villages
+    listingTowns.forEach(t => {
+      if (!allStaticTowns.has(t) && !allStaticVillages.has(t)) allStaticVillages.add(t);
+    });
+    return {
+      towns: [...allStaticTowns].sort(),
+      villages: [...allStaticVillages].sort()
+    };
   }, [listings, county]);
 
   const allCounties = useMemo(() => IRELAND_COUNTIES.map(c => c.county).sort(), []);
@@ -301,7 +317,7 @@ export default function Directory() {
         categories={categories}
         county={county} setCounty={setCounty}
         town={town} setTown={setTown}
-        counties={counties} towns={towns}
+        counties={counties} towns={towns} townGroups={townGroups}
         dateFrom={dateFrom} setDateFrom={setDateFrom}
         dateTo={dateTo} setDateTo={setDateTo}
         todayStr={todayStr}
