@@ -33,7 +33,6 @@ export default function Layout() {
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const mainRef = useRef(null);
-  const [tabScrollPositions, setTabScrollPositions] = useState({});
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -60,6 +59,10 @@ export default function Layout() {
 
   const isRootPath = ROOT_PATHS.includes(location.pathname);
   const canGoBack = !isRootPath;
+
+  // Save/restore scroll position per tab
+  const scrollPositions = useRef({});
+  const prevPathRef = useRef(location.pathname);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -221,27 +224,27 @@ export default function Layout() {
                 key={tab.to}
                 onClick={() => {
                   if (isActive) {
-                    // Re-clicking active tab scrolls to root and resets
-                    if (mainRef.current) mainRef.current.scrollTop = 0;
-                    setTabScrollPositions(prev => ({ ...prev, [tab.to]: 0 }));
-                    // If on a child route, navigate back to root of tab
-                    if (location.pathname !== tab.to && location.pathname !== "/" && location.pathname !== "/directory") {
+                    // Re-clicking active tab: scroll to top
+                    scrollPositions.current[tab.to] = 0;
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    if (location.pathname !== tab.to && tab.to !== "/" && location.pathname !== "/directory") {
                       navigate(tab.to);
                     }
                   } else {
-                    // Switching tabs
-                    if (mainRef.current) {
-                      const currentTab = BOTTOM_TABS.find(t => location.pathname.startsWith(t.to.split("?")[0]))?.to || "/";
-                      setTabScrollPositions(prev => ({ ...prev, [currentTab]: mainRef.current.scrollTop }));
-                    }
+                    // Save current scroll before switching
+                    scrollPositions.current[prevPathRef.current] = window.scrollY;
+                    prevPathRef.current = tab.to;
                     navigate(tab.to);
+                    // Restore scroll for destination tab after navigation
+                    requestAnimationFrame(() => {
+                      window.scrollTo({ top: scrollPositions.current[tab.to] || 0, behavior: "instant" });
+                    });
                   }
                 }}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-3 min-h-[44px] text-[10px] font-medium transition-colors ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+                className="flex-1 flex flex-col items-center justify-center gap-0.5 py-3 min-h-[44px] min-w-[44px] text-[10px] font-medium transition-colors"
+                style={{ color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))' }}
               >
-                <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                <Icon className="w-5 h-5" />
                 {tab.label}
               </button>
             );

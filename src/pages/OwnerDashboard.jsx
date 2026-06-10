@@ -54,7 +54,7 @@ export default function OwnerDashboard() {
   const [editingNotice, setEditingNotice] = useState(null); // null=closed, {}=new, {...}=edit
   const [deletingNoticeId, setDeletingNoticeId] = useState(null);
   const [editingListing, setEditingListing] = useState(false);
-  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteStep, setDeleteStep] = useState(0); // 0=hidden, 1=warning, 2=confirm
   const [deleteRequestSent, setDeleteRequestSent] = useState(false);
   const [sendingDelete, setSendingDelete] = useState(false);
 
@@ -122,7 +122,7 @@ export default function OwnerDashboard() {
     });
     setSendingDelete(false);
     setDeleteRequestSent(true);
-    setShowDeleteAccount(false);
+    setDeleteStep(0);
   };
 
   const countFor = (key) => engagement.filter((e) => e.event_type === key).length;
@@ -322,7 +322,16 @@ export default function OwnerDashboard() {
           listingId={selectedListing.id}
           ownerEmail={user.email}
           onClose={() => setEditingNotice(null)}
-          onSave={() => { setEditingNotice(null); loadNotices(); }}
+          onSave={(optimistic, isNew) => {
+            // Optimistic update: apply immediately, then reload for truth
+            setNotices(prev => isNew
+              ? [optimistic, ...prev]
+              : prev.map(n => n.id === optimistic.id ? optimistic : n)
+            );
+            setEditingNotice(null);
+            // Sync from server shortly after
+            setTimeout(loadNotices, 1500);
+          }}
         />
       )}
 
@@ -334,30 +343,67 @@ export default function OwnerDashboard() {
             ✓ Your deletion request has been received. We'll process it within 7 days.
           </div>
         ) : (
-          <div className="bg-card border rounded-xl p-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="font-medium text-sm">Request Account Deletion</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Permanently delete your account and all associated data.</p>
+          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-start gap-3 flex-1">
+              <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-sm text-destructive">Delete Account</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Permanently remove your account and all associated listings and data. This cannot be undone.</p>
+              </div>
             </div>
-            <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/5 shrink-0" onClick={() => setShowDeleteAccount(true)}>
-              <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Delete Account
+            <Button
+              variant="destructive"
+              size="sm"
+              className="shrink-0 min-h-[44px] sm:min-h-0"
+              onClick={() => setDeleteStep(1)}
+            >
+              <AlertTriangle className="w-3.5 h-3.5 mr-1.5" /> Request Deletion
             </Button>
           </div>
         )}
       </div>
 
-      {/* Delete Account Confirmation */}
-      {showDeleteAccount && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-card rounded-xl border p-6 max-w-sm w-full shadow-xl">
-            <AlertTriangle className="w-8 h-8 text-destructive mx-auto mb-3" />
-            <p className="font-semibold text-center mb-1">Delete your account?</p>
-            <p className="text-sm text-muted-foreground text-center mb-5">This will send a deletion request to our team. Your account and all data will be permanently removed within 7 days.</p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" size="sm" onClick={() => setShowDeleteAccount(false)}>Cancel</Button>
-              <Button variant="destructive" size="sm" onClick={handleDeleteAccountRequest} disabled={sendingDelete}>
-                {sendingDelete && <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />}
-                Confirm & Request Deletion
+      {/* Delete Account — Step 1: Warning */}
+      {deleteStep === 1 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card rounded-xl border shadow-2xl w-full max-w-sm">
+            <div className="p-6 border-b text-center">
+              <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-7 h-7 text-destructive" />
+              </div>
+              <h2 className="font-bold text-lg">Before you continue</h2>
+              <p className="text-sm text-muted-foreground mt-2">Deleting your account will permanently remove:</p>
+            </div>
+            <ul className="px-6 py-4 space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2"><span className="text-destructive font-bold">✕</span> Your profile and login access</li>
+              <li className="flex items-center gap-2"><span className="text-destructive font-bold">✕</span> All your claimed listings</li>
+              <li className="flex items-center gap-2"><span className="text-destructive font-bold">✕</span> All notices and engagement data</li>
+            </ul>
+            <div className="p-5 flex gap-3">
+              <Button variant="outline" className="flex-1 min-h-[44px]" onClick={() => setDeleteStep(0)}>Cancel</Button>
+              <Button variant="destructive" className="flex-1 min-h-[44px]" onClick={() => setDeleteStep(2)}>I understand, continue</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account — Step 2: Final Confirm */}
+      {deleteStep === 2 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card rounded-xl border shadow-2xl w-full max-w-sm">
+            <div className="p-6 text-center">
+              <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-7 h-7 text-destructive" />
+              </div>
+              <h2 className="font-bold text-lg">Final confirmation</h2>
+              <p className="text-sm text-muted-foreground mt-2 mb-1">You are about to submit a deletion request for:</p>
+              <p className="font-semibold text-sm">{user?.full_name || user?.email}</p>
+              <p className="text-xs text-muted-foreground mt-1">Our team will process it within 7 days.</p>
+            </div>
+            <div className="p-5 flex gap-3">
+              <Button variant="outline" className="flex-1 min-h-[44px]" onClick={() => setDeleteStep(0)}>Cancel</Button>
+              <Button variant="destructive" className="flex-1 min-h-[44px]" onClick={handleDeleteAccountRequest} disabled={sendingDelete}>
+                {sendingDelete ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm & Delete"}
               </Button>
             </div>
           </div>

@@ -28,13 +28,17 @@ export default function NoticeForm({ notice, listingId, ownerEmail, onClose, onS
     e.preventDefault();
     setSaving(true);
     const data = { ...form, listing_id: listingId, listing_owner_email: ownerEmail };
+    // Optimistic: close immediately with local data
+    const optimisticRecord = isNew
+      ? { ...data, id: `temp-${Date.now()}` }
+      : { ...notice, ...data };
+    onSave(optimisticRecord, isNew);
     if (isNew) {
       await base44.entities.ListingNotice.create(data);
     } else {
       await base44.entities.ListingNotice.update(notice.id, data);
     }
     setSaving(false);
-    onSave();
   };
 
   return (
