@@ -15,7 +15,8 @@ function nextWeeklyDates(weekday, count = 4) {
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
-  const user = await base44.auth.me();
+  let user = null;
+  try { user = await base44.auth.me(); } catch (_) {}
   if (!user || user.role !== 'admin') {
     return Response.json({ error: 'Admin access required' }, { status: 403 });
   }
@@ -73,6 +74,7 @@ For each event, return:
 
     const original = toProcess[p.index];
     if (!original) continue;
+    if (!original.nearest_town && !original.town && !original.area) continue;
 
     const dates = nextWeeklyDates(dayIndex, 4);
     for (const date of dates) {
@@ -82,7 +84,7 @@ For each event, return:
         category: Array.isArray(original.category) ? original.category : (original.category ? [original.category] : ['Community Event']),
         subcategory_group: Array.isArray(original.subcategory_group) ? original.subcategory_group : (original.subcategory_group ? [original.subcategory_group] : []),
         county: original.county,
-        nearest_town: original.nearest_town || original.town || original.area || '',
+        nearest_town: original.nearest_town || original.town || original.area,
         town: original.town,
         area: original.area || '',
         country: 'Ireland',

@@ -16,7 +16,8 @@ const DAY_NAMES = ['sunday','monday','tuesday','wednesday','thursday','friday','
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
-  const user = await base44.auth.me();
+  let user = null;
+  try { user = await base44.auth.me(); } catch (_) {}
   if (!user || user.role !== 'admin') {
     return Response.json({ error: 'Admin access required' }, { status: 403 });
   }
@@ -91,6 +92,7 @@ Return as a JSON array of event objects.`;
       type: "What's On",
       category: e.category ? [e.category] : ['Community Event'],
       county: e.county,
+      nearest_town: e.town,
       town: e.town,
       country: 'Ireland',
       description: e.description || '',
