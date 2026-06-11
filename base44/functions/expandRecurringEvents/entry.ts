@@ -79,8 +79,10 @@ For each event, return:
       toCreate.push({
         name: original.name,
         type: "What's On",
-        category: original.category || 'Community Event',
+        category: Array.isArray(original.category) ? original.category : (original.category ? [original.category] : ['Community Event']),
+        subcategory_group: Array.isArray(original.subcategory_group) ? original.subcategory_group : (original.subcategory_group ? [original.subcategory_group] : []),
         county: original.county,
+        nearest_town: original.nearest_town || original.town || original.area || '',
         town: original.town,
         area: original.area || '',
         country: 'Ireland',

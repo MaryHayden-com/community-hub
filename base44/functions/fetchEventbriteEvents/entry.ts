@@ -82,12 +82,14 @@ Deno.serve(async (req) => {
       l.county.toLowerCase() === (e.county || '').toLowerCase()
     ) || IRELAND_LOCATIONS[0];
 
+    const resolvedTown = e.town || loc.town;
     toCreate.push({
       name: e.name,
       type: "What's On",
       category: ['Community Event'],
       county: e.county || loc.county,
-      town: e.town || loc.town,
+      nearest_town: resolvedTown,
+      town: resolvedTown,
       country: 'Ireland',
       description: e.description || '',
       address: e.address || '',
