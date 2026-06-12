@@ -13,29 +13,39 @@ function nextWeeklyDates(weekday, count = 4) {
   return dates;
 }
 
+function toArray(v) {
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === 'string' && v.trim()) return [v.trim()];
+  return [];
+}
+
 Deno.serve(async (req) => {
-  const base44 = createClientFromRequest(req);
-  let user = null;
-  try { user = await base44.auth.me(); } catch (_) {}
-  if (!user || user.role !== 'admin') {
-    return Response.json({ error: 'Admin access required' }, { status: 403 });
-  }
+  try {
+    const base44 = createClientFromRequest(req);
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
-  // Get all What's On listings that have meeting_info but no event_date
-  const all = await base44.asServiceRole.entities.CommunityListing.list('-created_date', 2000);
-  const toProcess = all.filter(l =>
-    l.type === "What's On" &&
-    l.meeting_info &&
-    !l.event_date
-  );
+    // Get all What's On listings that have meeting_info but no event_date
+    const all = await base44.asServiceRole.entities.CommunityListing.list('-created_date', 2000);
+    const toProcess = all.filter(l =>
+      l.type === "What's On" &&
+      l.meeting_info &&
+      !l.meeting_info.includes('[expanded]') &&
+      !l.event_date
+    );
 
-  if (toProcess.length === 0) {
-    return Response.json({ processed: 0, created: 0, message: 'No recurring events to expand.' });
-  }
+    console.log(`Found ${toProcess.length} recurring events to process`);
 
-  // Use LLM to parse recurrence from meeting_info
-  const parseResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
-    prompt: `For each of the following events, parse the meeting_info to determine if it's a weekly recurring event and extract the day of week and time.
+    if (toProcess.length === 0) {
+      return Response.json({ processed: 0, created: 0, message: 'No recurring events to expand.' });
+    }
+
+    // Use LLM to parse recurrence from meeting_info
+    const parseResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
+      prompt: `For each of the following events, parse the meeting_info to determine if it's a weekly recurring event and extract the day of week and time.
 
 Events:
 ${toProcess.map((l, i) => `${i}. Name: "${l.name}" | meeting_info: "${l.meeting_info}"`).join('\n')}
@@ -45,47 +55,62 @@ For each event, return:
 - is_weekly: true if it recurs weekly
 - day_of_week: English weekday name (e.g. "thursday") if weekly
 - time: time string if found (e.g. "9:00pm")`,
-    response_json_schema: {
-      type: 'object',
-      properties: {
-        events: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              index: { type: 'number' },
-              is_weekly: { type: 'boolean' },
-              day_of_week: { type: 'string' },
-              time: { type: 'string' }
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          events: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                index: { type: 'number' },
+                is_weekly: { type: 'boolean' },
+                day_of_week: { type: 'string' },
+                time: { type: 'string' }
+              }
             }
           }
         }
       }
-    }
-  });
+    });
 
-  const parsed = parseResult?.events || [];
-  const toCreate = [];
+    const parsed = parseResult?.events || [];
+    console.log(`LLM parsed ${parsed.length} events`);
 
-  for (const p of parsed) {
-    if (!p.is_weekly || !p.day_of_week) continue;
-    const dayIndex = DAY_NAMES.indexOf(p.day_of_week.toLowerCase());
-    if (dayIndex === -1) continue;
+    let created = 0;
+    let processed = 0;
 
-    const original = toProcess[p.index];
-    if (!original) continue;
-    if (!original.nearest_town && !original.town && !original.area) continue;
+    for (const p of parsed) {
+      if (!p.is_weekly || !p.day_of_week) continue;
+      const dayIndex = DAY_NAMES.indexOf(p.day_of_week.toLowerCase());
+      if (dayIndex === -1) continue;
 
-    const dates = nextWeeklyDates(dayIndex, 4);
-    for (const date of dates) {
-      toCreate.push({
+      const original = toProcess[p.index];
+      if (!original) continue;
+
+      const resolvedNearestTown = (original.nearest_town && original.nearest_town.trim())
+        || original.town
+        || original.area
+        || original.county;
+
+      if (!resolvedNearestTown) {
+        console.log(`Skipping "${original.name}" — no town/area found`);
+        continue;
+      }
+
+      const category = toArray(original.category);
+      const subcategory_group = toArray(original.subcategory_group);
+
+      const dates = nextWeeklyDates(dayIndex, 4);
+      const toCreate = dates.map(date => ({
         name: original.name,
         type: "What's On",
-        category: Array.isArray(original.category) ? original.category : (original.category ? [original.category] : ['Community Event']),
-        subcategory_group: Array.isArray(original.subcategory_group) ? original.subcategory_group : (original.subcategory_group ? [original.subcategory_group] : []),
-        county: original.county,
-        nearest_town: original.nearest_town || original.town || original.area,
-        town: original.town,
+        status: 'approved',
+        category: category.length > 0 ? category : ['Community Event'],
+        subcategory_group,
+        county: original.county || '',
+        nearest_town: resolvedNearestTown,
+        town: original.town || resolvedNearestTown,
         area: original.area || '',
         country: 'Ireland',
         description: original.description || '',
@@ -100,22 +125,31 @@ For each event, return:
         event_time: p.time || original.event_time || '',
         is_featured: original.is_featured || false,
         image_url: original.image_url || '',
-      });
+      }));
+
+      try {
+        await base44.asServiceRole.entities.CommunityListing.bulkCreate(toCreate);
+        created += toCreate.length;
+        processed++;
+
+        // Mark original as expanded
+        await base44.asServiceRole.entities.CommunityListing.update(original.id, {
+          meeting_info: original.meeting_info + ' [expanded]'
+        });
+      } catch (err) {
+        console.error(`Failed to create entries for "${original.name}":`, err.message);
+      }
     }
 
-    // Mark original as processed by setting a note in meeting_info
-    await base44.asServiceRole.entities.CommunityListing.update(original.id, {
-      meeting_info: original.meeting_info + ' [expanded]'
+    console.log(`Done: processed=${processed}, created=${created}`);
+    return Response.json({
+      processed,
+      created,
+      message: `Expanded ${processed} recurring events into ${created} dated entries.`
     });
-  }
 
-  if (toCreate.length > 0) {
-    await base44.asServiceRole.entities.CommunityListing.bulkCreate(toCreate);
+  } catch (error) {
+    console.error('expandRecurringEvents error:', error.message, error.data || '');
+    return Response.json({ error: error.message }, { status: 500 });
   }
-
-  return Response.json({
-    processed: parsed.filter(p => p.is_weekly).length,
-    created: toCreate.length,
-    message: `Expanded ${parsed.filter(p => p.is_weekly).length} recurring events into ${toCreate.length} dated entries.`
-  });
 });
