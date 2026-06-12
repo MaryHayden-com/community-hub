@@ -17,6 +17,7 @@ import AdminListingForm from "../components/AdminListingForm";
 import BulkEditBar from "../components/BulkEditBar";
 import AdminWhatsOnTab from "../components/AdminWhatsOnTab";
 import AdminSurveyResults from "../components/AdminSurveyResults";
+import AdminEngagementReport from "../components/AdminEngagementReport";
 import AdminPendingTab from "../components/AdminPendingTab";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -389,6 +390,7 @@ export default function Admin() {
           { key: "claims", label: "Claim Requests", icon: <Inbox className="w-4 h-4" />, badge: pendingClaimsCount, badgeColor: "bg-primary text-primary-foreground" },
           { key: "stream", label: "Action Stream", icon: <Zap className="w-4 h-4" /> },
           { key: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
+          { key: "engagement", label: "📈 Engagement" },
           { key: "analytics", label: "📊 Analytics" },
           { key: "survey", label: "📋 Survey Results" },
         ].map(({ key, label, icon, badge, badgeColor }) => (
@@ -442,6 +444,7 @@ export default function Admin() {
                 { key: "claims", label: "Claim Requests", badge: pendingClaimsCount },
                 { key: "stream", label: "Action Stream" },
                 { key: "users", label: "Users" },
+                { key: "engagement", label: "Engagement" },
                 { key: "analytics", label: "Analytics" },
                 { key: "survey", label: "Survey Results" },
               ].map(({ key, label, badge }) => (
@@ -495,6 +498,7 @@ export default function Admin() {
           fetchingWhatsOn={fetchingWhatsOn}
         />
       )}
+      {activeTab === "engagement" && <AdminEngagementReport listings={listings} />}
       {activeTab === "analytics" && <AdminAnalytics listings={listings} />}
       {activeTab === "survey" && <AdminSurveyResults />}
       {activeTab === "claims" && <AdminClaimRequests />}
