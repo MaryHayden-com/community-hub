@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, CheckCircle2, CalendarPlus, Clock } from "lucide-react";
+import { Loader2, CheckCircle2, CalendarPlus, Clock, Crown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const COUNTIES = [
   "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down","Dublin",
@@ -22,7 +23,7 @@ const EMPTY = {
   contact_name: "", email: "", phone: "",
 };
 
-export default function SubmitEventForm({ open, onClose }) {
+export default function SubmitEventForm({ open, onClose, isPaidUser = false }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -67,7 +68,22 @@ export default function SubmitEventForm({ open, onClose }) {
           </DialogTitle>
         </DialogHeader>
 
-        {done ? (
+        {!isPaidUser ? (
+          <div className="py-8 text-center space-y-4">
+            <Crown className="w-12 h-12 text-amber-500 mx-auto" />
+            <h3 className="text-lg font-semibold">Standard or Premium Plan Required</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Adding What's On events is available to paid listing holders.<br />
+              Upgrade your listing to Standard (€49/yr) or Premium (€99/yr) to start posting events.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Link to="/billing" onClick={onClose}>
+                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white">View Plans & Upgrade</Button>
+              </Link>
+              <Button variant="outline" className="w-full" onClick={onClose}>Cancel</Button>
+            </div>
+          </div>
+        ) : done ? (
           <div className="py-8 text-center space-y-4">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: "#097275" }}>
               <Clock className="w-8 h-8 text-white" />
@@ -181,8 +197,8 @@ export default function SubmitEventForm({ open, onClose }) {
               </Button>
             </div>
           </form>
-        )}
-      </DialogContent>
+          )}
+          </DialogContent>
     </Dialog>
   );
 }

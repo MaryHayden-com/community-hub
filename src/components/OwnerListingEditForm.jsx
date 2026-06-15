@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Wand2 } from "lucide-react";
+import { Loader2, Wand2, Crown, Lock } from "lucide-react";
 
 export default function OwnerListingEditForm({ listing, onClose, onSave }) {
+  const isPaid = (listing?.plan === "standard" || listing?.plan === "premium") && listing?.plan_status === "active";
   const [form, setForm] = useState({
     name: listing?.name || "",
     description: listing?.description || "",
@@ -77,6 +79,19 @@ export default function OwnerListingEditForm({ listing, onClose, onSave }) {
             <Input value={form.name} onChange={(e) => update("name", e.target.value)} />
           </div>
 
+          {!isPaid && (
+            <div className="border-2 border-dashed border-amber-200 bg-amber-50/60 rounded-xl p-5 text-center">
+              <Lock className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+              <p className="font-semibold text-amber-900 text-sm">Standard or Premium plan required</p>
+              <p className="text-xs text-amber-700 mt-1 mb-3">Upgrade to edit your full listing details — description, contact info, social links, images and more.</p>
+              <Link to="/billing">
+                <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white">Upgrade Now</Button>
+              </Link>
+            </div>
+          )}
+
+          {isPaid && (
+          <>
           <div>
             <Label>Description</Label>
             <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} />
@@ -172,6 +187,18 @@ export default function OwnerListingEditForm({ listing, onClose, onSave }) {
               Save Changes
             </Button>
           </div>
+          </>
+          )}
+
+          {!isPaid && (
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
+                Save Name
+              </Button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

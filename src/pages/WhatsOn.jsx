@@ -108,6 +108,7 @@ export default function WhatsOn() {
   const [filterTown, setFilterTown] = useState("");
   const [user, setUser] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [userIsPaid, setUserIsPaid] = useState(false);
 
   // List view state
   const [dateFrom, setDateFrom] = useState(TODAY_STR);
@@ -120,7 +121,17 @@ export default function WhatsOn() {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(u => {
+      setUser(u);
+      if (u?.email) {
+        base44.entities.CommunityListing.filter({ owner_email: u.email }).then(ownedListings => {
+          const hasPaidActive = ownedListings.some(
+            l => (l.plan === "standard" || l.plan === "premium") && l.plan_status === "active"
+          );
+          setUserIsPaid(u.role === "admin" || hasPaidActive);
+        }).catch(() => {});
+      }
+    }).catch(() => {});
     base44.entities.CommunityListing.filter({ status: "approved" }, "-created_date", 2000)
       .then(data => setListings(data.filter(l => l.type === "What's On")))
       .finally(() => setLoading(false));
@@ -208,11 +219,9 @@ export default function WhatsOn() {
     : `All events in ${format(currentMonth, "MMMM yyyy")}`;
 
   // ── Render ─────────────────────────────────────────────────────────────────
-  const isPaidUser = user && (user.role === "listing_owner" || user.role === "admin" || user.role === "group_admin");
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
+      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} isPaidUser={userIsPaid} />
 
       {/* Header + view toggle */}
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">

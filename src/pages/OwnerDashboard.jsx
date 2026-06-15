@@ -127,7 +127,10 @@ export default function OwnerDashboard() {
 
   const countFor = (key) => engagement.filter((e) => e.event_type === key).length;
 
-  const isPremium = selectedListing?.plan === "premium";
+  const plan = selectedListing?.plan || "basic";
+  const planActive = selectedListing?.plan_status === "active";
+  const isPaid = (plan === "standard" || plan === "premium") && planActive;
+  const isPremium = plan === "premium" && planActive;
 
   if (loading) {
     return (
@@ -228,7 +231,7 @@ export default function OwnerDashboard() {
                 <p className="font-semibold text-amber-900">Premium Feature</p>
                 <p className="text-sm text-amber-700 mt-1 mb-4">Upgrade to Premium to see how many people viewed your profile, clicked your phone number, visited your website and more.</p>
                 <Link to="/billing">
-                  <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white">Upgrade to Premium</Button>
+                  <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white">Upgrade to Premium — €99/yr</Button>
                 </Link>
               </div>
             ) : (
@@ -240,30 +243,31 @@ export default function OwnerDashboard() {
             )}
           </div>
 
-          {/* Notice Board — Premium only */}
+          {/* Notice Board — Standard & Premium */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Notice Board</h2>
-              {isPremium && (
+              {isPaid && (
                 <Button size="sm" onClick={() => setEditingNotice({})}>
                   <Plus className="w-4 h-4 mr-1" /> Add Notice
                 </Button>
               )}
             </div>
 
-            {!isPremium ? (
-              <div className="border-2 border-dashed border-amber-200 bg-amber-50/50 rounded-xl p-8 text-center">
-                <Crown className="w-8 h-8 text-amber-500 mx-auto mb-3" />
-                <p className="font-semibold text-amber-900">Premium Feature</p>
-                <p className="text-sm text-amber-700 mt-1 mb-4">Upgrade to Premium to post notices — volunteers wanted, jobs, announcements — directly on your listing page.</p>
+            {!isPaid ? (
+              <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-xl p-8 text-center">
+                <Crown className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+                <p className="font-semibold text-blue-900">Standard or Premium Feature</p>
+                <p className="text-sm text-blue-700 mt-1 mb-4">Upgrade to post notices — volunteers wanted, jobs, announcements — directly on your listing page.</p>
                 <Link to="/billing">
-                  <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white">Upgrade to Premium</Button>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">Upgrade from €49/yr</Button>
                 </Link>
               </div>
             ) : notices.length === 0 ? (
               <div className="border border-dashed rounded-xl p-8 text-center text-muted-foreground">
                 <p className="text-sm">No notices yet. Add your first notice to engage with your community.</p>
               </div>
+
             ) : (
               <div className="space-y-3">
                 {notices.map((notice) => (
@@ -284,7 +288,7 @@ export default function OwnerDashboard() {
                       <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{notice.body}</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingNotice(notice)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => isPaid && setEditingNotice(notice)}>
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeletingNoticeId(notice.id)}>
