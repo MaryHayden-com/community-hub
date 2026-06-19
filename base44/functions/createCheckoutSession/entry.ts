@@ -14,7 +14,7 @@ const PLANS = {
   },
   // Legacy plans (keep for existing subscribers)
   standard: {
-    price_id: 'price_1TMcSjD3Hb4wOTs9FfJ3vMhF',
+    price_id: 'price_1TjyQvL1Hdd45gUuZViwfxuc',
     name: 'Standard Plan',
   },
   premium: {
