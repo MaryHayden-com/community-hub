@@ -48,6 +48,9 @@ export default function Billing() {
       const res = await base44.functions.invoke("createCheckoutSession", {
         plan,
         listing_id: listing.id,
+        listing_name: listing.name,
+        contact_name: user?.full_name || "",
+        email: user?.email,
         success_url: window.location.href + "?success=1",
         cancel_url: window.location.href,
       });
