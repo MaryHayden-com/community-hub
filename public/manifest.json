@@ -1,0 +1,44 @@
+{
+  "name": "Bandon Community Hub",
+  "short_name": "Community Hub",
+  "description": "The free local directory for Bandon and West Cork. Find businesses, clubs, schools, community services and upcoming events.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#097275",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-IE",
+  "categories": ["local", "community", "directory"],
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/3ff0369c9_MH.PNG",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/3ff0369c9_MH.PNG",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "What's On",
+      "short_name": "Events",
+      "description": "Browse local events",
+      "url": "/whats-on",
+      "icons": [{ "src": "https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/3ff0369c9_MH.PNG", "sizes": "96x96" }]
+    },
+    {
+      "name": "Directory",
+      "short_name": "Directory",
+      "description": "Browse local businesses and clubs",
+      "url": "/directory",
+      "icons": [{ "src": "https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/3ff0369c9_MH.PNG", "sizes": "96x96" }]
+    }
+  ]
+}
