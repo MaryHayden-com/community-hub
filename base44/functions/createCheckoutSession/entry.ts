@@ -18,7 +18,7 @@ const PLANS = {
     name: 'Standard Plan',
   },
   premium: {
-    price_id: 'price_1TMcSjD3Hb4wOTs9oil05nJm',
+    price_id: 'price_1TjyRFL1Hdd45gUuG9zW9Lf0',
     name: 'Premium Plan',
   },
 };
