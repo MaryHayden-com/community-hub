@@ -82,10 +82,10 @@ export default function Layout() {
               </button>
             ) : null}
             <Link to="/" className="flex items-center gap-2.5">
-              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/960f0b76a_generated_image.png" alt="Local Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
+              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/216301887_generated_image.png" alt="Hub for Community Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
               <span className="font-display font-bold tracking-tight uppercase text-base sm:text-xl" style={{ color: '#097275' }}>
-                <span className="sm:hidden">Local Community</span>
-                <span className="hidden sm:inline">Local Community Hub</span>
+                <span className="sm:hidden">Hub for Community</span>
+                <span className="hidden sm:inline">Hub for Community</span>
               </span>
             </Link>
           </div>
@@ -202,7 +202,7 @@ export default function Layout() {
             <NewsletterSignup source="footer" />
           </div>
           <div className="text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Local Community Hub. Connecting communities across Ireland.</p>
+            <p>© {new Date().getFullYear()} Hub for Community. Connecting communities across Ireland.</p>
             <p className="mt-2">
               <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
               {" · "}
