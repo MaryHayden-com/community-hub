@@ -238,7 +238,7 @@ export default function Directory() {
       if (dateTo && key > dateTo) return false;
       return true;
     });
-  }, [listings, search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, JSON.stringify(nearbyCounties)]);
+  }, [listings, search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, JSON.stringify(nearbyCounties), dateFrom, dateTo]);
 
   const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = pagedItems.length < filtered.length;
