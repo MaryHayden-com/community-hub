@@ -218,9 +218,10 @@ export default function Directory() {
         }
       } else if (l.is_recurring) {
         const nextDate = getNextOccurrence(l);
-        expanded.push({ listing: l, date: null, sortKey: nextDate });
+        expanded.push({ listing: l, date: new Date(nextDate + "T12:00:00"), sortKey: nextDate });
       } else {
-        expanded.push({ listing: l, date: null, sortKey: l.event_date || "9999" });
+        const sk = l.event_date || "9999";
+        expanded.push({ listing: l, date: sk !== "9999" ? new Date(sk + "T12:00:00") : null, sortKey: sk });
       }
     });
 
@@ -338,13 +339,21 @@ export default function Directory() {
         </div>
       ) : type === "What's On" ? (
         <div className="flex flex-col gap-3 mt-6">
-          {pagedItems.map((entry, i) => (
-            <WhatsOnEventRow
-              key={entry.listing.id + (entry.sortKey || i)}
-              listing={entry.listing}
-              overrideDate={entry.date}
-            />
-          ))}
+          {pagedItems.map((entry, i) => {
+            const prevKey = i > 0 ? pagedItems[i - 1].sortKey : null;
+            const showSep = entry.sortKey !== "9999" && entry.sortKey !== prevKey;
+            const sepDate = showSep ? new Date(entry.sortKey + "T12:00:00") : null;
+            return (
+              <div key={entry.listing.id + (entry.sortKey || i)}>
+                {showSep && sepDate && (
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-2 mb-1 pl-1">
+                    {sepDate.toLocaleDateString("en-IE", { weekday: "long", day: "numeric", month: "long" })}
+                  </p>
+                )}
+                <WhatsOnEventRow listing={entry.listing} overrideDate={entry.date} />
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col gap-2 mt-6">
