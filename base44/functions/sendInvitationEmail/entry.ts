@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
       if (listing) listingsToInvite = [listing];
     } else if (test_email) {
       listingsToInvite = [{
-        id: 'test',
+        id: '69db8b146dfd6d26f1d45a63',
         name: 'Mary Hayden Business Consulting',
         contact_name: 'Mary Hayden',
         owner_email: test_email,
