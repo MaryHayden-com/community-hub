@@ -53,9 +53,16 @@ export default function Directory() {
     setTown(params.get("town") || localStorage.getItem("dir_town") || "");
   }, [location.search]);
 
-  const loadListings = useCallback(() => {
-    return base44.entities.CommunityListing.list("-created_date", 1000)
-      .then(setListings);
+  const loadListings = useCallback(async () => {
+    const BATCH = 200;
+    let all = [], skip = 0, hasMore = true;
+    while (hasMore) {
+      const batch = await base44.entities.CommunityListing.list("-created_date", BATCH, skip);
+      all = all.concat(batch);
+      hasMore = batch.length === BATCH;
+      skip += BATCH;
+    }
+    setListings(all);
   }, []);
 
   useEffect(() => {
