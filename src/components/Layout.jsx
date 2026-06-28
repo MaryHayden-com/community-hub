@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
@@ -31,13 +31,9 @@ const BOTTOM_TABS = [
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const mainRef = useRef(null);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-  }, []);
 
   useEffect(() => {
     setMobileOpen(false);

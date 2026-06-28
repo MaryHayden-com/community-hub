@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import {
   ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle
 } from "lucide-react";
@@ -17,7 +18,7 @@ import {
 } from "date-fns";
 
 const DAYS_HEADER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const TODAY_STR = new Date().toISOString().slice(0, 10);
+const getTodayStr = () => new Date().toISOString().slice(0, 10);
 const DAY_MAP = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
 
 // Returns date strings a listing appears on within [rangeStart, rangeEnd] (for calendar grid)
@@ -65,6 +66,7 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function WhatsOn() {
   const location = useLocation();
+  const { user } = useAuth();
   const { data: listings = [], isLoading: loading, isError: loadError } = useQuery({
     queryKey: ["whatsOn"],
     queryFn: async () => {
@@ -83,14 +85,13 @@ export default function WhatsOn() {
   const [viewMode, setViewMode] = useState("calendar"); // "list" | "calendar"
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
-  const [user, setUser] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [userIsPaid, setUserIsPaid] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [ownerListing, setOwnerListing] = useState(null);
 
   // List view state
-  const [dateFrom, setDateFrom] = useState(TODAY_STR);
+  const [dateFrom, setDateFrom] = useState(getTodayStr);
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 30;
@@ -101,20 +102,18 @@ export default function WhatsOn() {
   const panelTodayRef = useRef(null);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
-      setUser(u);
-      if (u?.role === "admin") setIsAdmin(true);
-      if (u?.email) {
-        base44.entities.CommunityListing.filter({ owner_email: u.email }).then(ownedListings => {
-          const paidListing = ownedListings.find(
-            l => (l.plan === "standard" || l.plan === "premium") && l.plan_status === "active"
-          );
-          setUserIsPaid(u.role === "admin" || !!paidListing);
-          if (paidListing) setOwnerListing(paidListing);
-        }).catch(() => {});
-      }
-    }).catch(() => {});
-  }, []);
+    if (!user) return;
+    if (user.role === "admin") setIsAdmin(true);
+    if (user.email) {
+      base44.entities.CommunityListing.filter({ owner_email: user.email }).then(ownedListings => {
+        const paidListing = ownedListings.find(
+          l => (l.plan === "standard" || l.plan === "premium") && l.plan_status === "active"
+        );
+        setUserIsPaid(user.role === "admin" || !!paidListing);
+        if (paidListing) setOwnerListing(paidListing);
+      }).catch(() => {});
+    }
+  }, [user]);
 
   // Reset page when filters change
   useEffect(() => { setPage(1); }, [filterCounty, filterTown, dateFrom, dateTo]);
@@ -165,7 +164,7 @@ export default function WhatsOn() {
     Object.entries(eventMap).forEach(([dk, evts]) => evts.forEach(l => results.push({ listing: l, dateKey: dk })));
     results.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
     // When showing the full month, only show from today onwards
-    return results.filter(({ dateKey }) => dateKey >= TODAY_STR);
+    return results.filter(({ dateKey }) => dateKey >= getTodayStr());
   }, [eventMap, selectedDate, selectedDateKey]);
 
   const panelTitle = selectedDate
@@ -236,14 +235,14 @@ export default function WhatsOn() {
             <input
               type="date"
               value={dateFrom}
-              min={TODAY_STR}
+              min={getTodayStr()}
               onChange={e => setDateFrom(e.target.value)}
               className="h-9 rounded-md border border-input bg-card px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
             <input
               type="date"
               value={dateTo}
-              min={dateFrom || TODAY_STR}
+              min={dateFrom || getTodayStr()}
               onChange={e => setDateTo(e.target.value)}
               placeholder="To date"
               className="h-9 rounded-md border border-input bg-card px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -390,7 +389,7 @@ export default function WhatsOn() {
                   const dateObj = parseISO(dateKey + "T12:00:00");
                   const prevKey = i > 0 ? calendarPanelItems[i - 1].dateKey : null;
                   const showSep = !selectedDate && dateKey !== prevKey;
-                  const isFirstToday = !selectedDate && i === 0 && dateKey >= TODAY_STR;
+                  const isFirstToday = !selectedDate && i === 0 && dateKey >= getTodayStr();
                   return (
                     <div key={listing.id + dateKey} ref={isFirstToday ? panelTodayRef : null}>
                       {showSep && (
