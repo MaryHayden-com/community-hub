@@ -180,7 +180,7 @@ export default function Directory() {
       if (!search && type && l.type !== type) return false;
       if (!search && subcategoryGroup && subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
       if (!search && category && category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
-      if (nearbyCounties) {
+      if (!search && nearbyCounties) {
         // Filter by actual listing coordinates vs user GPS location
         const townCoords = TOWN_COORDINATES[l.town] || TOWN_COORDINATES[l.area];
         const countyCoords = COUNTY_CENTROIDS.find(c => c.county === l.county);
@@ -193,15 +193,25 @@ export default function Directory() {
       if (!search && town && l.town !== town) return false;
       if (search) {
         const s = search.toLowerCase();
-        return (
-          (l.name || "").toLowerCase().includes(s) ||
-          (l.description || "").toLowerCase().includes(s) ||
-          (Array.isArray(l.category) ? l.category.join(" ") : (l.category || "")).toLowerCase().includes(s) ||
-          (l.town || "").toLowerCase().includes(s) ||
-          (l.contact_name || "").toLowerCase().includes(s) ||
-          (l.email || "").toLowerCase().includes(s) ||
-          (l.county || "").toLowerCase().includes(s)
-        );
+        const searchableText = [
+          l.name,
+          l.description,
+          l.contact_name,
+          l.email,
+          l.phone,
+          l.town,
+          l.nearest_town,
+          l.county,
+          l.area,
+          l.address,
+          l.meeting_info,
+          l.type,
+          l.category_text,
+          Array.isArray(l.category) ? l.category.join(" ") : (l.category || ""),
+          Array.isArray(l.subcategory_group) ? l.subcategory_group.join(" ") : (l.subcategory_group || ""),
+          Array.isArray(l.subgroup) ? l.subgroup.join(" ") : (l.subgroup || ""),
+        ].filter(Boolean).join(" ").toLowerCase();
+        return searchableText.includes(s);
       }
       return true;
     });
