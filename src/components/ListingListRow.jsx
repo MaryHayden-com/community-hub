@@ -38,7 +38,7 @@ export default function ListingListRow({ listing }) {
       <div className="flex-1 min-w-0">
         {/* Line 1: Name */}
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm truncate" style={{ color: '#097275' }}>{listing.name}</span>
+          <span className="font-bold text-base sm:text-lg truncate leading-tight" style={{ color: '#097275' }}>{listing.name}</span>
           {listing.is_featured && <Star className="w-3.5 h-3.5 text-accent fill-accent shrink-0" />}
         </div>
         {/* Badges row — shared data */}
