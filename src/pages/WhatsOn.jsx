@@ -163,12 +163,13 @@ export default function WhatsOn() {
     const results = [];
     Object.entries(eventMap).forEach(([dk, evts]) => evts.forEach(l => results.push({ listing: l, dateKey: dk })));
     results.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
-    return results;
+    // When showing the full month, only show from today onwards
+    return results.filter(({ dateKey }) => dateKey >= TODAY_STR);
   }, [eventMap, selectedDate, selectedDateKey]);
 
   const panelTitle = selectedDate
     ? format(selectedDate, "EEEE, d MMMM yyyy")
-    : `All events in ${format(currentMonth, "MMMM yyyy")}`;
+    : `Events from today`;
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
