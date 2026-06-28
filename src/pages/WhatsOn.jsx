@@ -76,6 +76,7 @@ export default function WhatsOn() {
   const [user, setUser] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [userIsPaid, setUserIsPaid] = useState(false);
+  const [ownerListing, setOwnerListing] = useState(null);
 
   // List view state
   const [dateFrom, setDateFrom] = useState(TODAY_STR);
@@ -92,10 +93,11 @@ export default function WhatsOn() {
       setUser(u);
       if (u?.email) {
         base44.entities.CommunityListing.filter({ owner_email: u.email }).then(ownedListings => {
-          const hasPaidActive = ownedListings.some(
+          const paidListing = ownedListings.find(
             l => (l.plan === "standard" || l.plan === "premium") && l.plan_status === "active"
           );
-          setUserIsPaid(u.role === "admin" || hasPaidActive);
+          setUserIsPaid(u.role === "admin" || !!paidListing);
+          if (paidListing) setOwnerListing(paidListing);
         }).catch(() => {});
       }
     }).catch(() => {});
@@ -171,7 +173,7 @@ export default function WhatsOn() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} isPaidUser={userIsPaid} />
+      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} isPaidUser={userIsPaid} ownerListing={ownerListing} />
 
       {/* Header + view toggle */}
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">

@@ -23,7 +23,7 @@ const EMPTY = {
   contact_name: "", email: "", phone: "",
 };
 
-export default function SubmitEventForm({ open, onClose, isPaidUser = false }) {
+export default function SubmitEventForm({ open, onClose, isPaidUser = false, ownerListing = null }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -52,6 +52,7 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false }) {
       plan_status: "active",
       country: "Ireland",
       is_free: form.is_free === "true" ? true : form.is_free === "false" ? false : undefined,
+      ...(ownerListing?.id ? { parent_listing_id: ownerListing.id, owner_email: ownerListing.owner_email } : {}),
     };
     await base44.entities.CommunityListing.create(payload);
     setDone(true);
