@@ -16,7 +16,7 @@ export default function SubmitListingForm({ open, onClose }) {
   const [step, setStep] = useState(1); // 1 = details, 2 = plan, 3 = success
   const [form, setForm] = useState({
     name: "", type: "", county: "", town: "", description: "",
-    phone: "", email: "", website: "", contact_name: ""
+    phone: "", email: "", website: "", contact_name: "", category: []
   });
   const [plan, setPlan] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -25,7 +25,7 @@ export default function SubmitListingForm({ open, onClose }) {
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleClose = () => {
-    setForm({ name: "", type: "", county: "", town: "", description: "", phone: "", email: "", website: "", contact_name: "" });
+    setForm({ name: "", type: "", county: "", town: "", description: "", phone: "", email: "", website: "", contact_name: "", category: [] });
     setStep(1);
     setPlan(null);
     setSaving(false);
@@ -147,6 +147,18 @@ export default function SubmitListingForm({ open, onClose }) {
                 <Input value={form.town} onChange={(e) => update("town", e.target.value)} placeholder="e.g. Ballycastle" />
               </div>
             </div>
+
+            {form.type && (
+              <div>
+                <Label>Category / Categories</Label>
+                <CategoryPicker
+                  listingType={form.type}
+                  selected={form.category}
+                  onChange={v => update("category", v)}
+                  placeholder="Search or browse categories..."
+                />
+              </div>
+            )}
 
             <div>
               <Label>Description</Label>

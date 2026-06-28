@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CategoryPicker from "@/components/CategoryPicker";
-import { getGroupsForCategories, getAllCategories } from "@/utils/taxonomy";
+import { getGroupsForCategories } from "@/utils/taxonomy";
 import { IRELAND_COUNTIES, getTownsAndVillagesForCounty } from "@/utils/irelandData";
 import { getVillagesNearTown } from "@/utils/townVillageCoords";
 
@@ -228,11 +228,6 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     }, 800);
     return () => clearTimeout(timer);
   }, [form.website, form.facebook_url, form.instagram_url]);
-  const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
-
-  // All categories for the selected type (from taxonomy)
-  const categoryOptions = useMemo(() => getAllCategories(form.type), [form.type]);
-
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
@@ -325,11 +320,11 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
               <div>
                 <Label>Category / Categories</Label>
                 <CategoryPicker
-                  type={form.type}
+                  listingType={form.type}
                   selected={form.category}
-                  onChange={(cats) => {
-                    update("category", cats);
-                    update("subcategory_group", getGroupsForCategories(form.type, cats));
+                  onChange={(selectedCats) => {
+                    update("category", selectedCats);
+                    update("subcategory_group", getGroupsForCategories(form.type, selectedCats));
                   }}
                   placeholder="Search or browse categories..."
                 />
@@ -339,7 +334,7 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
                 <Input
                   value={form.category_text}
                   onChange={(e) => update("category_text", e.target.value)}
-                  placeholder="Enter custom category if not listed above..."
+                  placeholder="Enter a custom category if not listed above..."
                 />
               </div>
             </div>
