@@ -18,7 +18,7 @@ function buildEmailHtml({ name, firstName, claimUrl, appUrl }) {
           <tr>
             <td style="background-color:#097275;padding:32px 40px;text-align:center;">
               <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:bold;letter-spacing:0.5px;">Community Hub</h1>
-              <p style="color:#a8d8da;margin:6px 0 0 0;font-size:14px;">hub4community.ie</p>
+              <p style="color:#a8d8da;margin:6px 0 0 0;font-size:14px;">Community Hub – Bandon</p>
             </td>
           </tr>
 
@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
     }
 
     const { listing_id, test_email } = await req.json();
-    const appUrl = 'https://hub4community.ie';
+    const appUrl = 'https://69d7dcee3ce725bf49f16135.base44.app';
 
     let listingsToInvite = [];
 
