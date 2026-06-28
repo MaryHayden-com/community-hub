@@ -189,15 +189,18 @@ export default function Directory() {
         const dist = haversineKm(nearbyCounties.lat, nearbyCounties.lng, coords.lat, coords.lng);
         if (dist > nearbyCounties.km) return false;
       }
-      if (!nearbyCounties && county && l.county !== county) return false;
-      if (town && l.town !== town) return false;
+      if (!search && !nearbyCounties && county && l.county !== county) return false;
+      if (!search && town && l.town !== town) return false;
       if (search) {
         const s = search.toLowerCase();
         return (
           (l.name || "").toLowerCase().includes(s) ||
           (l.description || "").toLowerCase().includes(s) ||
           (Array.isArray(l.category) ? l.category.join(" ") : (l.category || "")).toLowerCase().includes(s) ||
-          (l.town || "").toLowerCase().includes(s)
+          (l.town || "").toLowerCase().includes(s) ||
+          (l.contact_name || "").toLowerCase().includes(s) ||
+          (l.email || "").toLowerCase().includes(s) ||
+          (l.county || "").toLowerCase().includes(s)
         );
       }
       return true;
