@@ -17,6 +17,7 @@ function buildEmailHtml({ name, firstName, claimUrl, appUrl }) {
           <!-- Header -->
           <tr>
             <td style="background-color:#097275;padding:32px 40px;text-align:center;">
+              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="64" height="64" style="border-radius:10px;display:block;margin:0 auto 14px auto;" />
               <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:bold;letter-spacing:0.5px;">Community Hub</h1>
               <p style="color:#a8d8da;margin:6px 0 0 0;font-size:14px;">Community Hub – Bandon</p>
             </td>
@@ -70,7 +71,8 @@ function buildEmailHtml({ name, firstName, claimUrl, appUrl }) {
 
               <p style="margin:0;font-size:15px;color:#555555;line-height:1.6;">
                 Best regards,<br>
-                <strong>The Community Hub Team</strong>
+                <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="36" height="36" style="border-radius:6px;vertical-align:middle;margin-right:8px;display:inline-block;" />
+                <strong style="vertical-align:middle;">The Community Hub Team</strong>
               </p>
             </td>
           </tr>
