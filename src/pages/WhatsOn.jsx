@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import {
   ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WhatsOnEventRow from "@/components/WhatsOnEventRow";
 import SubmitEventForm from "@/components/SubmitEventForm";
-import { getNextOccurrence, expandAndSortEvents } from "@/utils/recurringEvents";
+import { getNextOccurrence, expandAndSortEvents, toArr } from "@/utils/recurringEvents";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
   eachDayOfInterval, isSameDay, isSameMonth, isToday,
@@ -26,11 +27,9 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
   const dates = [];
 
   if (!listing.is_recurring && listing.event_date) {
-    const d = listing.event_date.slice(0, 10);
-    const end = (listing.event_date_end || d).slice(0, 10);
-    let cur = new Date(d + "T12:00:00");
-    const endDate = new Date(end + "T12:00:00");
-    while (cur <= endDate) {
+    let cur = new Date(listing.event_date + "T12:00:00");
+    const end = new Date((listing.event_date_end || listing.event_date) + "T12:00:00");
+    while (cur <= end) {
       const key = format(cur, "yyyy-MM-dd");
       if (key >= rangeStartStr && key <= rangeEndStr) dates.push(key);
       cur.setDate(cur.getDate() + 1);
@@ -40,8 +39,7 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
 
   if (listing.is_recurring) {
     const t = listing.recurring_type || "weekly";
-    const dayName = listing.recurring_day || "";
-    const targetDay = DAY_MAP[dayName];
+    const targetDay = DAY_MAP[listing.recurring_day || ""];
     if ((t === "weekly" || t === "fortnightly") && targetDay !== undefined) {
       let cur = new Date(rangeStart);
       while (cur.getDay() !== targetDay) cur.setDate(cur.getDate() + 1);
@@ -51,11 +49,10 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
         cur.setDate(cur.getDate() + step);
       }
     } else if (t === "2nd_4th_weekday" && targetDay !== undefined) {
-      const monthStart = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
-      const monthEnd = new Date(rangeStart.getFullYear(), rangeStart.getMonth() + 1, 0);
       const occs = [];
-      let d = new Date(monthStart);
-      while (d <= monthEnd) {
+      let d = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+      const mEnd = new Date(rangeStart.getFullYear(), rangeStart.getMonth() + 1, 0);
+      while (d <= mEnd) {
         if (d.getDay() === targetDay) occs.push(new Date(d));
         d.setDate(d.getDate() + 1);
       }
@@ -68,8 +65,21 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function WhatsOn() {
   const location = useLocation();
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: listings = [], isLoading: loading, isError: loadError } = useQuery({
+    queryKey: ["whatsOn"],
+    queryFn: async () => {
+      const BATCH = 200;
+      let all = [], skip = 0, hasMore = true;
+      while (hasMore) {
+        const batch = await base44.entities.CommunityListing.filter({ status: "approved", type: "What's On" }, "-created_date", BATCH, skip);
+        all = all.concat(batch);
+        hasMore = batch.length === BATCH;
+        skip += BATCH;
+      }
+      return all;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
   const [viewMode, setViewMode] = useState("calendar"); // "list" | "calendar"
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
@@ -88,6 +98,7 @@ export default function WhatsOn() {
   // Calendar state
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
+  const panelTodayRef = useRef(null);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -103,18 +114,6 @@ export default function WhatsOn() {
         }).catch(() => {});
       }
     }).catch(() => {});
-    (async () => {
-      const BATCH = 200;
-      let all = [], skip = 0, hasMore = true;
-      while (hasMore) {
-        const batch = await base44.entities.CommunityListing.filter({ status: "approved", type: "What's On" }, "-created_date", BATCH, skip);
-        all = all.concat(batch);
-        hasMore = batch.length === BATCH;
-        skip += BATCH;
-      }
-      setListings(all);
-      setLoading(false);
-    })().catch(() => setLoading(false));
   }, []);
 
   // Reset page when filters change
@@ -266,6 +265,12 @@ export default function WhatsOn() {
         )}
       </div>
 
+      {loadError && (
+        <div className="text-center py-10 text-muted-foreground">
+          <p className="text-sm">Failed to load events. Please refresh the page.</p>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -385,8 +390,9 @@ export default function WhatsOn() {
                   const dateObj = parseISO(dateKey + "T12:00:00");
                   const prevKey = i > 0 ? calendarPanelItems[i - 1].dateKey : null;
                   const showSep = !selectedDate && dateKey !== prevKey;
+                  const isFirstToday = !selectedDate && i === 0 && dateKey >= TODAY_STR;
                   return (
-                    <div key={listing.id + dateKey}>
+                    <div key={listing.id + dateKey} ref={isFirstToday ? panelTodayRef : null}>
                       {showSep && (
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4 mb-2 pl-1">
                           {format(dateObj, "EEEE, d MMMM")}

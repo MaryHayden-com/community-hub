@@ -7,14 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, PlusCircle, Clock } from "lucide-react";
+import { ALL_COUNTIES } from "@/utils/irelandData";
 
 const LISTING_TYPES = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
-const COUNTIES = [
-  "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down","Dublin",
-  "Fermanagh","Galway","Kerry","Kildare","Kilkenny","Laois","Leitrim","Limerick",
-  "Longford","Louth","Mayo","Meath","Monaghan","Offaly","Roscommon","Sligo",
-  "Tipperary","Tyrone","Waterford","Westmeath","Wexford","Wicklow"
-].sort();
 
 export default function SubmitListingForm({ open, onClose }) {
   const [step, setStep] = useState(1); // 1 = details, 2 = plan, 3 = success
@@ -24,6 +19,7 @@ export default function SubmitListingForm({ open, onClose }) {
   });
   const [plan, setPlan] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -37,9 +33,10 @@ export default function SubmitListingForm({ open, onClose }) {
 
   const handleDetailsNext = () => {
     if (!form.name || !form.type || !form.county || !form.town || !form.contact_name || !form.email) {
-      alert("Please fill in all required fields (marked with *).");
+      setFormError("Please fill in all required fields (marked with *).");
       return;
     }
+    setFormError("");
     setStep(2);
   };
 
@@ -56,7 +53,7 @@ export default function SubmitListingForm({ open, onClose }) {
       });
       setStep(3);
     } catch (err) {
-      alert("Something went wrong: " + err.message);
+      setFormError("Something went wrong: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -68,7 +65,7 @@ export default function SubmitListingForm({ open, onClose }) {
     setSaving(true);
 
     if (window.self !== window.top) {
-      alert("Payment checkout only works from the published app, not the preview.");
+      setFormError("Payment checkout only works from the published app, not the preview.");
       setSaving(false);
       return;
     }
@@ -97,7 +94,7 @@ export default function SubmitListingForm({ open, onClose }) {
         throw new Error(response.data?.error || 'Failed to create checkout session');
       }
     } catch (err) {
-      alert("Something went wrong: " + err.message);
+      setFormError("Something went wrong: " + err.message);
       setSaving(false);
     }
   };
@@ -140,7 +137,7 @@ export default function SubmitListingForm({ open, onClose }) {
                 <Select value={form.county} onValueChange={(v) => update("county", v)}>
                   <SelectTrigger><SelectValue placeholder="County..." /></SelectTrigger>
                   <SelectContent>
-                    {COUNTIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    {ALL_COUNTIES.sort().map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -177,6 +174,7 @@ export default function SubmitListingForm({ open, onClose }) {
               </div>
             </div>
 
+            {formError && <p className="text-sm text-destructive">{formError}</p>}
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={handleClose}>Cancel</Button>
               <Button onClick={handleDetailsNext}>Next: Choose Plan →</Button>

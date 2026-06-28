@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,13 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, CalendarPlus } from "lucide-react";
-
-const COUNTIES = [
-  "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down","Dublin",
-  "Fermanagh","Galway","Kerry","Kildare","Kilkenny","Laois","Leitrim","Limerick",
-  "Longford","Louth","Mayo","Meath","Monaghan","Offaly","Roscommon","Sligo",
-  "Tipperary","Tyrone","Waterford","Westmeath","Wexford","Wicklow"
-].sort();
+import { ALL_COUNTIES } from "@/utils/irelandData";
 
 const EMPTY = {
   name: "", county: "", town: "", description: "",
@@ -26,39 +20,73 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
+  const [availableListings, setAvailableListings] = useState([]);
+  const [selectedListingId, setSelectedListingId] = useState("");
 
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k, v) => {
+    setForm(p => ({ ...p, [k]: v }));
+    setErrors(e => ({ ...e, [k]: "" }));
+  };
+
+  // Load approved directory listings for the public to link their event to
+  useEffect(() => {
+    if (open && !isPaidUser && !isAdmin) {
+      base44.entities.CommunityListing.filter({ status: "approved" }, "name", 500)
+        .then(listings => setAvailableListings(listings.filter(l => l.type !== "What's On")))
+        .catch(() => {});
+    }
+  }, [open, isPaidUser, isAdmin]);
 
   const handleClose = () => {
     setForm(EMPTY);
     setSaving(false);
     setDone(false);
+    setErrors({});
+    setSubmitError("");
+    setSelectedListingId("");
     onClose();
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.name) e.name = "Event name is required";
+    if (!form.county) e.county = "County is required";
+    if (!form.town) e.town = "Town is required";
+    if (!form.event_date) e.event_date = "Start date is required";
+    if (!form.contact_name) e.contact_name = "Your name is required";
+    if (!form.email) e.email = "Email is required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.county || !form.town || !form.event_date || !form.contact_name || !form.email) {
-      alert("Please fill in all required fields (*).");
-      return;
-    }
+    if (!validate()) return;
     setSaving(true);
-    // Paid owners and admins get auto-approved; public submissions stay pending for owner review
-    const autoApprove = isPaidUser || isAdmin;
-    const payload = {
-      ...form,
-      type: "What's On",
-      status: autoApprove ? "approved" : "pending",
-      plan: "basic",
-      plan_status: "active",
-      country: "Ireland",
-      nearest_town: form.town,
-      is_free: form.is_free === "true" ? true : form.is_free === "false" ? false : undefined,
-      ...(ownerListing?.id ? { parent_listing_id: ownerListing.id, owner_email: ownerListing.owner_email } : {}),
-    };
-    await base44.entities.CommunityListing.create(payload);
-    setDone(true);
-    setSaving(false);
+    setSubmitError("");
+    try {
+      const autoApprove = isPaidUser || isAdmin;
+      const linkedListing = ownerListing || (selectedListingId ? availableListings.find(l => l.id === selectedListingId) : null);
+      const payload = {
+        ...form,
+        type: "What's On",
+        status: autoApprove ? "approved" : "pending",
+        plan: "basic",
+        plan_status: "active",
+        country: "Ireland",
+        nearest_town: form.town,
+        is_free: form.is_free === "true" ? true : form.is_free === "false" ? false : undefined,
+        ...(linkedListing?.id ? { parent_listing_id: linkedListing.id, owner_email: linkedListing.owner_email } : {}),
+      };
+      await base44.entities.CommunityListing.create(payload);
+      setDone(true);
+    } catch (err) {
+      setSubmitError("Something went wrong. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -97,10 +125,28 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
                 : "Anyone can submit an event. The local listing owner will be notified to approve it before it goes live."}
             </p>
 
+            {/* Link to a listing — public users only */}
+            {!isPaidUser && !isAdmin && (
+              <div>
+                <Label>Link to a Directory Listing (recommended)</Label>
+                <Select value={selectedListingId} onValueChange={setSelectedListingId}>
+                  <SelectTrigger><SelectValue placeholder="Search & select a listing..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>None</SelectItem>
+                    {availableListings.map(l => (
+                      <SelectItem key={l.id} value={l.id}>{l.name} — {l.town}, Co. {l.county}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Linking your event to a directory listing helps the owner approve it faster.</p>
+              </div>
+            )}
+
             {/* Event details */}
             <div>
               <Label>Event Name *</Label>
               <Input value={form.name} onChange={e => set("name", e.target.value)} placeholder="e.g. Bandon Farmers Market" />
+              {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
             </div>
 
             <div>
@@ -112,6 +158,7 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
               <div>
                 <Label>Start Date *</Label>
                 <Input type="date" value={form.event_date} onChange={e => set("event_date", e.target.value)} />
+                {errors.event_date && <p className="text-xs text-destructive mt-1">{errors.event_date}</p>}
               </div>
               <div>
                 <Label>End Date</Label>
@@ -145,13 +192,15 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
                   <Select value={form.county} onValueChange={v => set("county", v)}>
                     <SelectTrigger><SelectValue placeholder="County..." /></SelectTrigger>
                     <SelectContent>
-                      {COUNTIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {ALL_COUNTIES.sort().map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {errors.county && <p className="text-xs text-destructive mt-1">{errors.county}</p>}
                 </div>
                 <div>
                   <Label>Town / Village *</Label>
                   <Input value={form.town} onChange={e => set("town", e.target.value)} placeholder="e.g. Bandon" />
+                  {errors.town && <p className="text-xs text-destructive mt-1">{errors.town}</p>}
                 </div>
               </div>
               <div className="mt-3">
@@ -173,10 +222,12 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
                 <div>
                   <Label>Your Name *</Label>
                   <Input value={form.contact_name} onChange={e => set("contact_name", e.target.value)} placeholder="Contact name" />
+                  {errors.contact_name && <p className="text-xs text-destructive mt-1">{errors.contact_name}</p>}
                 </div>
                 <div>
                   <Label>Email *</Label>
                   <Input type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="your@email.ie" />
+                  {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
                 </div>
                 <div className="col-span-2">
                   <Label>Phone</Label>
@@ -185,6 +236,7 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
               </div>
             </div>
 
+            {submitError && <p className="text-sm text-destructive">{submitError}</p>}
             <div className="flex justify-end gap-2 pt-1">
               <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
               <Button type="submit" disabled={saving} style={{ background: '#097275' }}>
