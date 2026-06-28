@@ -118,9 +118,8 @@ export default function ListingDetail() {
   }, [user, listing, isAttending]);
 
   useEffect(() => {
-    base44.entities.CommunityListing.filter({ id })
-      .then((results) => {
-        const l = results[0] || null;
+    base44.entities.CommunityListing.get(id)
+      .then((l) => {
         setListing(l);
         if (l) {
           trackEvent(l.id, l.owner_email, "view");
