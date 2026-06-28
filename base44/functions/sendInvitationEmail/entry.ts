@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       const contactName = listing.contact_name || listing.name || '';
       const firstName = contactName.split(' ')[0] || 'there';
 
-      const subject = `Your listing is live on Community Hub, ${firstName} 🎉`;
+      const subject = `Your listing is live on Community Hub, ${firstName} 🎉 — Discover the businesses, clubs, schools and events that bring your community together.`;
 
       const html = buildEmailHtml({
         name: listing.name,
