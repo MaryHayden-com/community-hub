@@ -1,0 +1,31 @@
+{
+  "name": "EventAttendance",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "User Email"
+    },
+    "listing_name": {
+      "type": "string",
+      "title": "Listing Name"
+    },
+    "attendee_name": {
+      "type": "string",
+      "title": "Attendee Name"
+    },
+    "attending": {
+      "type": "boolean",
+      "title": "Attending",
+      "default": true
+    }
+  },
+  "required": [
+    "listing_id",
+    "user_email"
+  ]
+}

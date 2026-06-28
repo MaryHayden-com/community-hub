@@ -1,0 +1,30 @@
+{
+  "name": "SavedListing",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "User Email"
+    },
+    "listing_name": {
+      "type": "string",
+      "title": "Listing Name"
+    },
+    "listing_type": {
+      "type": "string",
+      "title": "Listing Type"
+    },
+    "county": {
+      "type": "string",
+      "title": "County"
+    }
+  },
+  "required": [
+    "listing_id",
+    "user_email"
+  ]
+}
