@@ -50,7 +50,11 @@ export default function Admin() {
   const [fetchingImageId, setFetchingImageId] = useState(null);
   const [fetchResult, setFetchResult] = useState(null);
   const [expandingRecurring, setExpandingRecurring] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = window.location.hash.replace("#", "");
+    const valid = ["overview","pending","listings","whatson","claims","stream","users","engagement","analytics","survey"];
+    return valid.includes(hash) ? hash : "overview";
+  });
   const [triggerImport, setTriggerImport] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);

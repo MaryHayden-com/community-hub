@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
             </table>
 
             <p style="margin-top:16px;">Log in to the admin panel to review and mark these as done.</p>
-            <a href="https://communityhub.ie/admin" style="display:inline-block;background:#166534;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:4px;">Open Admin Panel</a>
+            <a href="https://communityhub.ie/admin#stream" style="display:inline-block;background:#166534;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:4px;">Open Admin Panel → Action Stream</a>
 
             <p style="margin-top:24px;font-size:12px;color:#9ca3af;">
               You are receiving this because you are assigned to these actions in Community Hub.
