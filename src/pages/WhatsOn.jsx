@@ -8,49 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WhatsOnEventRow from "@/components/WhatsOnEventRow";
 import SubmitEventForm from "@/components/SubmitEventForm";
+import { getNextOccurrence, expandAndSortEvents } from "@/utils/recurringEvents";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
   eachDayOfInterval, isSameDay, isSameMonth, isToday,
   parseISO, startOfWeek, endOfWeek
 } from "date-fns";
 
-const DAY_MAP = { Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 0 };
 const DAYS_HEADER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TODAY_STR = new Date().toISOString().slice(0, 10);
-
-// ── Recurring helpers (same logic as Directory page) ──────────────────────────
-function getNextOccurrence(listing) {
-  const t = listing.recurring_type || "weekly";
-  const d = listing.recurring_day || "";
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  if (t === "weekly" || t === "fortnightly") {
-    const target = DAY_MAP[d];
-    if (target === undefined) return TODAY_STR;
-    const diff = (target - today.getDay() + 7) % 7;
-    const next = new Date(today);
-    next.setDate(today.getDate() + (diff === 0 ? 0 : diff));
-    return next.toISOString().slice(0, 10);
-  }
-  if (t === "2nd_4th_weekday") {
-    const target = DAY_MAP[d];
-    if (target === undefined) return TODAY_STR;
-    const candidates = [];
-    for (let mo = 0; mo <= 1; mo++) {
-      const base = new Date(today.getFullYear(), today.getMonth() + mo, 1);
-      const occs = [];
-      const cur = new Date(base);
-      while (cur.getMonth() === base.getMonth()) {
-        if (cur.getDay() === target) occs.push(new Date(cur));
-        cur.setDate(cur.getDate() + 1);
-      }
-      if (occs[1]) candidates.push(occs[1]);
-      if (occs[3]) candidates.push(occs[3]);
-    }
-    const next = candidates.find(c => c >= today);
-    return next ? next.toISOString().slice(0, 10) : TODAY_STR;
-  }
-  return TODAY_STR;
-}
+const DAY_MAP = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
 
 // Returns date strings a listing appears on within [rangeStart, rangeEnd] (for calendar grid)
 function getListingDatesInRange(listing, rangeStart, rangeEnd) {
@@ -132,9 +99,18 @@ export default function WhatsOn() {
         }).catch(() => {});
       }
     }).catch(() => {});
-    base44.entities.CommunityListing.filter({ status: "approved" }, "-created_date", 2000)
-      .then(data => setListings(data.filter(l => l.type === "What's On")))
-      .finally(() => setLoading(false));
+    (async () => {
+      const BATCH = 200;
+      let all = [], skip = 0, hasMore = true;
+      while (hasMore) {
+        const batch = await base44.entities.CommunityListing.filter({ status: "approved", type: "What's On" }, "-created_date", BATCH, skip);
+        all = all.concat(batch);
+        hasMore = batch.length === BATCH;
+        skip += BATCH;
+      }
+      setListings(all);
+      setLoading(false);
+    })().catch(() => setLoading(false));
   }, []);
 
   // Reset page when filters change
@@ -153,34 +129,8 @@ export default function WhatsOn() {
     return true;
   }), [listings, filterCounty, filterTown]);
 
-  // ── LIST VIEW: same expansion logic as Directory ───────────────────────────
-  const listItems = useMemo(() => {
-    const expanded = [];
-    filteredListings.forEach(l => {
-      if (!l.is_recurring && l.event_date && l.event_date_end && l.event_date_end > l.event_date) {
-        const start = new Date(l.event_date + "T12:00:00");
-        const end = new Date(l.event_date_end + "T12:00:00");
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          expanded.push({ listing: l, date: new Date(d), sortKey: format(d, "yyyy-MM-dd") });
-        }
-      } else if (l.is_recurring) {
-        expanded.push({ listing: l, date: null, sortKey: getNextOccurrence(l) });
-      } else {
-        expanded.push({ listing: l, date: null, sortKey: l.event_date || "9999" });
-      }
-    });
-    expanded.sort((a, b) => {
-      const dc = a.sortKey.localeCompare(b.sortKey);
-      return dc !== 0 ? dc : (a.listing.event_time || "").localeCompare(b.listing.event_time || "");
-    });
-    return expanded.filter(entry => {
-      const k = entry.sortKey;
-      if (k === "9999") return true;
-      if (dateFrom && k < dateFrom) return false;
-      if (dateTo && k > dateTo) return false;
-      return true;
-    });
-  }, [filteredListings, dateFrom, dateTo]);
+  // ── LIST VIEW ─────────────────────────────────────────────────────────────
+  const listItems = useMemo(() => expandAndSortEvents(filteredListings, dateFrom, dateTo), [filteredListings, dateFrom, dateTo]);
 
   const pagedItems = useMemo(() => listItems.slice(0, page * PAGE_SIZE), [listItems, page]);
   const hasMore = pagedItems.length < listItems.length;
