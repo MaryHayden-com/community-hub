@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
     }
 
     const { listing_id, test_email } = await req.json();
-    const appUrl = 'https://69d7dcee3ce725bf49f16135.base44.app';
+    const appUrl = 'https://community-hub.base44.app';
 
     let listingsToInvite = [];
 
