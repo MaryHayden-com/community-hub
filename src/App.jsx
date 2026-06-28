@@ -41,6 +41,7 @@ const GroupAdminDashboard = lazy(() => import('./pages/GroupAdminDashboard'));
 const Survey = lazy(() => import('./pages/Survey'));
 const CalendarView = lazy(() => import('./pages/CalendarView'));
 const WhatsOn = lazy(() => import('./pages/WhatsOn'));
+const SavedListings = lazy(() => import('./pages/SavedListings'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
           <Route path="/survey" element={<Survey />} />
           <Route path="/calendar" element={<CalendarView />} />
           <Route path="/whats-on" element={<WhatsOn />} />
+          <Route path="/saved" element={<SavedListings />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>

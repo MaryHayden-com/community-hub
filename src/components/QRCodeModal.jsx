@@ -1,20 +1,25 @@
 import QRCode from "qrcode";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function QRCodeModal({ url, title, onClose }) {
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [loading, setLoading] = useState(true);
-  const canvasRef = useRef(null);
 
   useEffect(() => {
     if (!url) return;
+    let mounted = true;
     setLoading(true);
     QRCode.toDataURL(url, { width: 400, margin: 2, errorCorrectionLevel: "M" })
-      .then(setQrDataUrl)
+      .then((dataUrl) => {
+        if (mounted) setQrDataUrl(dataUrl);
+      })
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => { mounted = false; };
   }, [url]);
 
   const handleDownload = () => {

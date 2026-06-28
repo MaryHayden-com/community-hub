@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Phone, Mail, Globe, Facebook, Instagram, Linkedin,
   ArrowLeft, Building2, Users, GraduationCap, Calendar, Clock, Star, User, ShieldCheck, Flag,
-  Megaphone, HandHeart, Briefcase, Bell, Share2, RefreshCw
+  Megaphone, HandHeart, Briefcase, Bell, Share2, RefreshCw, QrCode, Heart
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import ClaimListingForm from "../components/ClaimListingForm";
 import AddToCalendarButton from "../components/AddToCalendarButton";
 import RemovalRequestForm from "../components/RemovalRequestForm";
+import QRCodeModal from "../components/QRCodeModal";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -53,11 +55,16 @@ function DetailRow({ icon: Icon, label, value, href }) {
 
 export default function ListingDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
   const [showRemoval, setShowRemoval] = useState(false);
   const [notices, setNotices] = useState([]);
+  const [showQR, setShowQR] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isAttending, setIsAttending] = useState(false);
+  const [attendanceCount, setAttendanceCount] = useState(0);
 
   const trackEvent = useCallback((listingId, ownerEmail, eventType) => {
     base44.entities.ListingEngagement.create({
@@ -66,6 +73,42 @@ export default function ListingDetail() {
       listing_owner_email: ownerEmail || "",
     }).catch(() => {});
   }, []);
+
+  const toggleSave = useCallback(async () => {
+    if (!user || !listing) return;
+    if (isSaved) {
+      await base44.entities.SavedListing.deleteMany({ listing_id: listing.id, user_email: user.email });
+      setIsSaved(false);
+    } else {
+      await base44.entities.SavedListing.create({
+        listing_id: listing.id,
+        user_email: user.email,
+        listing_name: listing.name,
+        listing_type: listing.type,
+        county: listing.county,
+      });
+      setIsSaved(true);
+    }
+  }, [user, listing, isSaved]);
+
+  const toggleAttendance = useCallback(async () => {
+    if (!user || !listing) return;
+    if (isAttending) {
+      await base44.entities.EventAttendance.deleteMany({ listing_id: listing.id, user_email: user.email });
+      setIsAttending(false);
+      setAttendanceCount(c => Math.max(0, c - 1));
+    } else {
+      await base44.entities.EventAttendance.create({
+        listing_id: listing.id,
+        user_email: user.email,
+        listing_name: listing.name,
+        attendee_name: user.full_name || user.email,
+        attending: true,
+      });
+      setIsAttending(true);
+      setAttendanceCount(c => c + 1);
+    }
+  }, [user, listing, isAttending]);
 
   useEffect(() => {
     base44.entities.CommunityListing.filter({ id })
@@ -79,10 +122,28 @@ export default function ListingDetail() {
               .then((all) => setNotices(all.filter((n) => n.is_active && (!n.expires_on || n.expires_on >= new Date().toISOString().slice(0, 10)))))
               .catch(() => {});
           }
+          // Load saved status
+          if (user) {
+            base44.entities.SavedListing.filter({ listing_id: l.id, user_email: user.email })
+              .then((saved) => setIsSaved(saved.length > 0))
+              .catch(() => {});
+          }
+          // Load attendance for events
+          if (l.type === "What's On") {
+            base44.entities.EventAttendance.filter({ listing_id: l.id })
+              .then((all) => {
+                setAttendanceCount(all.filter(a => a.attending).length);
+                if (user) {
+                  const userAttending = all.find(a => a.user_email === user.email && a.attending);
+                  setIsAttending(!!userAttending);
+                }
+              })
+              .catch(() => {});
+          }
         }
       })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, user]);
 
   if (loading) {
     return (
@@ -297,17 +358,53 @@ export default function ListingDetail() {
             </div>
           )}
 
-          {/* Add to Calendar — only for events */}
+          {/* Event Actions — only for events */}
           {listing.type === "What's On" && (
             <div className="mt-5 pt-5 border-t">
-              <p className="text-xs text-muted-foreground mb-2">Add this event to your calendar</p>
-              <AddToCalendarButton
-                listing={listing}
-                dateObj={listing.event_date ? new Date(listing.event_date + "T12:00:00") : null}
-                size="md"
-              />
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-muted-foreground">Event actions</p>
+                {attendanceCount > 0 && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Users className="w-3 h-3" />
+                    {attendanceCount} going
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <AddToCalendarButton listing={listing} dateObj={listing.event_date ? new Date(listing.event_date + "T12:00:00") : null} size="md" />
+                {user ? (
+                  <Button
+                    variant={isAttending ? "default" : "outline"}
+                    size="sm"
+                    onClick={toggleAttendance}
+                    className={isAttending ? "bg-primary" : ""}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    {isAttending ? "✓ Going" : "I'm Going"}
+                  </Button>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Log in to mark yourself as going</p>
+                )}
+              </div>
             </div>
           )}
+
+          {/* Save & QR Code */}
+          <div className="mt-5 pt-5 border-t flex flex-wrap gap-3">
+            <Button
+              variant={isSaved ? "default" : "outline"}
+              size="sm"
+              onClick={toggleSave}
+              className={isSaved ? "bg-primary" : ""}
+            >
+              <Heart className={`w-3.5 h-3.5 ${isSaved ? "fill-white" : ""}`} />
+              {isSaved ? "Saved" : "Save"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowQR(true)}>
+              <QrCode className="w-3.5 h-3.5" />
+              QR Code
+            </Button>
+          </div>
 
           {/* Share + Actions */}
           <div className="mt-5 pt-5 border-t flex flex-wrap gap-3">
@@ -370,6 +467,13 @@ export default function ListingDetail() {
       )}
       {showRemoval && (
         <RemovalRequestForm listing={listing} onClose={() => setShowRemoval(false)} />
+      )}
+      {showQR && (
+        <QRCodeModal
+          url={window.location.href}
+          title={listing.name}
+          onClose={() => setShowQR(false)}
+        />
       )}
     </div>
   );

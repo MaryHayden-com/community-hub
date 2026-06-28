@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle } from "lucide-react";
+import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NoticeForm from "../components/NoticeForm";
@@ -57,6 +57,7 @@ export default function OwnerDashboard() {
   const [deleteStep, setDeleteStep] = useState(0); // 0=hidden, 1=warning, 2=confirm
   const [deleteRequestSent, setDeleteRequestSent] = useState(false);
   const [sendingDelete, setSendingDelete] = useState(false);
+  const [eventAttendance, setEventAttendance] = useState(0);
 
   useEffect(() => {
     base44.auth.me().then((u) => {
@@ -98,6 +99,14 @@ export default function OwnerDashboard() {
       .then(setEngagement)
       .catch(() => setEngagement([]));
     loadNotices();
+    // Load event attendance for What's On listings
+    if (selectedListing.type === "What's On") {
+      base44.entities.EventAttendance.filter({ listing_id: selectedListing.id, attending: true })
+        .then((attendees) => setEventAttendance(attendees.length))
+        .catch(() => {});
+    } else {
+      setEventAttendance(0);
+    }
   }, [selectedListing]);
 
   const loadNotices = () => {
@@ -235,11 +244,16 @@ export default function OwnerDashboard() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {METRIC_CONFIG.map((m) => (
-                  <MetricCard key={m.key} icon={m.icon} label={m.label} value={countFor(m.key)} color={m.color} bg={m.bg} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {METRIC_CONFIG.map((m) => (
+                    <MetricCard key={m.key} icon={m.icon} label={m.label} value={countFor(m.key)} color={m.color} bg={m.bg} />
+                  ))}
+                  {selectedListing.type === "What's On" && (
+                    <MetricCard icon={Users} label="Event Attendees" value={eventAttendance} color="text-purple-600" bg="bg-purple-50" />
+                  )}
+                </div>
+              </>
             )}
           </div>
 

@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
-  Tag, ChevronLeft, HeartHandshake,
+  Tag, ChevronLeft, HeartHandshake, Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +25,7 @@ const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard
 const BOTTOM_TABS = [
   { to: "/", label: "Directory", icon: MapPin },
   { to: "/whats-on", label: "What's On", icon: Calendar },
+  { to: "/saved", label: "Saved", icon: Heart },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 
@@ -109,6 +110,16 @@ export default function Layout() {
                 </Link>
               );
             })}
+            <Link
+              to="/saved"
+              className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${
+                location.pathname === "/saved" ? "bg-primary/10" : "hover:bg-muted"
+              }`}
+              style={{ color: '#097275', borderColor: '#E2701B' }}
+            >
+              <Heart className="w-4 h-4" />
+              Saved
+            </Link>
             {isListingOwner && (
               <Link to="/dashboard" className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 uppercase tracking-wide border-2 ${location.pathname === "/dashboard" ? "bg-primary/10" : "hover:bg-muted"}`} style={{ color: '#097275', borderColor: '#E2701B' }}>
                 <LayoutDashboard className="w-4 h-4" /> My Dashboard
@@ -157,6 +168,11 @@ export default function Layout() {
                 </Link>
               );
             })}
+            <Link to="/saved" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
+              <Heart className="w-4 h-4" style={{ color: '#097275' }} />
+              Saved
+              <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
+            </Link>
             {isListingOwner && (
               <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors">
                 <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> My Dashboard
