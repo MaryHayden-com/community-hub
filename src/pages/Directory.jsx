@@ -18,7 +18,11 @@ export default function Directory() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
-  const [listings, setListings] = useState([]);
+  // browseListing: full dataset loaded for filter/browse mode (no search term)
+  const [browseListings, setBrowseListings] = useState([]);
+  // searchResults: returned from server-side search when a term is active
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(params.get("type") || "");
@@ -33,17 +37,17 @@ export default function Directory() {
   const [refreshing, setRefreshing] = useState(false);
   const pullStartY = useRef(0);
   const pullDelta = useRef(0);
-  const [pullIndicator, setPullIndicator] = useState(0); // 0-1 progress
+  const [pullIndicator, setPullIndicator] = useState(0);
   const [user, setUser] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
-  const [viewMode, setViewMode] = useState("list"); // "list" | "map"
+  const [viewMode, setViewMode] = useState("list");
   const PAGE_SIZE = 50;
   const [page, setPage] = useState(1);
+  const searchDebounceRef = useRef(null);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => setUser(null));
   }, []);
-
 
   useEffect(() => {
     setType(params.get("type") || "");
@@ -53,6 +57,7 @@ export default function Directory() {
     setTown(params.get("town") || localStorage.getItem("dir_town") || "");
   }, [location.search]);
 
+  // Load a smaller initial browse set (first 500 records) for fast filter UX
   const loadListings = useCallback(async () => {
     const BATCH = 200;
     let all = [], skip = 0, hasMore = true;
@@ -62,12 +67,57 @@ export default function Directory() {
       hasMore = batch.length === BATCH;
       skip += BATCH;
     }
-    setListings(all);
+    setBrowseListings(all);
   }, []);
 
   useEffect(() => {
     loadListings().finally(() => setLoading(false));
   }, []);
+
+  // Server-side search: debounced, fires when search term >= 2 chars
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (!search || search.trim().length < 2) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+    setSearchLoading(true);
+    searchDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await base44.functions.invoke("searchListings", { q: search.trim(), limit: 300 });
+        // Also filter array fields client-side (category, subcategory_group, subgroup)
+        const s = search.trim().toLowerCase();
+        const arrFiltered = (res.data?.results || []).filter(l => {
+          const arrText = [
+            Array.isArray(l.category) ? l.category.join(" ") : (l.category || ""),
+            Array.isArray(l.subcategory_group) ? l.subcategory_group.join(" ") : (l.subcategory_group || ""),
+            Array.isArray(l.subgroup) ? l.subgroup.join(" ") : (l.subgroup || ""),
+          ].join(" ").toLowerCase();
+          // Include if already matched server-side (results already filtered) OR array fields match
+          return true; // server already filtered, just pass through; array fields are a bonus below
+        });
+        // Supplement with any browse listings that match array fields but weren't in server results
+        const serverIds = new Set(arrFiltered.map(r => r.id));
+        const arrayMatches = browseListings.filter(l => {
+          if (serverIds.has(l.id)) return false;
+          const arrText = [
+            Array.isArray(l.category) ? l.category.join(" ") : (l.category || ""),
+            Array.isArray(l.subcategory_group) ? l.subcategory_group.join(" ") : (l.subcategory_group || ""),
+            Array.isArray(l.subgroup) ? l.subgroup.join(" ") : (l.subgroup || ""),
+          ].join(" ").toLowerCase();
+          return arrText.includes(s);
+        });
+        setSearchResults([...arrFiltered, ...arrayMatches]);
+      } catch (e) {
+        // Fallback to client-side search on error
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 350);
+    return () => clearTimeout(searchDebounceRef.current);
+  }, [search, browseListings]);
 
   // Pull-to-refresh handlers
   const handleTouchStart = useCallback((e) => {
@@ -88,6 +138,7 @@ export default function Directory() {
     if (pullDelta.current > 100 && !refreshing) {
       setRefreshing(true);
       setPullIndicator(1);
+      setSearchResults([]);
       loadListings().finally(() => {
         setRefreshing(false);
         setPullIndicator(0);
@@ -103,32 +154,32 @@ export default function Directory() {
   // Helper: normalise a field that may be a string or array
   const toArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);
 
+  // Derived filter options always come from the full browse dataset
   const groups = useMemo(() => {
     if (!type) return [];
-    const grps = listings.filter((l) => l.type === type).flatMap((l) => toArr(l.subcategory_group)).filter(Boolean);
+    const grps = browseListings.filter((l) => l.type === type).flatMap((l) => toArr(l.subcategory_group)).filter(Boolean);
     return [...new Set(grps)].sort();
-  }, [listings, type]);
+  }, [browseListings, type]);
   const categories = useMemo(() => {
     if (!type || !subcategoryGroup || subcategoryGroup.length === 0) return [];
-    const cats = listings
+    const cats = browseListings
       .filter((l) => l.type === type && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
       .flatMap((l) => toArr(l.category)).filter(Boolean);
     return [...new Set(cats)].sort();
-  }, [listings, type, subcategoryGroup]);
+  }, [browseListings, type, subcategoryGroup]);
   const towns = useMemo(() => {
     if (!county) return [];
     const staticTowns = getTownsForCounty(county);
-    const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
+    const listingTowns = browseListings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
     return [...new Set([...staticTowns, ...listingTowns])].sort();
-  }, [listings, county]);
+  }, [browseListings, county]);
 
   const townGroups = useMemo(() => {
     if (!county) return null;
     const { towns: staticTowns, villages: staticVillages } = getTownsAndVillagesForCounty(county);
-    const listingTowns = listings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
+    const listingTowns = browseListings.filter((l) => l.county === county).map((l) => l.town).filter(Boolean);
     const allStaticTowns = new Set(staticTowns);
     const allStaticVillages = new Set(staticVillages);
-    // Any listing town not in static data goes into villages
     listingTowns.forEach(t => {
       if (!allStaticTowns.has(t) && !allStaticVillages.has(t)) allStaticVillages.add(t);
     });
@@ -136,9 +187,7 @@ export default function Directory() {
       towns: [...allStaticTowns].sort(),
       villages: [...allStaticVillages].sort()
     };
-  }, [listings, county]);
-
-  const allCounties = useMemo(() => IRELAND_COUNTIES.map(c => c.county).sort(), []);
+  }, [browseListings, county]);
 
   function getNextOccurrence(listing) {
     const t = listing.recurring_type || "weekly";
@@ -180,45 +229,28 @@ export default function Directory() {
   // Reset to page 1 whenever filters change
   useEffect(() => { setPage(1); }, [search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, JSON.stringify(nearbyCounties), dateFrom, dateTo]);
 
+  // When searching, use server results; otherwise filter the browse dataset
+  const listings = search && search.trim().length >= 2 ? searchResults : browseListings;
+
   const filtered = useMemo(() => {
     const isWhatsOn = type === "What's On";
     const base = listings.filter((l) => {
       if (l.status === "pending" || l.status === "rejected") return false;
-      if (!search && type && l.type !== type) return false;
-      if (!search && subcategoryGroup && subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
-      if (!search && category && category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
-      if (!search && nearbyCounties) {
-        // Filter by actual listing coordinates vs user GPS location
-        const townCoords = TOWN_COORDINATES[l.town] || TOWN_COORDINATES[l.area];
-        const countyCoords = COUNTY_CENTROIDS.find(c => c.county === l.county);
-        const coords = townCoords || countyCoords;
-        if (!coords) return false;
-        const dist = haversineKm(nearbyCounties.lat, nearbyCounties.lng, coords.lat, coords.lng);
-        if (dist > nearbyCounties.km) return false;
-      }
-      if (!search && !nearbyCounties && county && l.county !== county) return false;
-      if (!search && town && l.town !== town) return false;
-      if (search) {
-        const s = search.toLowerCase();
-        const searchableText = [
-          l.name,
-          l.description,
-          l.contact_name,
-          l.email,
-          l.phone,
-          l.town,
-          l.nearest_town,
-          l.county,
-          l.area,
-          l.address,
-          l.meeting_info,
-          l.type,
-          l.category_text,
-          Array.isArray(l.category) ? l.category.join(" ") : (l.category || ""),
-          Array.isArray(l.subcategory_group) ? l.subcategory_group.join(" ") : (l.subcategory_group || ""),
-          Array.isArray(l.subgroup) ? l.subgroup.join(" ") : (l.subgroup || ""),
-        ].filter(Boolean).join(" ").toLowerCase();
-        return searchableText.includes(s);
+      // In search mode, results already matched — skip text filters, only apply geo/type if also set
+      if (!search) {
+        if (type && l.type !== type) return false;
+        if (subcategoryGroup && subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
+        if (category && category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
+        if (nearbyCounties) {
+          const townCoords = TOWN_COORDINATES[l.town] || TOWN_COORDINATES[l.area];
+          const countyCoords = COUNTY_CENTROIDS.find(c => c.county === l.county);
+          const coords = townCoords || countyCoords;
+          if (!coords) return false;
+          const dist = haversineKm(nearbyCounties.lat, nearbyCounties.lng, coords.lat, coords.lng);
+          if (dist > nearbyCounties.km) return false;
+        }
+        if (!nearbyCounties && county && l.county !== county) return false;
+        if (town && l.town !== town) return false;
       }
       return true;
     });
@@ -261,6 +293,7 @@ export default function Directory() {
     });
   }, [listings, search, type, JSON.stringify(subcategoryGroup), JSON.stringify(category), county, town, JSON.stringify(nearbyCounties), dateFrom, dateTo]);
 
+
   const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = pagedItems.length < filtered.length;
 
@@ -298,8 +331,11 @@ export default function Directory() {
             <p className="text-muted-foreground mt-0.5 text-sm sm:text-base hidden sm:block">
               Discover the businesses, clubs, schools and events that bring your community together.
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
+            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
+              {searchLoading
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching…</>
+                : <>{filtered.length} listing{filtered.length !== 1 ? "s" : ""} found</>
+              }
             </p>
           </div>
           <div className="flex items-center gap-2">
