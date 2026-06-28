@@ -145,7 +145,7 @@ export const TAXONOMY = {
         "Courier & Delivery", "Freight & Haulage", "Van Hire", "Moving & Removals", "Storage & Warehousing"
       ],
       "Vehicle Services": [
-        "Car Dealer (New)", "Car Dealer (Used)", "Car Hire / Rental", "Garage & Mechanic", "Tyre & Exhaust Centre", "NCT Centre", "Bodywork & Valeting", "Motorcycle Dealer"
+        "Car Dealer (New)", "Car Dealer (Used)", "Car Hire / Rental", "Garage & Mechanic", "Tyre & Exhaust Centre", "NCT Centre", "Bodywork & Valeting", "Motorcycle Dealer", "Service Station / Forecourt"
       ],
       "Marine & Aviation": [
         "Boat Sales & Hire", "Marine Services", "Pilot & Aviation Services"
