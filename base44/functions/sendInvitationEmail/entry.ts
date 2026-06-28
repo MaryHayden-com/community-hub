@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-function buildEmailHtml({ name, firstName, claimUrl, appUrl }) {
+function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,9 +17,17 @@ function buildEmailHtml({ name, firstName, claimUrl, appUrl }) {
           <!-- Header -->
           <tr>
             <td style="background-color:#097275;padding:32px 40px;text-align:center;">
-              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="64" height="64" style="border-radius:10px;display:block;margin:0 auto 14px auto;" />
-              <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:bold;letter-spacing:0.5px;">Community Hub</h1>
-              <p style="color:#a8d8da;margin:6px 0 0 0;font-size:14px;">Community Hub – Bandon</p>
+              <table cellpadding="0" cellspacing="0" style="margin:0 auto 8px auto;">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:12px;">
+                    <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="52" height="52" style="border-radius:10px;display:block;" />
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:bold;letter-spacing:0.5px;">Community Hub</h1>
+                  </td>
+                </tr>
+              </table>
+              <p style="color:#a8d8da;margin:6px 0 0 0;font-size:14px;">${town}</p>
             </td>
           </tr>
 
@@ -142,6 +150,7 @@ Deno.serve(async (req) => {
       const html = buildEmailHtml({
         name: listing.name,
         firstName,
+        town: listing.nearest_town || listing.town || listing.county || 'Ireland',
         claimUrl,
         appUrl,
       });
