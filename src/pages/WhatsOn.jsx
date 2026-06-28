@@ -76,6 +76,7 @@ export default function WhatsOn() {
   const [user, setUser] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [userIsPaid, setUserIsPaid] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [ownerListing, setOwnerListing] = useState(null);
 
   // List view state
@@ -91,6 +92,7 @@ export default function WhatsOn() {
   useEffect(() => {
     base44.auth.me().then(u => {
       setUser(u);
+      if (u?.role === "admin") setIsAdmin(true);
       if (u?.email) {
         base44.entities.CommunityListing.filter({ owner_email: u.email }).then(ownedListings => {
           const paidListing = ownedListings.find(
@@ -174,7 +176,7 @@ export default function WhatsOn() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} isPaidUser={userIsPaid} ownerListing={ownerListing} />
+      <SubmitEventForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} isPaidUser={userIsPaid} isAdmin={isAdmin} ownerListing={ownerListing} />
 
       {/* Header + view toggle */}
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">

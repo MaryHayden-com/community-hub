@@ -6,8 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, CheckCircle2, CalendarPlus, Clock, Crown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Loader2, CheckCircle2, CalendarPlus } from "lucide-react";
 
 const COUNTIES = [
   "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down","Dublin",
@@ -23,7 +22,7 @@ const EMPTY = {
   contact_name: "", email: "", phone: "",
 };
 
-export default function SubmitEventForm({ open, onClose, isPaidUser = false, ownerListing = null }) {
+export default function SubmitEventForm({ open, onClose, isPaidUser = false, isAdmin = false, ownerListing = null }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -44,13 +43,16 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, own
       return;
     }
     setSaving(true);
+    // Paid owners and admins get auto-approved; public submissions stay pending for owner review
+    const autoApprove = isPaidUser || isAdmin;
     const payload = {
       ...form,
       type: "What's On",
-      status: "pending",
+      status: autoApprove ? "approved" : "pending",
       plan: "basic",
       plan_status: "active",
       country: "Ireland",
+      nearest_town: form.town,
       is_free: form.is_free === "true" ? true : form.is_free === "false" ? false : undefined,
       ...(ownerListing?.id ? { parent_listing_id: ownerListing.id, owner_email: ownerListing.owner_email } : {}),
     };
@@ -69,38 +71,30 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, own
           </DialogTitle>
         </DialogHeader>
 
-        {!isPaidUser ? (
-          <div className="py-8 text-center space-y-4">
-            <Crown className="w-12 h-12 text-amber-500 mx-auto" />
-            <h3 className="text-lg font-semibold">Standard or Premium Plan Required</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Adding What's On events is available to paid listing holders.<br />
-              Upgrade your listing to Standard (€49/yr) or Premium (€99/yr) to start posting events.
-            </p>
-            <div className="flex flex-col gap-2">
-              <Link to="/billing" onClick={onClose}>
-                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white">View Plans & Upgrade</Button>
-              </Link>
-              <Button variant="outline" className="w-full" onClick={onClose}>Cancel</Button>
-            </div>
-          </div>
-        ) : done ? (
+        {done ? (
           <div className="py-8 text-center space-y-4">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: "#097275" }}>
-              <Clock className="w-8 h-8 text-white" />
+              <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-xl font-semibold">Thanks, it's with us!</h3>
+            <h3 className="text-xl font-semibold">
+              {isPaidUser || isAdmin ? "Event published!" : "Event submitted!"}
+            </h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              <strong>{form.name}</strong> has been submitted and is awaiting review. We'll have it live shortly — usually within 24 hours.
+              {isPaidUser || isAdmin
+                ? <><strong>{form.name}</strong> is now live on the What's On calendar.</>
+                : <><strong>{form.name}</strong> has been submitted. The local listing owner will be notified to approve it — it should be live within 24 hours.</>
+              }
             </p>
             <Button onClick={handleClose} className="w-full" style={{ background: "#097275" }}>
-              <CheckCircle2 className="w-4 h-4 mr-2" /> Done
+              Done
             </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 mt-1">
             <p className="text-sm text-muted-foreground">
-              Free to submit. All events are reviewed before going live — usually within 24 hours.
+              {isPaidUser || isAdmin
+                ? "Your event will go live immediately once submitted."
+                : "Anyone can submit an event. The local listing owner will be notified to approve it before it goes live."}
             </p>
 
             {/* Event details */}
