@@ -80,7 +80,7 @@ export default function Layout() {
               </button>
             ) : null}
             <Link to="/" className="flex items-center gap-2.5">
-              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/292ad36cb_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
+              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/6c74b5cd9_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
                 Community Hub
               </span>
