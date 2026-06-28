@@ -1,0 +1,46 @@
+{
+  "name": "ListingReview",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "title": "Listing ID"
+    },
+    "listing_name": {
+      "type": "string",
+      "title": "Listing Name"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "User Email"
+    },
+    "user_name": {
+      "type": "string",
+      "title": "User Name"
+    },
+    "rating": {
+      "type": "number",
+      "title": "Rating",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "review_text": {
+      "type": "string",
+      "title": "Review Text"
+    },
+    "is_approved": {
+      "type": "boolean",
+      "title": "Approved",
+      "default": false
+    },
+    "created_date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "listing_id",
+    "user_email",
+    "rating"
+  ]
+}

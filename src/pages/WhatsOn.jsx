@@ -4,12 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import {
-  ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle
+  ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle, Navigation
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WhatsOnEventRow from "@/components/WhatsOnEventRow";
 import SubmitEventForm from "@/components/SubmitEventForm";
+import NearMeButton from "@/components/NearMeButton";
 import { getNextOccurrence, expandAndSortEvents, toArr } from "@/utils/recurringEvents";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
@@ -212,6 +213,8 @@ export default function WhatsOn() {
 
       {/* Filters row */}
       <div className="flex flex-wrap gap-3 mb-5">
+        <NearMeButton listings={listings} type="whatson" />
+        
         <Select value={filterCounty} onValueChange={v => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
           <SelectTrigger className="w-[150px] bg-card"><SelectValue placeholder="All Counties" /></SelectTrigger>
           <SelectContent>

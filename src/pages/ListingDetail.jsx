@@ -9,11 +9,14 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import ClaimListingForm from "../components/ClaimListingForm";
 import AddToCalendarButton from "../components/AddToCalendarButton";
 import RemovalRequestForm from "../components/RemovalRequestForm";
 import QRCodeModal from "../components/QRCodeModal";
+import ReviewModal from "../components/ReviewModal";
+import ReviewStars from "../components/ReviewStars";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -65,6 +68,10 @@ export default function ListingDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [isAttending, setIsAttending] = useState(false);
   const [attendanceCount, setAttendanceCount] = useState(0);
+  const [showReview, setShowReview] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [userReview, setUserReview] = useState(null);
 
   const trackEvent = useCallback((listingId, ownerEmail, eventType) => {
     base44.entities.ListingEngagement.create({
@@ -140,6 +147,21 @@ export default function ListingDetail() {
               })
               .catch(() => {});
           }
+          // Load reviews
+          base44.entities.ListingReview.filter({ listing_id: l.id })
+            .then((all) => {
+              const approved = all.filter(r => r.is_approved);
+              setReviews(approved.sort((a, b) => new Date(b.created_date) - new Date(a.created_date)));
+              if (approved.length > 0) {
+                const avg = approved.reduce((sum, r) => sum + r.rating, 0) / approved.length;
+                setAverageRating(Math.round(avg * 10) / 10);
+              }
+              if (user) {
+                const userRev = approved.find(r => r.user_email === user.email);
+                setUserReview(userRev || null);
+              }
+            })
+            .catch(() => {});
         }
       })
       .finally(() => setLoading(false));
@@ -389,6 +411,59 @@ export default function ListingDetail() {
             </div>
           )}
 
+          {/* Reviews Section */}
+          <div className="mt-8 pt-6 border-t">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-base">Reviews</h3>
+                {averageRating > 0 && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <ReviewStars rating={Math.round(averageRating)} size="lg" />
+                    <span className="text-sm font-medium">{averageRating.toFixed(1)}</span>
+                    <span className="text-xs text-muted-foreground">({reviews.length} review{reviews.length !== 1 ? "s" : ""})</span>
+                  </div>
+                )}
+              </div>
+              {user && !userReview && (
+                <Button size="sm" onClick={() => setShowReview(true)} style={{ background: '#E2701B', border: 'none' }}>
+                  Write a Review
+                </Button>
+              )}
+            </div>
+
+            {userReview && (
+              <div className="mb-4 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                <p className="text-xs text-muted-foreground mb-1">Your Review</p>
+                <ReviewStars rating={userReview.rating} />
+                {userReview.review_text && <p className="text-sm mt-2">{userReview.review_text}</p>}
+              </div>
+            )}
+
+            {reviews.length > 0 ? (
+              <div className="space-y-3">
+                {reviews.slice(0, 3).map((review) => (
+                  <div key={review.id} className="p-4 rounded-xl border bg-card">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="font-medium text-sm">{review.user_name || review.user_email.split('@')[0]}</p>
+                        <ReviewStars rating={review.rating} />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(review.created_date).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric" })}
+                      </p>
+                    </div>
+                    {review.review_text && <p className="text-sm text-muted-foreground">{review.review_text}</p>}
+                  </div>
+                ))}
+                {reviews.length > 3 && (
+                  <p className="text-xs text-muted-foreground text-center">+{reviews.length - 3} more reviews</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No reviews yet</p>
+            )}
+          </div>
+
           {/* Save & QR Code */}
           <div className="mt-5 pt-5 border-t flex flex-wrap gap-3">
             <Button
@@ -473,6 +548,36 @@ export default function ListingDetail() {
           url={window.location.href}
           title={listing.name}
           onClose={() => setShowQR(false)}
+        />
+      )}
+      {showReview && user && (
+        <ReviewModal
+          listing={listing}
+          user={user}
+          onClose={() => setShowReview(false)}
+          onSubmit={async ({ rating, review_text }) => {
+            await base44.entities.ListingReview.create({
+              listing_id: listing.id,
+              listing_name: listing.name,
+              user_email: user.email,
+              user_name: user.full_name || user.email.split('@')[0],
+              rating,
+              review_text,
+              is_approved: true, // Auto-approve for now
+              created_date: new Date().toISOString(),
+            });
+            setShowReview(false);
+            // Reload reviews
+            const all = await base44.entities.ListingReview.filter({ listing_id: listing.id });
+            const approved = all.filter(r => r.is_approved);
+            setReviews(approved.sort((a, b) => new Date(b.created_date) - new Date(a.created_date)));
+            if (approved.length > 0) {
+              const avg = approved.reduce((sum, r) => sum + r.rating, 0) / approved.length;
+              setAverageRating(Math.round(avg * 10) / 10);
+            }
+            const userRev = approved.find(r => r.user_email === user.email);
+            setUserReview(userRev || null);
+          }}
         />
       )}
     </div>

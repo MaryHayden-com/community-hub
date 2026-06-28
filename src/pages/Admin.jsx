@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap, ImagePlus, Clock, CalendarDays, MoreHorizontal, SlidersHorizontal } from "lucide-react";
 import AdminActionStream from "../components/AdminActionStream";
-import AdminAnalytics from "../components/AdminAnalytics";
+import AdminAnalyticsDashboard from "../components/AdminAnalyticsDashboard";
 import AdminClaimRequests from "../components/AdminClaimRequests";
 import AdminOverview from "../components/AdminOverview";
 import AdminUsersTab from "../components/AdminUsersTab";
@@ -503,7 +503,7 @@ export default function Admin() {
         />
       )}
       {activeTab === "engagement" && <AdminEngagementReport listings={listings} />}
-      {activeTab === "analytics" && <AdminAnalytics listings={listings} />}
+      {activeTab === "analytics" && <AdminAnalyticsDashboard />}
       {activeTab === "survey" && <AdminSurveyResults />}
       {activeTab === "claims" && <AdminClaimRequests />}
       {activeTab === "users" && <AdminUsersTab />}
