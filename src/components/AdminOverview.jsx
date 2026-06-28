@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+import { useState } from "react";
 import {
   LayoutGrid, Calendar, Flag, CheckCircle2, Clock,
-  Plus, FileDown, Inbox, TrendingUp, Star, MapPin
+  Plus, FileDown, Inbox, TrendingUp, Star, MapPin, Sheet, ExternalLink, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 
 function StatCard({ icon: Icon, label, value, sub, color = "text-primary", bg = "bg-primary/10" }) {
   return (
@@ -25,6 +27,21 @@ function SectionHeading({ children }) {
 }
 
 export default function AdminOverview({ listings, pendingClaimsCount, onAddListing, onAddEvent, onGoToTab, onExport }) {
+  const [syncing, setSyncing] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState(null);
+
+  const handleSyncToSheets = async () => {
+    setSyncing(true);
+    try {
+      const res = await base44.functions.invoke("syncToGoogleSheets", {});
+      if (res.data?.spreadsheetUrl) setSheetUrl(res.data.spreadsheetUrl);
+    } catch (e) {
+      alert("Sync failed: " + e.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString().slice(0, 10);
@@ -75,6 +92,16 @@ export default function AdminOverview({ listings, pendingClaimsCount, onAddListi
           <Button size="sm" variant="outline" onClick={onExport} className="gap-1.5">
             <FileDown className="w-4 h-4" /> Export CSV
           </Button>
+          <Button size="sm" variant="outline" onClick={handleSyncToSheets} disabled={syncing} className="gap-1.5">
+            {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sheet className="w-4 h-4 text-emerald-600" />}
+            {syncing ? "Syncing…" : "Sync to Google Sheets"}
+          </Button>
+          {sheetUrl && (
+            <a href={sheetUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-emerald-700 underline underline-offset-2">
+              <ExternalLink className="w-3.5 h-3.5" /> Open Sheet
+            </a>
+          )}
           <Button size="sm" variant="outline" onClick={() => onGoToTab("claims")} className="gap-1.5 relative">
             <Inbox className="w-4 h-4" /> Approve Claims
             {pendingClaimsCount > 0 && (
