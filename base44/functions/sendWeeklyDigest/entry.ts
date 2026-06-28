@@ -38,21 +38,39 @@ Deno.serve(async (req) => {
       const websiteClicks = recentEngagement.filter(e => e.event_type === 'website_click').length;
       const emailClicks = recentEngagement.filter(e => e.event_type === 'email_click').length;
 
+      // Get saved listings count
+      const savedCount = await base44.asServiceRole.entities.SavedListing.filter({
+        listing_id: listing.id,
+      }).then(lists => lists.length);
+
       // Get event attendance for What's On
       let attendanceCount = 0;
+      let newAttendanceCount = 0;
       let attendanceText = '';
       if (listing.type === "What's On") {
-        const attendance = await base44.asServiceRole.entities.EventAttendance.filter({
+        const allAttendance = await base44.asServiceRole.entities.EventAttendance.filter({
           listing_id: listing.id,
           attending: true,
         });
-        attendanceCount = attendance.length;
-        attendanceText = attendanceCount > 0 ? `${attendanceCount} people marked themselves as going` : 'No attendees yet';
+        attendanceCount = allAttendance.length;
+        // Count new RSVPs this week
+        newAttendanceCount = allAttendance.filter(a => {
+          const rsvpDate = new Date(a.created_date);
+          return rsvpDate >= lastWeek;
+        }).length;
+        if (attendanceCount > 0) {
+          attendanceText = `${attendanceCount} people marked themselves as going`;
+          if (newAttendanceCount > 0) {
+            attendanceText += ` (${newAttendanceCount} new this week)`;
+          }
+        } else {
+          attendanceText = 'No attendees yet';
+        }
       }
 
       // Only send if there's meaningful activity
       const totalEngagement = views + phoneClicks + websiteClicks + emailClicks;
-      if (totalEngagement === 0 && attendanceCount === 0) continue;
+      if (totalEngagement === 0 && attendanceCount === 0 && savedCount === 0) continue;
 
       // Build email
       const subject = `Your weekly ${listing.name} engagement report`;
@@ -66,9 +84,10 @@ Here's your weekly engagement report for **${listing.name}** (${lastWeekStr} to 
 - Phone Clicks: ${phoneClicks}
 - Website Visits: ${websiteClicks}
 - Email Clicks: ${emailClicks}
-${listing.type === "What's On" ? `\n🎉 **Event Update:**\n${attendanceText}` : ''}
+- Times Saved: ${savedCount}
+${listing.type === "What's On" ? `\n🎉 **Event Update:**\n- Total RSVPs: ${attendanceCount}\n${newAttendanceCount > 0 ? `- New This Week: ${newAttendanceCount}\n` : ''}` : ''}
 
-${totalEngagement > 0 ? `That's ${totalEngagement} interactions with your listing this week!` : ''}
+${totalEngagement > 0 || savedCount > 0 ? `That's ${totalEngagement + savedCount} interactions with your listing this week!` : ''}
 
 👉 **View your full dashboard:** ${process.env.BASE44_APP_URL || 'https://yourapp.base44.app'}/dashboard
 
