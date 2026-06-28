@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
-  Tag, ChevronLeft,
+  Tag, ChevronLeft, HeartHandshake,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +13,7 @@ const navItems = [
   { to: "/", label: "Directory", icon: MapPin },
   { to: "/directory?type=Business", label: "Businesses", icon: Building2 },
   { to: "/directory?type=Club+%26+Group", label: "Clubs & Groups", icon: Users },
-  { to: "/directory?type=Community+Services", label: "Services", icon: GraduationCap },
+  { to: "/directory?type=Community+Services", label: "Services", icon: HeartHandshake },
   { to: "/directory?type=Education", label: "Education", icon: GraduationCap },
   { to: "/whats-on", label: "What's On", icon: Calendar },
 ];
@@ -24,6 +24,7 @@ const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard
 // Bottom nav tabs (mobile)
 const BOTTOM_TABS = [
   { to: "/", label: "Directory", icon: MapPin },
+  { to: "/whats-on", label: "What's On", icon: Calendar },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 

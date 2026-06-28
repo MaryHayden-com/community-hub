@@ -22,8 +22,7 @@ export default function ListingListRow({ listing }) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="flex items-center gap-4 bg-card rounded-xl px-4 py-3 hover:shadow-md transition-all group"
-      style={{ border: '2px solid #E2701B' }}
+      className="flex items-center gap-4 bg-card rounded-xl px-4 py-3 hover:shadow-md transition-all group border-2 border-accent"
     >
       <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
         {listing.image_url ? (
@@ -83,7 +82,7 @@ export default function ListingListRow({ listing }) {
           <span>{listing.town}{listing.area && listing.area !== listing.town ? ` · ${listing.area}` : ""}, {listing.county}</span>
         </div>
         {listing.description && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">{listing.description}</p>
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-2">{listing.description}</p>
         )}
       </div>
 

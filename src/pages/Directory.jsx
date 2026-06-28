@@ -16,7 +16,7 @@ import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
 
 const PAGE_SIZE = 50;
 const BATCH_SIZE = 200;
-const todayStr = new Date().toISOString().slice(0, 10);
+const getTodayStr = () => new Date().toISOString().slice(0, 10);
 
 function readParam(params, key) { return params.get(key) || ""; }
 
@@ -37,7 +37,7 @@ export default function Directory() {
   const [category, setCategory] = useState(() => params.get("category") ? [params.get("category")] : []);
   const [county, setCounty] = useState(() => readParam(params, "county") || localStorage.getItem("dir_county") || "");
   const [town, setTown] = useState(() => readParam(params, "town") || localStorage.getItem("dir_town") || "");
-  const [dateFrom, setDateFrom] = useState(todayStr);
+  const [dateFrom, setDateFrom] = useState(getTodayStr);
   const [dateTo, setDateTo] = useState("");
   const [nearbyCounties, setNearbyCounties] = useState(null);
 
@@ -68,7 +68,7 @@ export default function Directory() {
 
   useEffect(() => {
     loadListings().finally(() => setLoading(false));
-  }, []);
+  }, [loadListings]);
 
   // ── Sync URL params → filter state ──────────────────────────────────────────
   useEffect(() => {
@@ -285,7 +285,7 @@ export default function Directory() {
         counties={counties} towns={towns} townGroups={townGroups}
         dateFrom={dateFrom} setDateFrom={setDateFrom}
         dateTo={dateTo} setDateTo={setDateTo}
-        todayStr={todayStr}
+        todayStr={getTodayStr()}
         nearbyCounties={nearbyCounties} setNearbyCounties={setNearbyCounties}
       />
 
