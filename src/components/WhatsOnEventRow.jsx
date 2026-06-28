@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Star, RefreshCw, CalendarPlus } from "lucide-react";
+import { Clock, MapPin, Star, RefreshCw } from "lucide-react";
+import AddToCalendarButton from "./AddToCalendarButton";
 
 const DAY_MAP = { Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6, Sunday:0 };
 
@@ -63,80 +64,6 @@ function formatTime(t) {
   return t; // fallback for old free-text values
 }
 
-function addToCalendar(e, listing, dateObj) {
-  e.preventDefault();
-  e.stopPropagation();
-
-  const pad = (n) => String(n).padStart(2, "0");
-  const fmtDate = (d) => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
-  const fmtDateTime = (d, time) => {
-    const [h, min] = (time || "12:00").split(":");
-    return `${fmtDate(d)}T${pad(parseInt(h))}${pad(parseInt(min))}00`;
-  };
-
-  const start = dateObj || (listing.event_date ? new Date(listing.event_date + "T12:00:00") : new Date());
-  const hasTime = !!listing.event_time;
-  const location = listing.address || (listing.town ? `${listing.town}, Co. ${listing.county}` : "");
-  const uid = `${listing.id}-${fmtDate(start)}@irishdirectory`;
-  const now = new Date();
-  const dtstamp = fmtDateTime(now, `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}`) + "Z";
-
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//IrishDirectory//Events//EN",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "BEGIN:VEVENT",
-    `UID:${uid}`,
-    `DTSTAMP:${dtstamp}`,
-    `SUMMARY:${listing.name}`,
-  ];
-
-  if (hasTime) {
-    const dtStart = fmtDateTime(start, listing.event_time);
-    const endDate = listing.event_date_end ? new Date(listing.event_date_end + "T12:00:00") : start;
-    const dtEnd = fmtDateTime(endDate, listing.event_time);
-    // If start == end add 2 hours
-    if (dtStart === dtEnd) {
-      const endTime = new Date(start);
-      const [h, m] = listing.event_time.split(":");
-      endTime.setHours(parseInt(h) + 2, parseInt(m));
-      lines.push(`DTSTART:${dtStart}`);
-      lines.push(`DTEND:${fmtDateTime(endTime, `${pad(endTime.getHours())}:${pad(endTime.getMinutes())}`)}`);
-    } else {
-      lines.push(`DTSTART:${dtStart}`);
-      lines.push(`DTEND:${dtEnd}`);
-    }
-  } else {
-    // All-day event
-    const endDate = listing.event_date_end ? new Date(listing.event_date_end + "T12:00:00") : start;
-    const dayAfterEnd = new Date(endDate);
-    dayAfterEnd.setDate(dayAfterEnd.getDate() + 1);
-    lines.push(`DTSTART;VALUE=DATE:${fmtDate(start)}`);
-    lines.push(`DTEND;VALUE=DATE:${fmtDate(dayAfterEnd)}`);
-  }
-
-  if (listing.description) {
-    lines.push(`DESCRIPTION:${listing.description.replace(/[\r\n]+/g, " ")}`);
-  }
-  if (location) lines.push(`LOCATION:${location}`);
-  const eventUrl = listing.website || `${window.location.origin}/listing/${listing.id}`;
-  lines.push(`URL:${eventUrl}`);
-  lines.push("END:VEVENT");
-  lines.push("END:VCALENDAR");
-
-  const icsContent = lines.join("\r\n");
-  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${listing.name.replace(/[^a-z0-9]/gi, "_")}.ics`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
-}
 
 export default function WhatsOnEventRow({ listing, overrideDate }) {
   let dateObj = overrideDate || null;
@@ -238,14 +165,7 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
               Featured
             </span>
           )}
-          <button
-            onClick={(e) => addToCalendar(e, listing, dateObj)}
-            title="Add to Calendar"
-            className="flex items-center gap-1 text-xs border rounded-md px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors whitespace-nowrap"
-          >
-            <CalendarPlus className="w-3 h-3" />
-            Add to Calendar
-          </button>
+          <AddToCalendarButton listing={listing} dateObj={dateObj} size="sm" />
         </div>
       </div>
     </Link>

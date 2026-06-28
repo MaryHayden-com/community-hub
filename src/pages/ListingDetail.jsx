@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import ClaimListingForm from "../components/ClaimListingForm";
+import AddToCalendarButton from "../components/AddToCalendarButton";
 import RemovalRequestForm from "../components/RemovalRequestForm";
 
 const typeConfig = {
@@ -293,6 +294,18 @@ export default function ListingDetail() {
               <Button size="sm" onClick={() => setShowClaim(true)} style={{ background: '#E2701B', border: 'none', color: '#fff' }}>
                 <Flag className="w-3.5 h-3.5" /> Claim this listing
               </Button>
+            </div>
+          )}
+
+          {/* Add to Calendar — only for events */}
+          {listing.type === "What's On" && (
+            <div className="mt-5 pt-5 border-t">
+              <p className="text-xs text-muted-foreground mb-2">Add this event to your calendar</p>
+              <AddToCalendarButton
+                listing={listing}
+                dateObj={listing.event_date ? new Date(listing.event_date + "T12:00:00") : null}
+                size="md"
+              />
             </div>
           )}
 
