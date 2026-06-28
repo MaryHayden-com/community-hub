@@ -1,7 +1,7 @@
 /**
  * Master taxonomy: Type → Group → SubGroup → Categories
- * Categories that appear in multiple places are cross-linked automatically.
- * When a user picks categories, groups are derived automatically.
+ * All types share aligned category language so What's On events map naturally
+ * to Business / Club & Group listings.
  */
 
 export const TAXONOMY = {
@@ -19,41 +19,44 @@ export const TAXONOMY = {
     },
     "Food & Beverage": {
       "Eat In": [
-        "Restaurant", "Bistro", "Gastropub", "Café", "Coffee Shop", "Deli", "Bar & Pub", "Hotel Restaurant"
+        "Restaurant", "Bistro", "Gastropub", "Café", "Coffee Shop", "Deli", "Bar & Pub", "Hotel Restaurant", "Carvery"
       ],
       "Takeaway & Fast Food": [
-        "Chipper / Fish & Chips", "Chinese Takeaway", "Indian Takeaway", "Pizza", "Burger & Fast Food", "Sandwich Bar"
+        "Chipper / Fish & Chips", "Chinese Takeaway", "Indian Takeaway", "Pizza", "Burger & Fast Food", "Sandwich Bar", "Kebab", "Mexican Takeaway"
       ],
       "Producers & Suppliers": [
-        "Artisan Food Producer", "Bakery", "Ice Cream", "Chocolatier", "Catering Company", "Food Truck / Mobile Catering"
+        "Artisan Food Producer", "Bakery", "Ice Cream & Gelato", "Chocolatier", "Catering Company", "Food Truck / Mobile Catering", "Meal Prep & Delivery"
+      ],
+      "Drinks": [
+        "Pub", "Bar", "Craft Beer & Microbrewery", "Wine Bar", "Distillery", "Off Licence", "Coffee Roaster"
       ]
     },
     "Healthcare": {
       "Medical": [
-        "GP & Medical Centre", "Hospital", "HSE Service", "Health Centre", "Specialist Clinic", "Optician", "Dentist"
+        "GP & Medical Centre", "Hospital", "HSE Service", "Health Centre", "Specialist Clinic", "Optician", "Dentist", "Orthodontist"
       ],
       "Therapy & Allied Health": [
-        "Physiotherapy", "Occupational Therapy", "Speech & Language Therapy", "Podiatry & Chiropody", "Osteopathy", "Chiropractic"
+        "Physiotherapy", "Occupational Therapy", "Speech & Language Therapy", "Podiatry & Chiropody", "Osteopathy", "Chiropractic", "Dietitian & Nutritionist"
       ],
       "Mental Health & Wellbeing": [
-        "Counselling & Psychotherapy", "Psychology", "Mental Health Service", "Addiction Services"
+        "Counselling & Psychotherapy", "Psychology", "Mental Health Service", "Addiction Services", "CBT Therapist", "Life Coach"
       ],
       "Pharmacy & Other": [
-        "Pharmacy", "Veterinary", "Alternative / Complementary Medicine"
+        "Pharmacy", "Veterinary", "Alternative / Complementary Medicine", "Acupuncture", "Homeopathy"
       ]
     },
     "Personal Services": {
       "Hair & Beauty": [
-        "Hair Salon", "Barber", "Nail Salon", "Beauty Salon", "Spray Tan", "Eyebrow & Lash Specialist", "Makeup Artist"
+        "Hair Salon", "Barber", "Nail Salon", "Beauty Salon", "Spray Tan", "Eyebrow & Lash Specialist", "Makeup Artist", "Skin Clinic", "Microblading"
       ],
       "Therapies & Wellness": [
-        "Massage Therapist", "Reflexology", "Reiki", "Acupuncture", "Holistic Therapy", "Personal Trainer"
+        "Massage Therapist", "Reflexology", "Reiki", "Acupuncture", "Holistic Therapy", "Personal Trainer", "Yoga Studio", "Pilates Studio"
       ],
       "Domestic & Care": [
         "Childcare & Crèche", "Childminder", "Cleaning Services", "Ironing & Laundry", "Dry Cleaning", "Home Help", "Pet Grooming", "Dog Walker"
       ],
       "Life Events": [
-        "Funeral Director", "Wedding Planner", "Celebrant", "Photographer (Personal)", "Florist (Personal)"
+        "Funeral Director", "Wedding Planner", "Celebrant", "Photographer", "Florist", "Wedding Venue", "Bridal Boutique"
       ]
     },
     "Professional Services": {
@@ -64,25 +67,25 @@ export const TAXONOMY = {
         "Auctioneer / Estate Agent", "Architect", "Quantity Surveyor", "Structural Engineer", "Property Management", "Valuer / Surveyor"
       ],
       "Business & Management": [
-        "Business Consultant", "HR & Recruitment", "Management Consultant", "Project Manager", "Coaching & Mentoring"
+        "Business Consultant", "HR & Recruitment", "Management Consultant", "Project Manager", "Coaching & Mentoring", "Executive Coach"
       ],
       "Technology & IT": [
-        "IT Support", "Software Development", "Cybersecurity", "Cloud Services", "Web Design", "App Development", "Data Analytics"
+        "IT Support", "Software Development", "Cybersecurity", "Cloud Services", "Web Design", "App Development", "Data Analytics", "AI & Machine Learning"
       ],
       "Marketing & Communications": [
-        "Marketing Agency", "PR & Communications", "Social Media Management", "SEO & Digital Marketing", "Copywriting", "Content Creation", "Brand Strategy"
+        "Marketing Agency", "PR & Communications", "Social Media Management", "SEO & Digital Marketing", "Copywriting", "Content Creation", "Brand Strategy", "Videography"
       ],
       "Creative & Design": [
-        "Graphic Design", "Interior Design", "Product Design", "Animation & Motion Graphics", "Illustration"
+        "Graphic Design", "Interior Design", "Product Design", "Animation & Motion Graphics", "Illustration", "Architecture & Design"
       ],
       "Media & Production": [
-        "Photography Studio", "Video Production", "Podcast Production", "Print & Publishing", "Advertising Agency"
+        "Photography Studio", "Video Production", "Podcast Production", "Print & Publishing", "Advertising Agency", "Music Production"
       ],
       "Administrative & Office": [
         "Virtual Assistant", "Translation & Interpretation", "Secretarial Services", "Document Management", "Payroll Services"
       ],
       "Education & Training (Professional)": [
-        "Corporate Training", "Executive Education", "Health & Safety Training", "First Aid Training", "Language Training"
+        "Corporate Training", "Executive Education", "Health & Safety Training", "First Aid Training", "Language Training", "Online Courses"
       ]
     },
     "Retail": {
@@ -102,7 +105,7 @@ export const TAXONOMY = {
         "Hardware Store", "DIY & Home Improvement", "Paint & Decorating", "Building Materials", "Tools & Equipment"
       ],
       "Hobbies, Books & Gifts": [
-        "Bookshop", "Gift Shop", "Craft & Hobby", "Toy Shop", "Arts & Crafts Supplies", "Games & Puzzles", "Music & Records"
+        "Bookshop", "Gift Shop", "Craft & Hobby", "Toy Shop", "Arts & Crafts Supplies", "Games & Puzzles", "Music & Records", "Stationery"
       ],
       "Electronics & Technology": [
         "Electronics", "Mobile Phones", "Computer & IT Retail", "Photography Equipment", "Appliances"
@@ -142,7 +145,7 @@ export const TAXONOMY = {
         "Courier & Delivery", "Freight & Haulage", "Van Hire", "Moving & Removals", "Storage & Warehousing"
       ],
       "Vehicle Services": [
-        "Car Dealer (New)", "Car Dealer (Used)", "Car Hire / Rental", "Garage & Mechanic", "Tyre & Exhaust Centre", "MOT & NCT Centre", "Bodywork & Valeting", "Motorcycle Dealer"
+        "Car Dealer (New)", "Car Dealer (Used)", "Car Hire / Rental", "Garage & Mechanic", "Tyre & Exhaust Centre", "NCT Centre", "Bodywork & Valeting", "Motorcycle Dealer"
       ],
       "Marine & Aviation": [
         "Boat Sales & Hire", "Marine Services", "Pilot & Aviation Services"
@@ -164,7 +167,7 @@ export const TAXONOMY = {
     },
     "Tourism & Leisure": {
       "Activities & Adventure": [
-        "Activity Centre", "Cycling & Bike Hire", "Horse Riding", "Kayaking & Water Sports", "Walking & Hiking Tours", "Surfing & Water Sports", "Golf Course"
+        "Activity Centre", "Cycling & Bike Hire", "Horse Riding", "Kayaking & Water Sports", "Walking & Hiking Tours", "Surfing & Water Sports", "Golf Course", "Escape Room"
       ],
       "Attractions & Culture": [
         "Museum & Heritage", "Art Gallery", "Historic House & Gardens", "Zoo & Wildlife Park", "Aquarium", "Theme Park", "Visitor Centre"
@@ -173,7 +176,7 @@ export const TAXONOMY = {
         "Tour Operator", "Guided Tours", "Food & Drink Tours", "Bus Tours", "Boat Tours", "Ghost & History Tours"
       ],
       "Events & Entertainment": [
-        "Entertainment Venue", "Live Music Venue", "Theatre", "Cinema", "Comedy Club", "Escape Room", "Go-Kart / Motorsport"
+        "Entertainment Venue", "Live Music Venue", "Theatre", "Cinema", "Comedy Club", "Go-Kart / Motorsport", "Nightclub", "Bowling Alley"
       ]
     },
     "Financial Services": {
@@ -195,16 +198,16 @@ export const TAXONOMY = {
   "Club & Group": {
     "Arts & Culture": {
       "Visual Arts": [
-        "Art Club", "Drawing & Painting", "Pottery & Ceramics", "Photography Club", "Sculpture"
+        "Art Club", "Drawing & Painting", "Pottery & Ceramics", "Photography Club", "Sculpture", "Printmaking"
       ],
       "Performing Arts": [
-        "Drama & Theatre", "Choir", "Dance", "Music Group", "Open Mic", "Improv Group"
+        "Drama & Theatre", "Choir", "Dance", "Music Group", "Open Mic", "Improv Group", "Amateur Film"
       ],
       "Literary & Creative": [
-        "Book Club", "Creative Writing", "Poetry Group", "Film Club", "Storytelling"
+        "Book Club", "Creative Writing", "Poetry Group", "Film Club", "Storytelling", "Debating Club"
       ],
       "Crafts & Making": [
-        "Craft & Hobby", "Knitting & Crochet", "Quilting", "Woodworking Club", "Sewing & Embroidery"
+        "Craft & Hobby", "Knitting & Crochet", "Quilting", "Woodworking Club", "Sewing & Embroidery", "Jewellery Making"
       ]
     },
     "Charity & Welfare": {
@@ -212,10 +215,10 @@ export const TAXONOMY = {
         "Charity", "Fundraising Group", "Food Bank", "Homeless Support", "Refugee & Asylum Support"
       ],
       "Support Groups": [
-        "Mental Health Support", "Bereavement Support", "Addiction Recovery", "Carer Support", "Disability Support"
+        "Mental Health Support", "Bereavement Support", "Addiction Recovery", "Carer Support", "Disability Support", "Cancer Support"
       ],
       "Service Organisations": [
-        "St Vincent de Paul", "Lions Club", "Rotary Club", "Soroptimists", "Hospice Support", "Volunteer Group"
+        "St Vincent de Paul", "Lions Club", "Rotary Club", "Soroptimists", "Hospice Support", "Volunteer Group", "Red Cross"
       ]
     },
     "Faith & Religious": {
@@ -231,24 +234,24 @@ export const TAXONOMY = {
         "Men's Shed", "Women's Group", "ICA", "Senior Citizens Club", "Bridge Club", "Chess Club", "Toastmasters", "Debating Club"
       ],
       "Outdoors & Nature": [
-        "Walking Group", "Rambling Club", "Birdwatching", "Gardening Club", "Beekeeping", "Fishing Club"
+        "Walking Group", "Rambling Club", "Birdwatching", "Gardening Club", "Beekeeping", "Fishing Club", "Nature & Conservation"
       ],
       "Hobbies & Interests": [
-        "Car & Motorbike Club", "Model Railway", "Pigeon Club", "Amateur Radio", "Astronomy Club", "History Society"
+        "Car & Motorbike Club", "Model Railway", "Pigeon Club", "Amateur Radio", "Astronomy Club", "History Society", "Genealogy Group"
       ]
     },
     "Sports & Recreation": {
       "Gaelic Games": [
-        "GAA", "Hurling", "Camogie", "Ladies Football", "Handball"
+        "GAA", "Hurling", "Camogie", "Ladies Football", "Handball", "Gaelic Football"
       ],
       "Team Sports": [
-        "Soccer / Football", "Rugby", "Hockey", "Basketball", "Volleyball", "American Football", "Cricket"
+        "Soccer / Football", "Rugby", "Hockey", "Basketball", "Volleyball", "American Football", "Cricket", "Netball"
       ],
       "Individual Sports": [
-        "Athletics", "Badminton", "Boxing", "Cycling", "Equestrian", "Golf", "Gymnastics", "Martial Arts", "Sailing", "Swimming", "Table Tennis", "Tennis", "Squash"
+        "Athletics", "Badminton", "Boxing", "Cycling", "Equestrian", "Golf", "Gymnastics", "Martial Arts", "Sailing", "Swimming", "Table Tennis", "Tennis", "Squash", "Weightlifting"
       ],
       "Water & Outdoor Sports": [
-        "Kayaking & Rowing", "Surfing", "Triathlon", "Orienteering", "Mountain Biking", "Hill Walking"
+        "Kayaking & Rowing", "Surfing", "Triathlon", "Orienteering", "Mountain Biking", "Hill Walking", "Open Water Swimming"
       ],
       "Racket & Target Sports": [
         "Archery", "Clay Pigeon Shooting", "Darts", "Snooker & Billiards", "Bowls"
@@ -256,21 +259,21 @@ export const TAXONOMY = {
     },
     "Youth & Community": {
       "Youth Organisations": [
-        "Foróige", "Scouts", "Girl Guides", "Youth Club", "Macra na Feirme", "4-H Club"
+        "Foróige", "Scouts", "Girl Guides", "Youth Club", "Macra na Feirme", "4-H Club", "Boys Brigade", "Girls Brigade"
       ],
       "Youth Sports & Activities": [
-        "Youth Football", "Youth GAA", "Youth Rugby", "Gymnastics (Youth)", "Karate & Martial Arts (Youth)", "Youth Sports Coaching"
+        "Youth Football", "Youth GAA", "Youth Rugby", "Gymnastics (Youth)", "Karate & Martial Arts (Youth)", "Youth Sports Coaching", "Swimming Lessons"
       ],
       "Community Groups": [
-        "Community Council", "Community Group", "Residents Association", "Tidy Towns", "Heritage Society", "Development Association"
+        "Community Council", "Community Group", "Residents Association", "Tidy Towns", "Heritage Society", "Development Association", "Neighbourhood Watch"
       ]
     },
     "Health & Wellness": {
       "Fitness & Movement": [
-        "Running Club", "Yoga", "Pilates", "Gym & Fitness", "Crossfit", "Zumba & Dance Fitness", "Tai Chi", "Nordic Walking"
+        "Running Club", "Yoga", "Pilates", "Gym & Fitness", "Crossfit", "Zumba & Dance Fitness", "Tai Chi", "Nordic Walking", "Aerobics"
       ],
       "Therapies & Wellbeing": [
-        "Mindfulness & Meditation", "Counselling Support Group", "Weight Management", "Physiotherapy Group", "Breathwork"
+        "Mindfulness & Meditation", "Counselling Support Group", "Weight Management", "Physiotherapy Group", "Breathwork", "Wellness Circle"
       ]
     }
   },
@@ -278,7 +281,7 @@ export const TAXONOMY = {
   "Community Services": {
     "Care & Support": {
       "Children & Families": [
-        "Crèche", "Childminder", "Family Support", "Tusla / Child & Family Agency", "Parenting Support"
+        "Crèche", "Childminder", "Family Support", "Tusla / Child & Family Agency", "Parenting Support", "After-school Care"
       ],
       "Older People": [
         "Day Care Centre", "Home Help", "Meals on Wheels", "Nursing Home", "Respite Care", "Active Retirement"
@@ -322,7 +325,7 @@ export const TAXONOMY = {
         "GP & Medical Centre", "Health Centre", "Hospital", "HSE Service", "Specialist Clinic", "Dentist", "Physiotherapy"
       ],
       "Mental Health": [
-        "Mental Health Service", "CAMHS", "Counselling Service", "Crisis Support"
+        "Mental Health Service", "CAMHS", "Counselling Service", "Crisis Support", "Addiction Services"
       ],
       "Pharmacy & Allied": [
         "Pharmacy", "Optician", "Podiatry", "Occupational Therapy"
@@ -378,10 +381,10 @@ export const TAXONOMY = {
     },
     "Training & Skills": {
       "Arts & Leisure": [
-        "Arts & Drama Classes", "Music Lessons", "Craft Classes", "Dance Classes", "Language Classes"
+        "Arts & Drama Classes", "Music Lessons", "Craft Classes", "Dance Classes", "Language Classes", "Singing Lessons"
       ],
       "Academic & Professional": [
-        "Tutoring", "Grinds", "Sports Coaching", "TEFL / English Language", "IT & Computer Training"
+        "Tutoring", "Grinds", "Sports Coaching", "TEFL / English Language", "IT & Computer Training", "Exam Preparation"
       ],
       "Trades & Vocational": [
         "Apprenticeship", "Trades Training", "Health & Safety Training", "First Aid Training", "Driver Training"
@@ -390,79 +393,114 @@ export const TAXONOMY = {
   },
 
   "What's On": {
-    "Arts & Entertainment": {
-      "Music": [
-        "Concert", "Live Music Night", "Trad Session", "Open Mic", "Choir Performance", "Classical Music", "Music Festival"
+    "Music": {
+      "Live Music": [
+        "Live Music Night", "Trad Session", "Open Mic", "Live Band", "Acoustic Night", "DJ Night", "Jazz Night", "Pub Music"
       ],
+      "Concerts & Performances": [
+        "Concert", "Choir Performance", "Classical Music", "Music Festival", "Orchestra", "Opera"
+      ],
+      "Music Events": [
+        "Music Workshop", "Singing Class", "Instrument Lessons", "Music Competition", "Battle of the Bands"
+      ]
+    },
+    "Arts & Culture": {
       "Stage & Screen": [
-        "Theatre", "Comedy Night", "Stand-up", "Film Screening", "Pantomime", "Dance Performance", "Circus & Cabaret"
+        "Theatre", "Amateur Drama", "Comedy Night", "Stand-up Comedy", "Film Screening", "Pantomime", "Dance Performance", "Circus & Cabaret", "Improv Night"
       ],
-      "Visual Arts": [
-        "Art Exhibition", "Photography Exhibition", "Craft Exhibition", "Gallery Opening", "Art Fair"
+      "Visual Arts & Exhibitions": [
+        "Art Exhibition", "Photography Exhibition", "Craft Exhibition", "Gallery Opening", "Art Fair", "Sculpture Trail"
+      ],
+      "Cultural Events": [
+        "Cultural Event", "Heritage Event", "Irish Language Event", "Commemoration", "Cultural Festival", "Storytelling"
       ]
     },
     "Community": {
       "Meetings & Information": [
-        "AGM / Meeting", "Information Evening", "Talk & Lecture", "Public Consultation", "Town Hall Meeting"
+        "AGM / Meeting", "Information Evening", "Talk & Lecture", "Public Consultation", "Town Hall Meeting", "Planning Meeting"
       ],
       "Fundraisers & Charity": [
-        "Fundraiser", "Charity Auction", "Coffee Morning", "Quiz Night", "Gala Dinner"
+        "Fundraiser", "Charity Auction", "Coffee Morning", "Quiz Night", "Gala Dinner", "Table Quiz", "Sponsored Walk", "Charity Run"
       ],
       "Open Days & Tours": [
-        "Open Day", "Heritage Tour", "School Open Night", "Business Open Day"
+        "Open Day", "Heritage Tour", "School Open Night", "Business Open Day", "Farm Open Day", "Garden Open Day"
       ],
       "Workshops & Classes": [
-        "Workshop", "Class", "Demonstration", "Course", "Seminar & Conference"
-      ]
-    },
-    "Family & Kids": {
-      "Kids Activities": [
-        "Kids Event", "Storytelling", "Puppet Show", "Kids Workshop", "Summer Camp"
-      ],
-      "Family Fun": [
-        "Family Fun Day", "Craft Fair", "Treasure Hunt", "Circus Skills", "Pantomime"
-      ]
-    },
-    "Festivals & Markets": {
-      "Festivals": [
-        "Music Festival", "Food Festival", "Street Festival", "Arts Festival", "Cultural Festival", "Film Festival"
-      ],
-      "Markets": [
-        "Farmers Market", "Craft Market", "Christmas Market", "Car Boot Sale", "Flea Market"
+        "Workshop", "Class", "Demonstration", "Course", "Seminar & Conference", "Webinar", "Craft Workshop", "Cookery Class", "Art Class"
       ]
     },
     "Sport & Recreation": {
       "Running & Walking": [
-        "Fun Run", "5K / 10K Race", "Half Marathon", "Marathon", "Charity Walk", "Sponsored Walk"
+        "Fun Run", "5K Race", "10K Race", "Half Marathon", "Marathon", "Charity Walk", "Sponsored Walk", "Parkrun"
       ],
       "Sport Events": [
-        "Match / Game", "Tournament", "Sports Day", "Triathlon", "Swimming Gala", "Cycling Sportive"
+        "GAA Match", "Football Match", "Rugby Match", "Swimming Gala", "Cycling Sportive", "Tournament", "Sports Day", "Triathlon"
       ],
       "Outdoor & Adventure": [
-        "Hiking Event", "Orienteering", "Sailing Regatta", "Surf Competition", "Equestrian Event"
+        "Hiking Event", "Orienteering", "Sailing Regatta", "Surf Competition", "Equestrian Event", "Mountain Bike Race", "Open Water Swim"
+      ],
+      "Fitness Classes": [
+        "Yoga Class", "Pilates Class", "Fitness Class", "Zumba", "Crossfit", "Spin Class", "Boot Camp", "Aerobics"
       ]
     },
-    "Seasonal & Cultural": {
-      "Seasonal": [
-        "Christmas Event", "Halloween Event", "St Patrick's Day", "Easter Event", "Summer Event", "Spring Festival"
+    "Family & Kids": {
+      "Kids Activities": [
+        "Kids Event", "Storytelling", "Puppet Show", "Kids Workshop", "Summer Camp", "Kids Art Class", "Kids Sports"
       ],
-      "Cultural & Heritage": [
-        "Cultural Event", "Heritage Event", "Irish Language Event", "Religious Ceremony", "Commemoration"
+      "Family Fun": [
+        "Family Fun Day", "Treasure Hunt", "Circus Skills", "Pantomime", "Family Walk", "Halloween Event (Kids)", "Christmas Event (Kids)"
+      ]
+    },
+    "Festivals & Markets": {
+      "Festivals": [
+        "Music Festival", "Food Festival", "Street Festival", "Arts Festival", "Cultural Festival", "Film Festival", "Harvest Festival", "Summer Festival"
+      ],
+      "Markets": [
+        "Farmers Market", "Craft Market", "Christmas Market", "Car Boot Sale", "Flea Market", "Pop-up Market", "Food Market"
+      ],
+      "Fairs & Shows": [
+        "Agricultural Show", "Craft Fair", "County Fair", "Trade Show", "Dog Show", "Horse Fair"
+      ]
+    },
+    "Food & Drink": {
+      "Food Events": [
+        "Food Tasting", "Pop-up Restaurant", "Supper Club", "Cookery Demonstration", "Food & Drink Tour", "Brewery Tour", "Distillery Tour"
+      ],
+      "Social & Dining": [
+        "Charity Dinner", "Gala Dinner", "Quiz Night", "Coffee Morning", "Afternoon Tea", "BBQ", "Céilí"
+      ]
+    },
+    "Seasonal & Celebrations": {
+      "Seasonal": [
+        "Christmas Event", "Halloween Event", "St Patrick's Day", "Easter Event", "Summer Event", "Spring Festival", "New Year's Eve"
+      ],
+      "Celebrations & Ceremonies": [
+        "Religious Ceremony", "Memorial Service", "Award Night", "Graduation", "Anniversary Celebration"
+      ]
+    },
+    "Health & Wellbeing": {
+      "Wellness Events": [
+        "Wellness Workshop", "Mindfulness Session", "Meditation Class", "Retreat", "Breathwork Session", "Sound Bath"
+      ],
+      "Talks & Seminars": [
+        "Health Talk", "Mental Health Awareness", "Nutrition Talk", "First Aid Course", "Parenting Talk"
+      ]
+    },
+    "Education & Learning": {
+      "Talks & Lectures": [
+        "Public Lecture", "Book Talk", "History Talk", "Science Talk", "Environmental Talk", "Guest Speaker"
+      ],
+      "Workshops & Courses": [
+        "Adult Learning", "Language Class", "IT Class", "Creative Writing Workshop", "Photography Workshop", "Drama Workshop"
       ]
     }
   }
 };
 
-/**
- * Get all available groups for a given type.
- */
 export function getGroups(type) {
   return Object.keys(TAXONOMY[type] || {});
 }
 
-/**
- * Get all categories for a given type (flattened, sorted, deduplicated).
- */
 export function getAllCategories(type) {
   const groups = TAXONOMY[type] || {};
   const all = new Set();
@@ -472,11 +510,6 @@ export function getAllCategories(type) {
   return [...all].sort();
 }
 
-/**
- * Given a type and a list of selected categories,
- * return the full list of groups those categories belong to.
- * This is the cross-linking magic — Pharmacy auto-assigns to both Retail & Health Services.
- */
 export function getGroupsForCategories(type, selectedCategories) {
   const groups = TAXONOMY[type] || {};
   const result = new Set();
@@ -490,9 +523,6 @@ export function getGroupsForCategories(type, selectedCategories) {
   return [...result];
 }
 
-/**
- * Get categories for a specific set of groups (used for filtered display).
- */
 export function getCategoriesForGroups(type, selectedGroups) {
   const groups = TAXONOMY[type] || {};
   const all = new Set();
@@ -503,17 +533,11 @@ export function getCategoriesForGroups(type, selectedGroups) {
   return [...all].sort();
 }
 
-/**
- * Get all subgroups for a given group and type.
- */
 export function getSubGroupsForGroup(type, group) {
   const groups = TAXONOMY[type] || {};
   return Object.keys(groups[group] || {});
 }
 
-/**
- * Get categories for a specific subgroup.
- */
 export function getCategoriesForSubGroup(type, group, subGroup) {
   const groups = TAXONOMY[type] || {};
   return groups[group]?.[subGroup] || [];

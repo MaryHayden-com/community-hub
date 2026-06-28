@@ -8,12 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, CalendarPlus } from "lucide-react";
 import { ALL_COUNTIES } from "@/utils/irelandData";
+import CategoryPicker from "@/components/CategoryPicker";
 
 const EMPTY = {
   name: "", county: "", town: "", description: "",
   event_date: "", event_date_end: "", event_time: "",
   address: "", website: "", is_free: "",
   contact_name: "", email: "", phone: "",
+  category: [],
 };
 
 export default function SubmitEventForm({ open, onClose, isPaidUser = false, isAdmin = false, ownerListing = null }) {
@@ -141,6 +143,17 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
                 <p className="text-xs text-muted-foreground mt-1">Linking your event to a directory listing helps the owner approve it faster.</p>
               </div>
             )}
+
+            {/* Category */}
+            <div>
+              <Label>Event Type / Category</Label>
+              <CategoryPicker
+                listingType="What's On"
+                selected={form.category}
+                onChange={v => set("category", v)}
+                placeholder="e.g. Live Music, Fundraiser, Workshop..."
+              />
+            </div>
 
             {/* Event details */}
             <div>

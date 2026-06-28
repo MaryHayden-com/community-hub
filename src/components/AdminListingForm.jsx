@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import MultiSelectDropdown from "@/components/MultiSelectDropdown";
-import { getAllCategories, getGroupsForCategories, TAXONOMY, getSubGroupsForGroup, getCategoriesForSubGroup } from "@/utils/taxonomy";
+import CategoryPicker from "@/components/CategoryPicker";
+import { getGroupsForCategories, getAllCategories } from "@/utils/taxonomy";
 import { IRELAND_COUNTIES, getTownsAndVillagesForCounty } from "@/utils/irelandData";
 import { getVillagesNearTown } from "@/utils/townVillageCoords";
 
@@ -321,66 +321,19 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
           </div>
 
           {form.type && (
-            <div className="space-y-4">
-              {/* Group Selection */}
+            <div className="space-y-3">
               <div>
-                <Label>Group</Label>
-                <Select
-                  value={form.subcategory_group?.[0] || ""}
-                  onValueChange={(group) => {
-                    update("subcategory_group", group ? [group] : []);
-                    update("subgroup", []); // Reset subgroup on group change
-                    update("category", []);
+                <Label>Category / Categories</Label>
+                <CategoryPicker
+                  type={form.type}
+                  selected={form.category}
+                  onChange={(cats) => {
+                    update("category", cats);
+                    update("subcategory_group", getGroupsForCategories(form.type, cats));
                   }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a group..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(TAXONOMY[form.type] || {}).map((g) => (
-                      <SelectItem key={g} value={g}>{g}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Search or browse categories..."
+                />
               </div>
-
-              {/* SubGroup Selection */}
-              {form.subcategory_group?.[0] && (
-                <div>
-                  <Label>SubGroup</Label>
-                  <Select
-                    value={form.subgroup?.[0] || ""}
-                    onValueChange={(sg) => {
-                      update("subgroup", sg ? [sg] : []);
-                      update("category", []); // Reset categories on subgroup change
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a subgroup..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getSubGroupsForGroup(form.type, form.subcategory_group[0]).map((sg) => (
-                        <SelectItem key={sg} value={sg}>{sg}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {/* Category Multi-Select */}
-              {form.subgroup?.[0] && (
-                <div>
-                  <Label>Category / Categories</Label>
-                  <MultiSelectDropdown
-                    options={getCategoriesForSubGroup(form.type, form.subcategory_group[0], form.subgroup[0])}
-                    selected={form.category}
-                    placeholder="Select category/categories..."
-                    onChange={(selectedCats) => update("category", selectedCats)}
-                  />
-                </div>
-              )}
-
-              {/* Optional Custom Text Category */}
               <div>
                 <Label className="text-xs">Custom Category (optional)</Label>
                 <Input

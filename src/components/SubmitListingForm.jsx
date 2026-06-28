@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, PlusCircle, Clock } from "lucide-react";
 import { ALL_COUNTIES } from "@/utils/irelandData";
+import CategoryPicker from "@/components/CategoryPicker";
 
 const LISTING_TYPES = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
 
