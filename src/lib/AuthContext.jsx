@@ -41,6 +41,8 @@ export const AuthProvider = ({ children }) => {
         if (appParams.token) {
           await checkUserAuth();
         } else {
+          // No token — redirect to login, preserving the current URL to return to after login
+          base44.auth.redirectToLogin(window.location.href);
           setIsLoadingAuth(false);
           setIsAuthenticated(false);
         }
