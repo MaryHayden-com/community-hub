@@ -600,9 +600,22 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Switch checked={form.is_featured} onCheckedChange={(v) => update("is_featured", v)} />
-            <Label className="cursor-pointer">Featured Listing</Label>
+          <div className={`flex items-center gap-3 p-3 rounded-lg border ${listing?.plan === "premium" ? "border-amber-200 bg-amber-50/50" : "border-border bg-muted/30 opacity-70"}`}>
+            <Switch
+              checked={form.is_featured}
+              onCheckedChange={(v) => update("is_featured", v)}
+              disabled={listing?.plan !== "premium"}
+            />
+            <div>
+              <Label className={listing?.plan === "premium" ? "cursor-pointer" : "cursor-not-allowed text-muted-foreground"}>
+                Featured Listing
+              </Label>
+              {listing?.plan !== "premium" ? (
+                <p className="text-xs text-muted-foreground mt-0.5">⭐ Premium plan only — upgrade to enable featured placement</p>
+              ) : (
+                <p className="text-xs text-amber-700 mt-0.5">⭐ Featured listings appear at the top of search results</p>
+              )}
+            </div>
           </div>
 
           <div className="sticky bottom-0 bg-background border-t pt-3 pb-1 flex justify-end gap-2 -mx-6 px-6 mt-4">
