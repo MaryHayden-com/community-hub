@@ -84,6 +84,11 @@ export default function ListingListRow({ listing }) {
         {listing.description && (
           <p className="text-xs text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-2">{listing.description}</p>
         )}
+        {listing.updated_date && (
+          <p className="text-xs text-muted-foreground/60 mt-0.5">
+            Updated {new Date(listing.updated_date).toLocaleDateString("en-IE", { month: "short", year: "numeric" })}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">

@@ -156,7 +156,8 @@ export default function ListingDetail() {
                 setAverageRating(Math.round(avg * 10) / 10);
               }
               if (user) {
-                const userRev = approved.find(r => r.user_email === user.email);
+                // Show user's own review even if pending approval
+                const userRev = all.find(r => r.user_email === user.email);
                 setUserReview(userRev || null);
               }
             })
@@ -438,7 +439,12 @@ export default function ListingDetail() {
               </div>
             )}
 
-            {reviews.length > 0 ? (
+            {userReview && !userReview.is_approved && (
+            <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-700">
+              ⏳ Your review is awaiting approval and will appear publicly once approved.
+            </div>
+          )}
+          {reviews.length > 0 ? (
               <div className="space-y-3">
                 {reviews.slice(0, 3).map((review) => (
                   <div key={review.id} className="p-4 rounded-xl border bg-card">
@@ -562,7 +568,7 @@ export default function ListingDetail() {
               user_name: user.full_name || user.email.split('@')[0],
               rating,
               review_text,
-              is_approved: true, // Auto-approve for now
+              is_approved: false, // Requires admin approval
               created_date: new Date().toISOString(),
             });
             setShowReview(false);
@@ -574,7 +580,8 @@ export default function ListingDetail() {
               const avg = approved.reduce((sum, r) => sum + r.rating, 0) / approved.length;
               setAverageRating(Math.round(avg * 10) / 10);
             }
-            const userRev = approved.find(r => r.user_email === user.email);
+            // Show user's own review even if pending
+            const userRev = all.find(r => r.user_email === user.email);
             setUserReview(userRev || null);
           }}
         />

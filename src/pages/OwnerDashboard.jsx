@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle, Users } from "lucide-react";
+import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle, Users, Share2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NoticeForm from "../components/NoticeForm";
@@ -231,29 +231,51 @@ export default function OwnerDashboard() {
             </div>
           </div>
 
-          {/* Engagement Metrics — Premium only */}
+          {/* Quick actions */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            <Link to={`/listing/${selectedListing.id}`} target="_blank">
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <ExternalLink className="w-3.5 h-3.5" /> View Public Profile
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => {
+              const url = `${window.location.origin}/listing/${selectedListing.id}`;
+              if (navigator.share) {
+                navigator.share({ title: selectedListing.name, url });
+              } else {
+                navigator.clipboard.writeText(url);
+                alert("Link copied to clipboard!");
+              }
+            }}>
+              <Share2 className="w-3.5 h-3.5" /> Share My Listing
+            </Button>
+          </div>
+
+          {/* Engagement Metrics */}
           <div className="mb-8">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Engagement Metrics</h2>
-            {!isPremium ? (
-              <div className="border-2 border-dashed border-amber-200 bg-amber-50/50 rounded-xl p-8 text-center">
-                <Crown className="w-8 h-8 text-amber-500 mx-auto mb-3" />
-                <p className="font-semibold text-amber-900">Premium Feature</p>
-                <p className="text-sm text-amber-700 mt-1 mb-4">Upgrade to Premium to see how many people viewed your profile, clicked your phone number, visited your website and more.</p>
+
+            {/* Everyone sees views */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+              <MetricCard icon={Eye} label="Profile Views" value={countFor("view")} color="text-blue-600" bg="bg-blue-50" />
+              {isPremium && METRIC_CONFIG.filter(m => m.key !== "view").map((m) => (
+                <MetricCard key={m.key} icon={m.icon} label={m.label} value={countFor(m.key)} color={m.color} bg={m.bg} />
+              ))}
+              {isPremium && selectedListing.type === "What's On" && (
+                <MetricCard icon={Users} label="Event Attendees" value={eventAttendance} color="text-purple-600" bg="bg-purple-50" />
+              )}
+            </div>
+
+            {!isPremium && (
+              <div className="border border-amber-200 bg-amber-50/60 rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 flex items-center gap-1.5"><Crown className="w-4 h-4 text-amber-500" /> Unlock full analytics</p>
+                  <p className="text-xs text-amber-700 mt-0.5">See phone clicks, website visits, email clicks and more with Premium.</p>
+                </div>
                 <Link to="/billing">
-                  <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white">Upgrade to Premium — €99/yr</Button>
+                  <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white shrink-0">Upgrade — €99/yr</Button>
                 </Link>
               </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {METRIC_CONFIG.map((m) => (
-                    <MetricCard key={m.key} icon={m.icon} label={m.label} value={countFor(m.key)} color={m.color} bg={m.bg} />
-                  ))}
-                  {selectedListing.type === "What's On" && (
-                    <MetricCard icon={Users} label="Event Attendees" value={eventAttendance} color="text-purple-600" bg="bg-purple-50" />
-                  )}
-                </div>
-              </>
             )}
           </div>
 

@@ -52,6 +52,22 @@ export default function SubmitListingForm({ open, onClose }) {
         plan_status: "active",
         country: "Ireland",
       });
+      // Confirmation email to submitter
+      if (form.email) {
+        base44.integrations.Core.SendEmail({
+          from_name: "Community Hub",
+          to: form.email,
+          subject: `Your listing has been submitted — ${form.name}`,
+          body: `Hi ${(form.contact_name || "there").split(" ")[0]},\n\nThank you for submitting "${form.name}" to Community Hub!\n\nYour listing is now under review and will be live in the directory shortly. We'll be in touch if we need anything from you.\n\nBest regards,\nThe Community Hub Team`,
+        }).catch(() => {});
+      }
+      // Admin alert
+      base44.integrations.Core.SendEmail({
+        from_name: "Community Hub",
+        to: "mary@maryhayden.com",
+        subject: `New listing submission: ${form.name}`,
+        body: `A new listing has been submitted for review.\n\nName: ${form.name}\nType: ${form.type}\nTown: ${form.town}, ${form.county}\nContact: ${form.contact_name} (${form.email})\n\nReview in Admin → Pending.`,
+      }).catch(() => {});
       setStep(3);
     } catch (err) {
       setFormError("Something went wrong: " + err.message);

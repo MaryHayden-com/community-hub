@@ -13,6 +13,7 @@ import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
 import SubmitListingForm from "../components/SubmitListingForm";
 import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
+import NewsletterSignup from "../components/NewsletterSignup";
 
 const PAGE_SIZE = 50;
 const BATCH_SIZE = 200;
@@ -336,13 +337,20 @@ export default function Directory() {
       )}
 
       {viewMode === "list" && !hasMore && filtered.length > 0 && (
-        <div className="mt-10 rounded-xl p-6 text-center" style={{ background: '#097275' }}>
-          <p className="text-white font-display text-xl font-bold mb-1">Is your business or group missing?</p>
-          <p className="text-white/80 text-sm mb-4">Add your free listing to the directory today — it only takes a minute.</p>
-          <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
-            <PlusCircle className="w-4 h-4" /> Add Your Listing — It's Free
-          </Button>
-        </div>
+        <>
+          <div className="mt-10 rounded-xl p-6 text-center" style={{ background: '#097275' }}>
+            <p className="text-white font-display text-xl font-bold mb-1">Is your business or group missing?</p>
+            <p className="text-white/80 text-sm mb-4">Add your free listing to the directory today — it only takes a minute.</p>
+            <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
+              <PlusCircle className="w-4 h-4" /> Add Your Listing — It's Free
+            </Button>
+          </div>
+          <div className="mt-4 md:hidden p-5 rounded-xl bg-primary/5 border border-primary/20">
+            <p className="text-sm font-semibold mb-1" style={{ color: '#097275' }}>📬 Stay updated on local events & news</p>
+            <p className="text-xs text-muted-foreground mb-3">Get the latest listings, events and community news delivered to your inbox.</p>
+            <NewsletterSignup source="directory-mobile" />
+          </div>
+        </>
       )}
     </div>
   );
