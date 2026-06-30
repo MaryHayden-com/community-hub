@@ -33,8 +33,8 @@ ${isPending
 }
 
 Thanks,
-The Hub for Community Team
-https://localcommunityhub.ie`,
+The Community Hub Team
+https://community-hub.base44.app`,
       });
     }
 
@@ -44,7 +44,7 @@ https://localcommunityhub.ie`,
       const ownerEmail = parentListing?.owner_email;
 
       if (ownerEmail) {
-        const adminLink = `https://localcommunityhub.ie/admin#stream`;
+        const adminLink = `https://community-hub.base44.app/admin`;
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: ownerEmail,
           from_name: "Hub for Community",
@@ -61,7 +61,7 @@ You can review and approve this event from your admin panel:
 ${adminLink}
 
 Thanks,
-The Hub for Community Team`,
+The Community Hub Team`,
         });
       }
     }

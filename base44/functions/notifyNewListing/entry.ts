@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
         `Type: ${type}\n` +
         `Location: ${location}\n` +
         `Submitted by: ${createdBy}\n\n` +
-        `👉 Review and approve it here: https://localcommunityhub.base44.app/admin\n` +
+        `👉 Review and approve it here: https://community-hub.base44.app/admin\n` +
         `(Go to the "Pending Approval" tab)`
     });
 
