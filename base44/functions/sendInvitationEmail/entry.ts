@@ -16,15 +16,15 @@ function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
 
           <!-- Header -->
           <tr>
-            <td style="background-color:#097275;padding:32px 40px;text-align:center;">
+            <td style="background-color:#097275;padding:28px 40px;text-align:center;">
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
-                  <td style="vertical-align:middle;padding-right:14px;">
+                  <td style="vertical-align:middle;padding-right:16px;">
                     <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="56" height="56" style="border-radius:10px;display:block;" />
                   </td>
                   <td style="vertical-align:middle;text-align:left;">
-                    <h1 style="color:#ffffff;margin:0 0 2px 0;font-size:26px;font-weight:bold;letter-spacing:0.5px;line-height:1.2;">Community Hub</h1>
-                    <p style="color:#a8d8da;margin:0;font-size:16px;font-weight:500;line-height:1.2;">${town}</p>
+                    <h1 style="color:#ffffff;margin:0 0 1px 0;font-size:26px;font-weight:bold;letter-spacing:0.5px;line-height:1.1;">Community Hub</h1>
+                    <p style="color:#a8d8da;margin:0;font-size:15px;font-weight:500;line-height:1.1;letter-spacing:0.3px;">${town}</p>
                   </td>
                 </tr>
               </table>
