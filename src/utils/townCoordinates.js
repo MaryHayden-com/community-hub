@@ -26,9 +26,18 @@ export const TOWN_COORDINATES = {
   "Rosscarbery": { lat: 51.5758, lng: -9.0300 },
   "Timoleague": { lat: 51.6413, lng: -8.7637 },
   "Inishannon": { lat: 51.7720, lng: -8.6753 },
+  "Innishannon": { lat: 51.7720, lng: -8.6753 },
   "Enniskeane": { lat: 51.7540, lng: -8.9245 },
   "Ballineen": { lat: 51.7595, lng: -8.9287 },
   "Cork": { lat: 51.8985, lng: -8.4756 },
+  "Cork City": { lat: 51.8985, lng: -8.4756 },
+  "Darrara": { lat: 51.6180, lng: -8.9070 },
+  "Ballinascarthy": { lat: 51.6790, lng: -8.8130 },
+  "Courtmacsherry": { lat: 51.6440, lng: -8.7160 },
+  "Leap": { lat: 51.5820, lng: -9.1370 },
+  "Cape Clear": { lat: 51.4460, lng: -9.4930 },
+  "Heir Island": { lat: 51.5100, lng: -9.3000 },
+  "Bere Island": { lat: 51.6380, lng: -9.8380 },
 
   // Dublin
   "Dublin": { lat: 53.3498, lng: -6.2603 },
@@ -148,6 +157,7 @@ export const TOWN_COORDINATES = {
   // Westmeath
   "Athlone": { lat: 53.4240, lng: -7.9401 },
   "Mullingar": { lat: 53.5345, lng: -7.3387 },
+  "Loughnavalley": { lat: 53.5730, lng: -7.2740 },
 
   // Roscommon
   "Roscommon": { lat: 53.6332, lng: -8.1819 },

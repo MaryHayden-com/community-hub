@@ -185,7 +185,7 @@ export default function Directory() {
         if (subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
         if (category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
         if (nearbyCounties) {
-          const coords = TOWN_COORDINATES[l.town] || TOWN_COORDINATES[l.area] || COUNTY_CENTROIDS.find(c => c.county === l.county);
+          const coords = TOWN_COORDINATES[l.town?.trim()] || TOWN_COORDINATES[l.area?.trim()] || TOWN_COORDINATES[l.nearest_town?.trim()] || COUNTY_CENTROIDS.find(c => c.county === l.county);
           if (!coords) return false;
           if (haversineKm(nearbyCounties.lat, nearbyCounties.lng, coords.lat, coords.lng) > nearbyCounties.km) return false;
         } else {
