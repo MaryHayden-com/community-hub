@@ -9,6 +9,7 @@ import {
   eachDayOfInterval, isSameDay, isSameMonth, isToday,
   parseISO, startOfWeek, endOfWeek
 } from "date-fns";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const DAY_MAP = { Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 0 };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -72,6 +73,7 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
 }
 
 export default function CalendarView() {
+  usePageTitle("Calendar");
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());

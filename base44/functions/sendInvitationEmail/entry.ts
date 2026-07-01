@@ -115,7 +115,9 @@ Deno.serve(async (req) => {
     }
 
     const { listing_id, test_email } = await req.json();
-    const appUrl = 'https://community-hub.base44.app';
+    // Derive the live app URL from the request so the claim link always points to wherever the app is actually hosted
+    const origin = req.headers.get('origin') || req.headers.get('referer');
+    const appUrl = origin ? origin.replace(/\/$/, '').split('/').slice(0, 3).join('/') : 'https://community-hub.base44.app';
 
     let listingsToInvite = [];
 

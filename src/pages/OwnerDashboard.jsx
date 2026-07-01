@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NoticeForm from "../components/NoticeForm";
 import OwnerListingEditForm from "../components/OwnerListingEditForm";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const METRIC_CONFIG = [
   { key: "view", label: "Profile Views", icon: Eye, color: "text-blue-600", bg: "bg-blue-50" },
@@ -45,6 +46,7 @@ function MetricCard({ icon: Icon, label, value, color, bg }) {
 }
 
 export default function OwnerDashboard() {
+  usePageTitle("Owner Dashboard");
   const [user, setUser] = useState(null);
   const [myListings, setMyListings] = useState([]);
   const [selectedListing, setSelectedListing] = useState(null);

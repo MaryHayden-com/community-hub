@@ -14,6 +14,7 @@ import { sortByTypeOrder } from "../utils/typeOrder";
 import SubmitListingForm from "../components/SubmitListingForm";
 import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
 import NewsletterSignup from "../components/NewsletterSignup";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const PAGE_SIZE = 50;
 const BATCH_SIZE = 200;
@@ -22,6 +23,7 @@ const getTodayStr = () => new Date().toISOString().slice(0, 10);
 function readParam(params, key) { return params.get(key) || ""; }
 
 export default function Directory() {
+  usePageTitle("Directory");
   const location = useLocation();
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
@@ -57,14 +59,16 @@ export default function Directory() {
 
   // ── Load all listings in batches (scales to any size) ───────────────────────
   const loadListings = useCallback(async () => {
-    let all = [], skip = 0, hasMore = true;
+    let all = [], skip = 0, hasMore = true, isFirstBatch = true;
     while (hasMore) {
       const batch = await base44.entities.CommunityListing.list("-created_date", BATCH_SIZE, skip);
       all = all.concat(batch);
       hasMore = batch.length === BATCH_SIZE;
       skip += BATCH_SIZE;
+      // Show results as soon as the first batch is in, then keep loading the rest in the background
+      setBrowseListings(all);
+      if (isFirstBatch) { setLoading(false); isFirstBatch = false; }
     }
-    setBrowseListings(all);
   }, []);
 
   useEffect(() => {

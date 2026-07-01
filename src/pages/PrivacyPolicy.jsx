@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Shield } from "lucide-react";
+import usePageTitle from "@/hooks/usePageTitle";
 
 export default function PrivacyPolicy() {
+  usePageTitle("Privacy Policy");
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-8">

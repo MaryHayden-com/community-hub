@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2 } from "lucide-react";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const IRISH_COUNTIES = [
   "Antrim","Armagh","Carlow","Cavan","Clare","Cork","Derry","Donegal","Down","Dublin",
@@ -110,6 +111,7 @@ function ScaleSelector({ value, onChange }) {
 }
 
 export default function Survey() {
+  usePageTitle("Survey");
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);

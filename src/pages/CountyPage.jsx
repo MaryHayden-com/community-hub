@@ -7,9 +7,11 @@ import ListingListRow from "../components/ListingListRow";
 import { Button } from "@/components/ui/button";
 import ListingCard from "../components/ListingCard";
 import { sortByTypeOrder } from "../utils/typeOrder";
+import usePageTitle from "@/hooks/usePageTitle";
 
 export default function CountyPage() {
   const { county } = useParams();
+  usePageTitle(`Co. ${decodeURIComponent(county)}`);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");

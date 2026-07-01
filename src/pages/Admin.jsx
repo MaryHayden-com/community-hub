@@ -19,12 +19,14 @@ import AdminWhatsOnTab from "../components/AdminWhatsOnTab";
 import AdminSurveyResults from "../components/AdminSurveyResults";
 import AdminEngagementReport from "../components/AdminEngagementReport";
 import AdminPendingTab from "../components/AdminPendingTab";
+import usePageTitle from "@/hooks/usePageTitle";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 
 export default function Admin() {
+  usePageTitle("Admin Panel");
   const [user, setUser] = useState(null);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);

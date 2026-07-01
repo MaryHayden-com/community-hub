@@ -5,11 +5,13 @@ import { ArrowLeft, Loader2, CreditCard, AlertCircle, CheckCircle2, ExternalLink
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import PlanSelector from "@/components/PlanSelector";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const PLAN_LABELS = { basic: "Basic (Free)", standard: "Standard", premium: "Premium" };
 const PLAN_COLORS = { basic: "bg-muted text-muted-foreground", standard: "bg-primary/10 text-primary", premium: "bg-amber-100 text-amber-800" };
 
 export default function Billing() {
+  usePageTitle("Billing & Plans");
   const [user, setUser] = useState(null);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);

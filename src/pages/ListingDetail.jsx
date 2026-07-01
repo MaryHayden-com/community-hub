@@ -17,6 +17,7 @@ import RemovalRequestForm from "../components/RemovalRequestForm";
 import QRCodeModal from "../components/QRCodeModal";
 import ReviewModal from "../components/ReviewModal";
 import ReviewStars from "../components/ReviewStars";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -60,6 +61,7 @@ export default function ListingDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const [listing, setListing] = useState(null);
+  usePageTitle(listing?.name);
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
   const [showRemoval, setShowRemoval] = useState(false);
@@ -528,7 +530,7 @@ export default function ListingDetail() {
               Facebook
             </Button>
             <div className="flex-1" />
-            {listing.owner_email && (
+            {!listing.owner_email && (
               <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
                 <Flag className="w-3.5 h-3.5" />
                 Claim this listing

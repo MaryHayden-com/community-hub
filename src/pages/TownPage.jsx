@@ -6,6 +6,7 @@ import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ListingListRow from "../components/ListingListRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
 import { Badge } from "@/components/ui/badge";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const typeIcons = {
   "Business": Building2,
@@ -18,6 +19,7 @@ export default function TownPage() {
   const { county, town } = useParams();
   const decodedCounty = decodeURIComponent(county);
   const decodedTown = decodeURIComponent(town);
+  usePageTitle(`${decodedTown}, Co. ${decodedCounty}`);
 
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);

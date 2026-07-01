@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { Heart, MapPin, Calendar, Building2, Users, GraduationCap, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -14,6 +15,7 @@ const typeConfig = {
 };
 
 export default function SavedListings() {
+  usePageTitle("Saved Listings");
   const { user } = useAuth();
   const [saved, setSaved] = useState([]);
   const [loading, setLoading] = useState(true);

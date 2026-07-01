@@ -12,6 +12,7 @@ import WhatsOnEventRow from "@/components/WhatsOnEventRow";
 import SubmitEventForm from "@/components/SubmitEventForm";
 import NearMeButton from "@/components/NearMeButton";
 import { getNextOccurrence, expandAndSortEvents, toArr } from "@/utils/recurringEvents";
+import usePageTitle from "@/hooks/usePageTitle";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
   eachDayOfInterval, isSameDay, isSameMonth, isToday,
@@ -66,6 +67,7 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function WhatsOn() {
+  usePageTitle("What's On");
   const location = useLocation();
   const { user } = useAuth();
   const { data: listings = [], isLoading: loading, isError: loadError } = useQuery({

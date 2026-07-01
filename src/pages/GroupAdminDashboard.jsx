@@ -10,6 +10,7 @@ import ListingDetailPanel from "../components/ListingDetailPanel.jsx";
 import ActionDueBadge from "../components/ActionDueBadge";
 import { isToday, isPast, parseISO } from "date-fns";
 import { ShieldCheck, Star, UserCheck } from "lucide-react";
+import usePageTitle from "@/hooks/usePageTitle";
 
 const typeConfig = {
   "Business": { icon: Building2, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -43,6 +44,7 @@ function getPriority(nextAction) {
 const PRIORITY_ORDER = { overdue: 0, today: 1, upcoming: 2, no_action: 3 };
 
 export default function GroupAdminDashboard() {
+  usePageTitle("My Area");
   const [user, setUser] = useState(null);
   const [listings, setListings] = useState([]);
   const [actions, setActions] = useState([]);
