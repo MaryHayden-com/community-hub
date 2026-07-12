@@ -1,5 +1,35 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+function isSafeUrl(urlStr) {
+  let parsed;
+  try {
+    parsed = new URL(urlStr);
+  } catch (_) {
+    return false;
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
+
+  const hostname = parsed.hostname.toLowerCase();
+  if (hostname === 'localhost' || hostname.endsWith('.localhost')) return false;
+  if (hostname === '0.0.0.0' || hostname === '::1') return false;
+
+  // Block raw IP literals that fall in private/reserved ranges
+  const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4Match) {
+    const octets = ipv4Match.slice(1, 5).map(Number);
+    const [a, b] = octets;
+    if (a === 127) return false; // loopback
+    if (a === 10) return false; // private
+    if (a === 172 && b >= 16 && b <= 31) return false; // private
+    if (a === 192 && b === 168) return false; // private
+    if (a === 169 && b === 254) return false; // link-local / cloud metadata
+    if (a === 0) return false;
+  }
+  if (hostname.includes(':')) return false; // block IPv6 literals entirely (covers ::1, fc00::/7, etc.)
+
+  return true;
+}
+
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
@@ -12,7 +42,7 @@ Deno.serve(async (req) => {
     if (!urls || !urls.length) return Response.json({ image_url: null });
 
     for (const url of urls) {
-      if (!url) continue;
+      if (!url || !isSafeUrl(url)) continue;
       try {
         // For Facebook pages, try the graph API thumbnail approach
         if (url.includes('facebook.com')) {
