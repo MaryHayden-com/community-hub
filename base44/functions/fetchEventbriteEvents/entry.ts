@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       
       Return only real, specific events with confirmed dates. Include events from local council websites, eventbrite.ie, facebook events, local newspapers, and community websites. 
       
-      For each event include: name, description (1-2 sentences), event_date (YYYY-MM-DD format), event_time (HH:MM format, or empty string if unknown), address, website (URL if available), town, county.`,
+      For each event include: name, description (1-2 sentences), event_date (YYYY-MM-DD format), event_time (HH:MM format, or empty string if unknown), address, website (URL if available), email (contact email if available), phone (contact phone number if available), town, county.`,
       add_context_from_internet: true,
       model: 'gemini_3_flash',
       response_json_schema: {
@@ -55,6 +55,8 @@ Deno.serve(async (req) => {
                 event_time: { type: 'string' },
                 address: { type: 'string' },
                 website: { type: 'string' },
+                email: { type: 'string' },
+                phone: { type: 'string' },
                 town: { type: 'string' },
                 county: { type: 'string' },
               }
@@ -94,9 +96,11 @@ Deno.serve(async (req) => {
       description: e.description || '',
       address: e.address || '',
       website: e.website || '',
+      email: e.email || '',
+      phone: e.phone || '',
       event_date: e.event_date,
       event_time: e.event_time || '',
-      status: 'approved',
+      status: 'pending',
       is_verified: false,
       is_featured: false,
     });
@@ -107,6 +111,22 @@ Deno.serve(async (req) => {
   if (toCreate.length > 0) {
     await base44.asServiceRole.entities.CommunityListing.bulkCreate(toCreate);
     console.log(`Created ${toCreate.length} new events`);
+
+    const rows = toCreate.map((e) => {
+      const contact = [e.email, e.phone].filter(Boolean).join(' / ') || 'No contact info found';
+      return `- ${e.name} (${e.town}, Co. ${e.county}) on ${e.event_date}\n  Contact: ${contact}`;
+    }).join('\n\n');
+
+    try {
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: 'mary@maryhayden.com',
+        from_name: 'Community Hub',
+        subject: `📅 ${toCreate.length} new What's On event${toCreate.length > 1 ? 's' : ''} awaiting review`,
+        body: `The daily events search found ${toCreate.length} new event${toCreate.length > 1 ? 's' : ''}. They've been added as pending so you can review and follow up before they go live:\n\n${rows}\n\n👉 Review and approve here: https://community-hub.base44.app/admin\n(Go to the "Pending Approval" tab)`,
+      });
+    } catch (err) {
+      console.error('Failed to send new events notification email:', err.message);
+    }
   } else {
     console.log('No new events to create');
   }
