@@ -30,6 +30,24 @@ function isSafeUrl(urlStr) {
   return true;
 }
 
+// Fetches a URL while manually validating every redirect hop against isSafeUrl,
+// so an attacker-controlled server can't redirect us to internal/metadata addresses.
+async function safeFetch(url, options, maxRedirects = 5) {
+  let currentUrl = url;
+  for (let i = 0; i <= maxRedirects; i++) {
+    if (!isSafeUrl(currentUrl)) return null;
+    const res = await fetch(currentUrl, { ...options, redirect: 'manual' });
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get('location');
+      if (!location) return null;
+      currentUrl = new URL(location, currentUrl).toString();
+      continue;
+    }
+    return res;
+  }
+  return null;
+}
+
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
@@ -59,12 +77,12 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Fetch HTML and extract og:image
-        const res = await fetch(url, {
+        // Fetch HTML and extract og:image (redirects are manually validated to prevent SSRF)
+        const res = await safeFetch(url, {
           headers: { 'User-Agent': 'Mozilla/5.0 (compatible; IrishDirectory/1.0)' },
           signal: AbortSignal.timeout(8000),
         });
-        if (!res.ok) continue;
+        if (!res || !res.ok) continue;
         const html = await res.text();
 
         // Try og:image first

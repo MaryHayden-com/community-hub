@@ -25,7 +25,7 @@ const PLANS = {
 
 const ALLOWED_REDIRECT_HOSTS = ['hub4community.ie', 'hub4community.com', 'www.hub4community.ie', 'www.hub4community.com'];
 
-function isAllowedRedirectUrl(urlStr, requestOrigin) {
+function isAllowedRedirectUrl(urlStr) {
   if (!urlStr) return false;
   let parsed;
   try {
@@ -35,14 +35,9 @@ function isAllowedRedirectUrl(urlStr, requestOrigin) {
   }
   if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
   const hostname = parsed.hostname.toLowerCase();
+  // Origin/Referer headers are client-controlled and must never be trusted for this check.
   if (ALLOWED_REDIRECT_HOSTS.includes(hostname)) return true;
   if (hostname.endsWith('.base44.app')) return true;
-  if (requestOrigin) {
-    try {
-      const originHost = new URL(requestOrigin).hostname.toLowerCase();
-      if (hostname === originHost) return true;
-    } catch (_) { /* ignore */ }
-  }
   return false;
 }
 
@@ -51,17 +46,16 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
 
     const { plan, listing_name, contact_name, email, success_url, cancel_url } = await req.json();
-    const requestOrigin = req.headers.get('origin') || req.headers.get('referer');
 
     const planConfig = PLANS[plan];
     if (!planConfig) return Response.json({ error: 'Invalid plan' }, { status: 400 });
 
     if (!email) return Response.json({ error: 'Email is required' }, { status: 400 });
 
-    const safeSuccessUrl = isAllowedRedirectUrl(success_url, requestOrigin)
+    const safeSuccessUrl = isAllowedRedirectUrl(success_url)
       ? success_url
       : `${Deno.env.get('BASE44_APP_URL') || 'https://hub4community.ie'}?submitted=1`;
-    const safeCancelUrl = isAllowedRedirectUrl(cancel_url, requestOrigin)
+    const safeCancelUrl = isAllowedRedirectUrl(cancel_url)
       ? cancel_url
       : `${Deno.env.get('BASE44_APP_URL') || 'https://hub4community.ie'}`;
 
