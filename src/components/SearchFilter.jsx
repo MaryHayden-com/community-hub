@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
-export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, category, setCategory, categories, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
+export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const isWhatsOn = type === "What's On";
   const hasFilters = search || type || (group && group.length > 0) || (category && category.length > 0) || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
 
@@ -103,6 +103,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
               selected={group || []}
               onChange={(v) => { setGroup(v); setCategory([]); }}
               placeholder="All Groups"
+              counts={groupCounts}
             />
           </div>
           {group && group.length > 0 && categories && categories.length > 0 && (
@@ -112,6 +113,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
                 selected={category || []}
                 onChange={setCategory}
                 placeholder="All Categories"
+                counts={categoryCounts}
               />
             </div>
           )}

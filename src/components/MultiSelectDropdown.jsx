@@ -14,7 +14,7 @@ function useIsMobile() {
   return isMobile;
 }
 
-export default function MultiSelectDropdown({ options, selected = [], onChange, placeholder = "Select options..." }) {
+export default function MultiSelectDropdown({ options, selected = [], onChange, placeholder = "Select options...", counts }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const isMobile = useIsMobile();
@@ -72,7 +72,10 @@ export default function MultiSelectDropdown({ options, selected = [], onChange, 
             )}>
               {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
             </div>
-            {opt}
+            <span className="flex-1">{opt}</span>
+            {counts && counts[opt] != null && (
+              <span className="text-xs text-muted-foreground shrink-0">({counts[opt]})</span>
+            )}
           </div>
         );
       })}

@@ -14,7 +14,10 @@ import { sortByTypeOrder } from "../utils/typeOrder";
 import SubmitListingForm from "../components/SubmitListingForm";
 import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
 import NewsletterSignup from "../components/NewsletterSignup";
+import NewsletterPopup from "../components/NewsletterPopup";
+import SuggestBusinessForm from "../components/SuggestBusinessForm";
 import usePageTitle from "@/hooks/usePageTitle";
+import { Lightbulb } from "lucide-react";
 
 const PAGE_SIZE = 50;
 const BATCH_SIZE = 200;
@@ -46,6 +49,7 @@ export default function Directory() {
 
   // ── UI State ─────────────────────────────────────────────────────────────────
   const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [showSuggestForm, setShowSuggestForm] = useState(false);
   const [viewMode, setViewMode] = useState("list");
   const [page, setPage] = useState(1);
 
@@ -154,6 +158,26 @@ export default function Directory() {
     )].sort();
   }, [browseListings, type, subcategoryGroup]);
 
+  const groupCounts = useMemo(() => {
+    if (!type) return {};
+    const counts = {};
+    browseListings.filter(l => l.type === type).forEach(l => {
+      toArr(l.subcategory_group).filter(Boolean).forEach(g => { counts[g] = (counts[g] || 0) + 1; });
+    });
+    return counts;
+  }, [browseListings, type]);
+
+  const categoryCounts = useMemo(() => {
+    if (!type || subcategoryGroup.length === 0) return {};
+    const counts = {};
+    browseListings
+      .filter(l => l.type === type && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
+      .forEach(l => {
+        toArr(l.category).filter(Boolean).forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+      });
+    return counts;
+  }, [browseListings, type, subcategoryGroup]);
+
   const townGroups = useMemo(() => {
     if (!county) return null;
     const { towns: staticTowns, villages: staticVillages } = getTownsAndVillagesForCounty(county);
@@ -225,6 +249,8 @@ export default function Directory() {
       onTouchEnd={handleTouchEnd}
     >
       <SubmitListingForm open={showSubmitForm} onClose={() => setShowSubmitForm(false)} />
+      <SuggestBusinessForm open={showSuggestForm} onClose={() => setShowSuggestForm(false)} />
+      <NewsletterPopup />
 
       {/* Pull-to-refresh indicator */}
       {pullIndicator > 0 && (
@@ -250,6 +276,13 @@ export default function Directory() {
                 : <>{filtered.length} listing{filtered.length !== 1 ? "s" : ""} found</>
               }
             </p>
+            <button
+              onClick={() => setShowSuggestForm(true)}
+              className="text-sm mt-1 flex items-center gap-1.5 hover:underline"
+              style={{ color: '#E2701B' }}
+            >
+              <Lightbulb className="w-3.5 h-3.5" /> Know a business that should be listed? Suggest it
+            </button>
           </div>
           <div className="flex items-center gap-2">
             {/* List / Map toggle */}
@@ -283,8 +316,10 @@ export default function Directory() {
         type={type} setType={setType}
         group={subcategoryGroup} setGroup={setSubcategoryGroup}
         groups={groups}
+        groupCounts={groupCounts}
         category={category} setCategory={setCategory}
         categories={categories}
+        categoryCounts={categoryCounts}
         county={county} setCounty={setCounty}
         town={town} setTown={setTown}
         counties={counties} towns={towns} townGroups={townGroups}

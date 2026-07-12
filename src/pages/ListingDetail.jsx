@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import ClaimListingForm from "../components/ClaimListingForm";
 import AddToCalendarButton from "../components/AddToCalendarButton";
 import RemovalRequestForm from "../components/RemovalRequestForm";
+import ReportListingForm from "../components/ReportListingForm";
 import QRCodeModal from "../components/QRCodeModal";
 import ReviewModal from "../components/ReviewModal";
 import ReviewStars from "../components/ReviewStars";
@@ -65,6 +66,7 @@ export default function ListingDetail() {
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
   const [showRemoval, setShowRemoval] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [notices, setNotices] = useState([]);
   const [showQR, setShowQR] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -540,6 +542,10 @@ export default function ListingDetail() {
               <ShieldCheck className="w-3.5 h-3.5" />
               Request removal
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowReport(true)}>
+              <Flag className="w-3.5 h-3.5" />
+              Report a listing
+            </Button>
           </div>
         </div>
       </div>
@@ -549,6 +555,9 @@ export default function ListingDetail() {
       )}
       {showRemoval && (
         <RemovalRequestForm listing={listing} onClose={() => setShowRemoval(false)} />
+      )}
+      {showReport && (
+        <ReportListingForm listing={listing} onClose={() => setShowReport(false)} />
       )}
       {showQR && (
         <QRCodeModal
