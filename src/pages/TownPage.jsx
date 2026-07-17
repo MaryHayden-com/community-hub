@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar } from "lucide-react";
+import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar, Search, X } from "lucide-react";
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ListingListRow from "../components/ListingListRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
-import { expandAndSortEvents } from "../utils/recurringEvents";
+import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import usePageTitle from "@/hooks/usePageTitle";
 
@@ -25,6 +26,7 @@ export default function TownPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState("");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     // Fetch all county listings, then show those whose town OR area matches
@@ -33,21 +35,32 @@ export default function TownPage() {
       .finally(() => setLoading(false));
   }, [decodedCounty, decodedTown]);
 
+  // Keyword-filtered set (search across name, description, category) — counts + tabs reflect this
+  const matched = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return listings;
+    return listings.filter((l) =>
+      (l.name || "").toLowerCase().includes(q) ||
+      (l.description || "").toLowerCase().includes(q) ||
+      toArr(l.category).some((c) => (c || "").toLowerCase().includes(q))
+    );
+  }, [listings, query]);
+
   const types = useMemo(() => {
     const counts = {};
-    listings.forEach((l) => { counts[l.type] = (counts[l.type] || 0) + 1; });
+    matched.forEach((l) => { counts[l.type] = (counts[l.type] || 0) + 1; });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [listings]);
+  }, [matched]);
 
   const filtered = useMemo(() => {
-    const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
+    const base = !activeType ? matched : matched.filter((l) => l.type === activeType);
     // What's On sorts by next upcoming occurrence (handled by shared helper);
     // recurring events use their next date so the list is truly chronological.
     if (activeType === "What's On") {
       return expandAndSortEvents(base);
     }
     return sortByTypeOrder(base);
-  }, [listings, activeType]);
+  }, [matched, activeType]);
 
   if (loading) {
     return (
@@ -72,24 +85,44 @@ export default function TownPage() {
           {decodedTown}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Co. {decodedCounty} · {listings.length} listing{listings.length !== 1 ? "s" : ""}
+          Co. {decodedCounty} · {query ? `${filtered.length} of ${listings.length}` : listings.length} listing{listings.length !== 1 ? "s" : ""}
         </p>
-      </div>
+        </div>
 
-      {/* Type Filter */}
-       <div className="mb-6">
-       {types.length > 1 && (
-         <div className="flex flex-wrap gap-2">
-           <button
-             onClick={() => setActiveType("")}
-             className={`px-3 py-1.5 rounded-md text-sm font-medium cursor-pointer transition-colors ${
-               activeType === "" 
-                 ? "bg-primary text-primary-foreground" 
-                 : "bg-secondary text-secondary-foreground hover:bg-accent"
-             }`}
-           >
-             All ({listings.length})
-           </button>
+        {/* Keyword search */}
+        <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder={`Search listings in ${decodedTown}...`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="pl-10 pr-9 h-11 bg-card"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground"
+            aria-label="Clear search"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+        </div>
+
+        {/* Type Filter */}
+        <div className="mb-6">
+        {types.length > 1 && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveType("")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium cursor-pointer transition-colors ${
+                activeType === "" 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+            >
+              All ({matched.length})
+            </button>
            {types.map(([t, count]) => {
              const Icon = typeIcons[t] || Building2;
              return (
