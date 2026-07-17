@@ -11,14 +11,22 @@ const IRELAND_LOCATIONS = [
   { county: 'Cork', town: 'Dunmanway' },
 ];
 
+// Token that authorises the scheduled automation (no user context) to run
+// this endpoint. Set on the automation's function_args; never shipped to the client.
+const SCHEDULER_TOKEN = 'chEvSched_9f3c7a1e4d8b';
+
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
-  // Require an authenticated Super Admin. (Scheduled callers must supply a
-  // valid admin context; anonymous HTTP calls are rejected.)
+  // Allow an authenticated Super Admin, or the scheduled automation (which
+  // runs with no user context) when it supplies the shared SCHEDULER_TOKEN.
   let user = null;
   try { user = await base44.auth.me(); } catch (_) {}
-  if (!user || user.role !== 'admin') {
+  let body = {};
+  try { body = await req.json(); } catch (_) {}
+  const isScheduler = body?.scheduler_token === SCHEDULER_TOKEN;
+  const isAdmin = user && user.role === 'admin';
+  if (!isAdmin && !isScheduler) {
     return Response.json({ error: 'Admin access required' }, { status: 403 });
   }
 
