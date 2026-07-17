@@ -73,10 +73,10 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
       <div className="flex gap-2 flex-wrap items-center">
         <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup([]); setCategory([]); }}>
           <SelectTrigger className="h-11 bg-card font-bold flex-1 min-w-[130px]" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Types" />
+            <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Types</SelectItem>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Categories</SelectItem>
             <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business</SelectItem>
             <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
             <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Services</SelectItem>
