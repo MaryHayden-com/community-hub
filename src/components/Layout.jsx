@@ -14,7 +14,7 @@ const navItems = [
   { to: "/directory?type=Business", label: "Businesses", icon: Building2 },
   { to: "/directory?type=Club+%26+Group", label: "Clubs & Groups", icon: Users },
   { to: "/directory?type=Community+Services", label: "Community Services", icon: HeartHandshake },
-  { to: "/directory?type=Education", label: "Education", icon: GraduationCap },
+  { to: "/directory?type=Education", label: "Education & Training", icon: GraduationCap },
   { to: "/whats-on", label: "What's On", icon: Calendar },
 ];
 
