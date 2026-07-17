@@ -82,7 +82,7 @@ export default function Home() {
         <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20" style={{ background: '#E2701B' }} />
         <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full opacity-10" style={{ background: '#E2701B' }} />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 text-center">
           <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Bandon · West Cork · Ireland</p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
             Welcome to <span style={{ color: '#E2701B' }}>Community Hub</span>.
@@ -134,7 +134,7 @@ export default function Home() {
               <Link
                 key={cat.type}
                 to={`/directory?type=${encodeURIComponent(cat.type)}`}
-                className="group bg-card rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300"
+                className="group bg-card rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300 text-center flex flex-col items-center"
                 style={{ border: '2px solid #E2701B' }}
               >
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-opacity"
@@ -144,7 +144,7 @@ export default function Home() {
                 <h3 className="mt-3 font-semibold text-sm sm:text-base" style={{ color: '#097275' }}>
                   {cat.label}
                 </h3>
-                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">{cat.desc}</p>
+                <p className="text-xs mt-1" style={{ color: '#097275' }}>{cat.desc}</p>
                 <p className="text-xs font-medium mt-1" style={{ color: '#E2701B' }}>
                   {typeCounts[cat.type] || 0} listings
                 </p>
