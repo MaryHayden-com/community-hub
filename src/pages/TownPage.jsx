@@ -5,6 +5,7 @@ import { MapPin, Loader2, ArrowLeft, Building2, Users, GraduationCap, Calendar }
 import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ListingListRow from "../components/ListingListRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
+import { expandAndSortEvents } from "../utils/recurringEvents";
 import { Badge } from "@/components/ui/badge";
 import usePageTitle from "@/hooks/usePageTitle";
 
@@ -40,13 +41,10 @@ export default function TownPage() {
 
   const filtered = useMemo(() => {
     const base = !activeType ? listings : listings.filter((l) => l.type === activeType);
-    // What's On sorts by date, others by type then name
+    // What's On sorts by next upcoming occurrence (handled by shared helper);
+    // recurring events use their next date so the list is truly chronological.
     if (activeType === "What's On") {
-      return [...base].sort((a, b) => {
-        const da = a.event_date || '9999';
-        const db = b.event_date || '9999';
-        return da.localeCompare(db);
-      });
+      return expandAndSortEvents(base);
     }
     return sortByTypeOrder(base);
   }, [listings, activeType]);
@@ -119,8 +117,8 @@ export default function TownPage() {
         </div>
       ) : activeType === "What's On" ? (
         <div className="flex flex-col gap-3">
-          {filtered.map((l) => (
-            <WhatsOnEventRow key={l.id} listing={l} />
+          {filtered.map((entry) => (
+            <WhatsOnEventRow key={entry.listing.id} listing={entry.listing} overrideDate={entry.date} />
           ))}
         </div>
       ) : (
