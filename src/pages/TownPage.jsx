@@ -21,7 +21,9 @@ export default function TownPage() {
   const { county, town } = useParams();
   const decodedCounty = decodeURIComponent(county);
   const decodedTown = decodeURIComponent(town);
-  usePageTitle(`${decodedTown}, Co. ${decodedCounty}`);
+  usePageTitle(`${decodedTown}, Co. ${decodedCounty}`, {
+    description: `Everything happening in ${decodedTown}, Co. ${decodedCounty}: local businesses, clubs, events and community resources, all in one place.`,
+  });
 
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
