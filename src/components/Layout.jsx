@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/", label: "Directory", icon: MapPin },
-  { to: "/directory?type=Business", label: "Businesses", icon: Building2 },
+  { to: "/directory?type=Business", label: "Business & Retail", icon: Building2 },
   { to: "/directory?type=Club+%26+Group", label: "Clubs & Groups", icon: Users },
   { to: "/directory?type=Community+Services", label: "Community Services", icon: HeartHandshake },
   { to: "/directory?type=Education", label: "Education & Training", icon: GraduationCap },

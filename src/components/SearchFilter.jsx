@@ -77,7 +77,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Categories</SelectItem>
-            <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business</SelectItem>
+            <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business & Retail</SelectItem>
             <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
             <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
             <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education & Training</SelectItem>
