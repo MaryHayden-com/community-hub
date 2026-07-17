@@ -81,11 +81,15 @@ function EditUserRow({ user, onSave, onCancel }) {
 
   const handleSave = async () => {
     setSaving(true);
-    await base44.entities.User.update(user.id, {
-      role,
-      managed_tags: role === "group_admin" ? selectedTags : [],
-    });
-    setSaving(false);
+    try {
+      await base44.functions.invoke("updateUserRole", {
+        user_id: user.id,
+        role,
+        managed_tags: role === "group_admin" ? selectedTags : [],
+      });
+    } finally {
+      setSaving(false);
+    }
     onSave();
   };
 
@@ -200,7 +204,7 @@ export default function AdminUsersTab() {
         const allUsers = await base44.entities.User.list("-created_date", 500);
         const invited = allUsers.find((u) => u.email === inviteEmail);
         if (invited) {
-          await base44.entities.User.update(invited.id, { role: inviteRole });
+          await base44.functions.invoke("updateUserRole", { user_id: invited.id, role: inviteRole });
         }
       }
 

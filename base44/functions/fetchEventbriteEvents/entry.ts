@@ -14,10 +14,11 @@ const IRELAND_LOCATIONS = [
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
-  // Allow admin calls and scheduled automation (no user)
+  // Require an authenticated Super Admin. (Scheduled callers must supply a
+  // valid admin context; anonymous HTTP calls are rejected.)
   let user = null;
   try { user = await base44.auth.me(); } catch (_) {}
-  if (user && user.role !== 'admin') {
+  if (!user || user.role !== 'admin') {
     return Response.json({ error: 'Admin access required' }, { status: 403 });
   }
 
