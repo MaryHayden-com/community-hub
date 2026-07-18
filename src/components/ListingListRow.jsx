@@ -91,14 +91,25 @@ export default function ListingListRow({ listing }) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
-        {listing.phone && <Phone className="w-3.5 h-3.5 text-muted-foreground" />}
-        {listing.email && <Mail className="w-3.5 h-3.5 text-muted-foreground" />}
-        {listing.website && <Globe className="w-3.5 h-3.5 text-muted-foreground" />}
-        {listing.facebook_url && <Facebook className="w-3.5 h-3.5 text-blue-600" />}
-        {listing.instagram_url && <Instagram className="w-3.5 h-3.5 text-pink-500" />}
-        {listing.linkedin_url && <Linkedin className="w-3.5 h-3.5 text-blue-700" />}
-      </div>
+      {(() => {
+        // Contact details and socials are only shown for claimed listings, and only
+        // if the owner hasn't hidden them. Website is always public.
+        const isClaimed = !!listing.owner_email;
+        const hidden = listing.hidden_fields || [];
+        const canShow = (f) => !hidden.includes(f) && (isClaimed || !["phone", "email", "facebook_url", "instagram_url", "linkedin_url"].includes(f));
+        const any = (canShow("phone") && listing.phone) || (canShow("email") && listing.email) || listing.website || (canShow("facebook_url") && listing.facebook_url) || (canShow("instagram_url") && listing.instagram_url) || (canShow("linkedin_url") && listing.linkedin_url);
+        if (!any) return null;
+        return (
+          <div className="flex items-center gap-2 shrink-0">
+            {canShow("phone") && listing.phone && <Phone className="w-3.5 h-3.5 text-muted-foreground" />}
+            {canShow("email") && listing.email && <Mail className="w-3.5 h-3.5 text-muted-foreground" />}
+            {listing.website && <Globe className="w-3.5 h-3.5 text-muted-foreground" />}
+            {canShow("facebook_url") && listing.facebook_url && <Facebook className="w-3.5 h-3.5 text-blue-600" />}
+            {canShow("instagram_url") && listing.instagram_url && <Instagram className="w-3.5 h-3.5 text-pink-500" />}
+            {canShow("linkedin_url") && listing.linkedin_url && <Linkedin className="w-3.5 h-3.5 text-blue-700" />}
+          </div>
+        );
+      })()}
     </Link>
   );
 }

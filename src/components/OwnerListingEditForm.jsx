@@ -24,11 +24,19 @@ export default function OwnerListingEditForm({ listing, onClose, onSave }) {
     contact_name: listing?.contact_name || "",
     meeting_info: listing?.meeting_info || "",
     image_url: listing?.image_url || "",
+    hidden_fields: listing?.hidden_fields || [],
   });
   const [saving, setSaving] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const toggleHidden = (field) => setForm((prev) => ({
+    ...prev,
+    hidden_fields: prev.hidden_fields.includes(field)
+      ? prev.hidden_fields.filter((f) => f !== field)
+      : [...prev.hidden_fields, field],
+  }));
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -145,6 +153,38 @@ export default function OwnerListingEditForm({ listing, onClose, onSave }) {
                 <Label>LinkedIn URL</Label>
                 <Input value={form.linkedin_url} onChange={(e) => update("linkedin_url", e.target.value)} placeholder="https://linkedin.com/..." />
               </div>
+            </div>
+          </div>
+
+          <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+            <div>
+              <p className="text-sm font-semibold">What people can see</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Untick any details you don't want shown publicly.</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { field: "phone", label: "Phone" },
+                { field: "email", label: "Email" },
+                { field: "contact_name", label: "Contact name" },
+                { field: "website", label: "Website" },
+                { field: "address", label: "Address" },
+                { field: "meeting_info", label: "Meeting info" },
+                { field: "facebook_url", label: "Facebook" },
+                { field: "instagram_url", label: "Instagram" },
+                { field: "linkedin_url", label: "LinkedIn" },
+              ].map((item) => (
+                <label key={item.field} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.hidden_fields.includes(item.field)}
+                    onChange={() => toggleHidden(item.field)}
+                    className="cursor-pointer"
+                  />
+                  <span className={form.hidden_fields.includes(item.field) ? "line-through text-muted-foreground" : ""}>
+                    {item.label}
+                  </span>
+                </label>
+              ))}
             </div>
           </div>
 

@@ -60,7 +60,7 @@ function DetailRow({ icon: Icon, label, value, href }) {
 
 export default function ListingDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, navigateToLogin } = useAuth();
   const [listing, setListing] = useState(null);
   usePageTitle(listing?.name);
   const [loading, setLoading] = useState(true);
@@ -76,6 +76,14 @@ export default function ListingDetail() {
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [userReview, setUserReview] = useState(null);
+
+  const handleClaim = () => {
+    if (!user) {
+      navigateToLogin();
+      return;
+    }
+    setShowClaim(true);
+  };
 
   const trackEvent = useCallback((listingId, ownerEmail, eventType) => {
     base44.entities.ListingEngagement.create({
@@ -193,7 +201,11 @@ export default function ListingDetail() {
   const config = typeConfig[listing.type] || typeConfig["Business"];
   const TypeIcon = config.icon;
   const hidden = listing.hidden_fields || [];
-  const isVisible = (field) => !hidden.includes(field);
+  const isClaimed = !!listing.owner_email;
+  // Phone, email and socials stay hidden until the listing is claimed;
+  // once claimed, the owner can hide individual fields via hidden_fields.
+  const HIDDEN_UNTIL_CLAIMED = ["phone", "email", "contact_name", "facebook_url", "instagram_url", "linkedin_url"];
+  const isVisible = (field) => !hidden.includes(field) && (isClaimed || !HIDDEN_UNTIL_CLAIMED.includes(field));
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -376,9 +388,9 @@ export default function ListingDetail() {
             <div className="mt-5 p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <p className="text-sm font-semibold text-amber-800">Is this your listing?</p>
-                <p className="text-xs text-amber-700 mt-0.5">Claim it to manage your details and keep your community updated.</p>
+                <p className="text-xs text-amber-700 mt-0.5">Claim it to manage your details — phone, email and socials appear on the listing once claimed.</p>
               </div>
-              <Button size="sm" onClick={() => setShowClaim(true)} style={{ background: '#E2701B', border: 'none', color: '#fff' }}>
+              <Button size="sm" onClick={handleClaim} style={{ background: '#E2701B', border: 'none', color: '#fff' }}>
                 <Flag className="w-3.5 h-3.5" /> Claim this listing
               </Button>
             </div>
@@ -533,7 +545,7 @@ export default function ListingDetail() {
             </Button>
             <div className="flex-1" />
             {!listing.owner_email && (
-              <Button variant="outline" size="sm" onClick={() => setShowClaim(true)}>
+              <Button variant="outline" size="sm" onClick={handleClaim}>
                 <Flag className="w-3.5 h-3.5" />
                 Claim this listing
               </Button>
@@ -551,7 +563,7 @@ export default function ListingDetail() {
       </div>
 
       {showClaim && (
-        <ClaimListingForm listing={listing} onClose={() => setShowClaim(false)} />
+        <ClaimListingForm listing={listing} user={user} onClose={() => setShowClaim(false)} />
       )}
       {showRemoval && (
         <RemovalRequestForm listing={listing} onClose={() => setShowRemoval(false)} />

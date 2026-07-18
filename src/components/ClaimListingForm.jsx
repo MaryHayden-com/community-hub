@@ -8,8 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
-export default function ClaimListingForm({ listing, onClose }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", role: "", message: "" });
+export default function ClaimListingForm({ listing, onClose, user }) {
+  const [form, setForm] = useState({
+    name: user?.full_name || "",
+    email: user?.email || "",
+    phone: "",
+    role: "",
+    message: "",
+  });
   const [saving, setSaving] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [consented, setConsented] = useState(false);
@@ -85,7 +91,8 @@ export default function ClaimListingForm({ listing, onClose }) {
 
             <div>
               <Label>Email Address *</Label>
-              <Input value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="your@email.ie" type="email" />
+              <Input value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="your@email.ie" type="email" readOnly={!!user} />
+              {!!user && <p className="text-xs text-muted-foreground mt-1">Linked to your signed-in account.</p>}
             </div>
 
             <div>

@@ -41,10 +41,11 @@ export const AuthProvider = ({ children }) => {
         if (appParams.token) {
           await checkUserAuth();
         } else {
-          // No token — redirect to login, preserving the current URL to return to after login
-          base44.auth.redirectToLogin(window.location.href);
-          setIsLoadingAuth(false);
+          // The app is browsable without an account. Proceed as a guest;
+          // login is only prompted when an action requires it (e.g. claiming a listing).
+          setUser(null);
           setIsAuthenticated(false);
+          setIsLoadingAuth(false);
         }
         setIsLoadingPublicSettings(false);
       } catch (appError) {

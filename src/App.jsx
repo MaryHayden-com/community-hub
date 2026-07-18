@@ -7,6 +7,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
+import RequireAuth from './components/RequireAuth';
 
 class LazyLoadErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
@@ -87,11 +88,11 @@ const AuthenticatedApp = () => {
           <Route path="/county/:county" element={<CountyPage />} />
           <Route path="/town/:county/:town" element={<TownPage />} />
           <Route path="/listing/:id" element={<ListingDetail />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/dashboard" element={<OwnerDashboard />} />
-          <Route path="/group-dashboard" element={<GroupAdminDashboard />} />
+          <Route path="/billing" element={<RequireAuth><Billing /></RequireAuth>} />
+          <Route path="/dashboard" element={<RequireAuth><OwnerDashboard /></RequireAuth>} />
+          <Route path="/group-dashboard" element={<RequireAuth><GroupAdminDashboard /></RequireAuth>} />
           <Route path="/survey" element={<Survey />} />
           <Route path="/calendar" element={<CalendarView />} />
           <Route path="/whats-on" element={<WhatsOn />} />
