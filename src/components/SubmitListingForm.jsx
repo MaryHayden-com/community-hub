@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +14,24 @@ import CategoryPicker from "@/components/CategoryPicker";
 const LISTING_TYPES = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
 
 export default function SubmitListingForm({ open, onClose }) {
-  const [step, setStep] = useState(1); // 1 = details, 2 = plan, 3 = success
+  const { user } = useAuth();
+  const [step, setStep] = useState(1); // 1 = details, 2 = success
   const [form, setForm] = useState({
     name: "", type: "", county: "", town: "", description: "",
     phone: "", email: "", website: "", contact_name: "", category: []
   });
   const [plan, setPlan] = useState(null);
+
+  // Prefill contact details from the signed-in account
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        email: prev.email || user.email || "",
+        contact_name: prev.contact_name || user.full_name || "",
+      }));
+    }
+  }, [user]);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -32,13 +45,13 @@ export default function SubmitListingForm({ open, onClose }) {
     onClose();
   };
 
-  const handleDetailsNext = () => {
+  const handleSubmit = () => {
     if (!form.name || !form.type || !form.county || !form.town || !form.contact_name || !form.email) {
       setFormError("Please fill in all required fields (marked with *).");
       return;
     }
     setFormError("");
-    setStep(2);
+    handleFreeSubmit();
   };
 
   // Free basic listing — save as pending, no payment
@@ -47,6 +60,7 @@ export default function SubmitListingForm({ open, onClose }) {
     try {
       await base44.entities.CommunityListing.create({
         ...form,
+        owner_email: user?.email || "",
         status: "pending",
         plan: "basic",
         plan_status: "active",
@@ -122,7 +136,7 @@ export default function SubmitListingForm({ open, onClose }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PlusCircle className="w-5 h-5 text-primary" />
-            {step === 1 ? "Submit Your Listing" : step === 2 ? "Choose Your Plan" : "Submission Received!"}
+            {step === 1 ? "Add Your Listing (Free)" : "Submission Received!"}
           </DialogTitle>
         </DialogHeader>
 
@@ -130,7 +144,7 @@ export default function SubmitListingForm({ open, onClose }) {
         {step === 1 && (
           <div className="space-y-4 mt-1">
             <p className="text-sm text-muted-foreground">
-              Fill in the details below. You'll choose your plan on the next step.
+              Fill in the details below. Listing on Community Hub is free — no payment required.
             </p>
 
             <div>
@@ -190,7 +204,8 @@ export default function SubmitListingForm({ open, onClose }) {
                 </div>
                 <div>
                   <Label>Email *</Label>
-                  <Input value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="your@email.ie" type="email" />
+                  <Input value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="your@email.ie" type="email" readOnly={!!user} />
+                  {!!user && <p className="text-xs text-muted-foreground mt-1">Linked to your signed-in account — you'll own and manage this listing.</p>}
                 </div>
                 <div>
                   <Label>Phone</Label>
@@ -206,89 +221,11 @@ export default function SubmitListingForm({ open, onClose }) {
             {formError && <p className="text-sm text-destructive">{formError}</p>}
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleDetailsNext}>Next: Choose Plan →</Button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Plan */}
-        {step === 2 && (
-          <div className="space-y-4 mt-1">
-            <p className="text-sm text-muted-foreground">
-              Your listing will be reviewed before going live. Choose the plan that suits you best.
-            </p>
-
-            {/* Free */}
-            <div className="border rounded-xl p-5 space-y-3 hover:border-primary transition-colors">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-lg">Free Basic Listing</p>
-                  <p className="text-muted-foreground text-sm">Get listed at no cost</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">€0</p>
-                  <p className="text-xs text-muted-foreground">forever free</p>
-                </div>
-              </div>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>✓ Name, location & description</li>
-                <li>✓ Visible in the directory</li>
-                <li>✓ Contact details</li>
-              </ul>
-              <Button variant="outline" className="w-full" onClick={handleFreeSubmit} disabled={saving}>
-                {saving && !plan ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting…</> : "Submit Free Listing"}
+              <Button onClick={handleSubmit} disabled={saving}>
+                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Submit Free Listing
               </Button>
             </div>
-
-            {/* Monthly */}
-            <div className="border rounded-xl p-5 space-y-3 hover:border-primary transition-colors">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-lg">Monthly</p>
-                  <p className="text-muted-foreground text-sm">Cancel any time</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">€20</p>
-                  <p className="text-xs text-muted-foreground">per month</p>
-                </div>
-              </div>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>✓ Full listing profile</li>
-                <li>✓ Social links & featured placement</li>
-              </ul>
-              <Button className="w-full" onClick={() => handlePayment('monthly')} disabled={saving}>
-                {saving && plan === 'monthly' ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Redirecting…</> : "Subscribe Monthly — €20/mo"}
-              </Button>
-            </div>
-
-            {/* Annual */}
-            <div className="border-2 border-primary rounded-xl p-5 space-y-3 relative">
-              <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                Best Value — Save €40
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-lg">Annual</p>
-                  <p className="text-muted-foreground text-sm">Pay once, listed all year</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">€200</p>
-                  <p className="text-xs text-muted-foreground">per year</p>
-                </div>
-              </div>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>✓ Full listing profile</li>
-                <li>✓ Social links & featured placement</li>
-                <li>✓ 2 months free vs monthly</li>
-              </ul>
-              <Button className="w-full" onClick={() => handlePayment('annual')} disabled={saving}>
-                {saving && plan === 'annual' ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Redirecting…</> : "Subscribe Annually — €200/yr"}
-              </Button>
-            </div>
-
-            <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => setStep(1)}>
-              ← Back to listing details
-            </Button>
           </div>
         )}
 
@@ -302,6 +239,11 @@ export default function SubmitListingForm({ open, onClose }) {
             <p className="text-muted-foreground text-sm leading-relaxed">
               Thank you, <strong>{form.contact_name || "there"}</strong>! Your listing for <strong>{form.name}</strong> has been submitted and is awaiting review. We'll have it live in the directory shortly.
             </p>
+            {user && (
+              <p className="text-xs text-muted-foreground">
+                This listing is linked to your account — you can edit it from <strong>My Dashboard</strong> once it's approved.
+              </p>
+            )}
             <Button onClick={handleClose} className="w-full" style={{ background: "#097275" }}>
               <CheckCircle2 className="w-4 h-4 mr-2" /> Done
             </Button>
