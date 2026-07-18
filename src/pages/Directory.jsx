@@ -17,6 +17,7 @@ import NewsletterSignup from "../components/NewsletterSignup";
 import NewsletterPopup from "../components/NewsletterPopup";
 import SuggestBusinessForm from "../components/SuggestBusinessForm";
 import usePageTitle from "@/hooks/usePageTitle";
+import HomeHero from "@/components/HomeHero";
 import { Lightbulb } from "lucide-react";
 
 const PAGE_SIZE = 50;
@@ -264,11 +265,14 @@ export default function Directory() {
         </div>
       )}
 
+      {/* Brand summary — primary content for SEO & social link previews */}
+      <HomeHero onAddListing={() => setShowSubmitForm(true)} />
+
       {/* Header */}
       <div className="mb-5">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>Directory</h1>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>Directory</h2>
             <p className="text-muted-foreground mt-0.5 text-sm sm:text-base hidden sm:block">
               Discover the businesses, clubs, schools and events that bring your community together.
             </p>
