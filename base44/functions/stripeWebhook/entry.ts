@@ -34,16 +34,23 @@ Deno.serve(async (req) => {
 
         const listings = await base44.asServiceRole.entities.CommunityListing.filter({ id: listing_id });
         if (listings.length > 0) {
-          await base44.asServiceRole.entities.CommunityListing.update(listing_id, {
-            plan,
-            plan_status: 'active',
-            stripe_subscription_id: subscriptionId,
-            stripe_customer_id: session.customer,
-            plan_renewal_date: renewalDate,
-            owner_email: user_email || listings[0].owner_email,
-            is_featured: plan === 'premium',
-          });
-          console.log(`Updated listing ${listing_id} to plan: ${plan}`);
+          // Idempotency guard: skip if this checkout was already processed
+          // (e.g. Stripe webhook replay/resend) to prevent double-update.
+          const existing = listings[0];
+          if (existing.stripe_subscription_id === subscriptionId && existing.plan_status === 'active' && existing.plan === plan) {
+            console.log(`Listing ${listing_id} already processed for subscription ${subscriptionId}, skipping (idempotent)`);
+          } else {
+            await base44.asServiceRole.entities.CommunityListing.update(listing_id, {
+              plan,
+              plan_status: 'active',
+              stripe_subscription_id: subscriptionId,
+              stripe_customer_id: session.customer,
+              plan_renewal_date: renewalDate,
+              owner_email: user_email || listings[0].owner_email,
+              is_featured: plan === 'premium',
+            });
+            console.log(`Updated listing ${listing_id} to plan: ${plan}`);
+          }
         }
       }
     }

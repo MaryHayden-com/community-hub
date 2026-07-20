@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import CountyCard from "../components/CountyCard";
 import ListingCard from "../components/ListingCard";
 import SubmitListingForm from "../components/SubmitListingForm";
+import CommunityContributionBanner from "../components/CommunityContributionBanner";
 
 const categories = [
   { type: "Business", label: "Businesses", icon: Building2, desc: "Local shops, services & trades" },
@@ -176,6 +177,11 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Community contribution value proposition */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-16">
+        <CommunityContributionBanner onAddListing={() => setShowSubmitForm(true)} />
+      </section>
 
       {/* Counties */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-16">

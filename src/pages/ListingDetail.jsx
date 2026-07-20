@@ -18,6 +18,7 @@ import ReportListingForm from "../components/ReportListingForm";
 import QRCodeModal from "../components/QRCodeModal";
 import ReviewModal from "../components/ReviewModal";
 import ReviewStars from "../components/ReviewStars";
+import CommunityContributionBanner from "../components/CommunityContributionBanner";
 import usePageTitle from "@/hooks/usePageTitle";
 
 const typeConfig = {
@@ -560,6 +561,10 @@ export default function ListingDetail() {
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <CommunityContributionBanner town={listing.nearest_town || listing.town} />
       </div>
 
       {showClaim && (
