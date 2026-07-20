@@ -15,6 +15,9 @@ const IRELAND_LOCATIONS = [
 // this endpoint. Set on the automation's function_args; never shipped to the client.
 const SCHEDULER_TOKEN = 'chEvSched_9f3c7a1e4d8b';
 
+// Normalize a string for duplicate comparison: lowercase, strip punctuation/whitespace.
+const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
@@ -33,10 +36,19 @@ Deno.serve(async (req) => {
   const today = new Date().toISOString().slice(0, 10);
   const locationList = IRELAND_LOCATIONS.map(l => `${l.town}, ${l.county}`).join('; ');
 
-  // Fetch existing listings to avoid duplicates
+  // Fetch existing listings to avoid duplicates. Smart dedup key:
+  // normalized name + town + event_date (stops near-dupes like
+  // "Farmers' Market" vs "Farmers Market" on the same slot).
   const existing = await base44.asServiceRole.entities.CommunityListing.filter({ type: "What's On" }, '-created_date', 2000);
-  const existingNames = new Set(existing.map(l => l.name?.toLowerCase().trim()));
+  const existingKeys = new Set(
+    existing.map(l => {
+      // Strip trailing duplicate-date suffix some records carry ("Name — 2026-06-27")
+      const baseName = (l.name || '').replace(/\s+—\s*\d{4}-\d{2}-\d{2}$/, '').trim();
+      return norm(baseName) + '__' + norm(l.nearest_town || l.town) + '__' + (l.event_date || 'none');
+    })
+  );
 
+  const todayDate = new Date().toISOString().slice(0, 10);
   console.log(`Searching for events across: ${locationList}`);
 
   // Single batched AI web search for all locations
@@ -82,23 +94,43 @@ Deno.serve(async (req) => {
   const events = aiResult?.events || [];
   console.log(`AI returned ${events.length} events`);
 
-  const toCreate = [];
+  const autoApproved = [];
+  const needsReview = [];
+  const toCreateByStatus = { approved: [], pending: [] };
+
   for (const e of events) {
     if (!e.name || !e.event_date) continue;
-    if (existingNames.has(e.name.toLowerCase().trim())) continue;
 
-    // Match town/county to our known locations (fallback to first match by county)
+    // Match town/county to our known locations
     const loc = IRELAND_LOCATIONS.find(l =>
       l.town.toLowerCase() === (e.town || '').toLowerCase() ||
       l.county.toLowerCase() === (e.county || '').toLowerCase()
-    ) || IRELAND_LOCATIONS[0];
+    );
+    const matchedTown = !!(loc && loc.town.toLowerCase() === (e.town || '').toLowerCase());
+    const fallbackLoc = loc || IRELAND_LOCATIONS[0];
 
-    const resolvedTown = e.town || loc.town;
-    toCreate.push({
+    // Smart dedup key
+    const dedupKey = norm(e.name) + '__' + norm(e.town || fallbackLoc.town) + '__' + e.event_date;
+    if (existingKeys.has(dedupKey)) continue;
+
+    // Quality gate for auto-approve:
+    //  - event_date is today or in the future
+    //  - town matched a known location exactly
+    //  - name is at least 4 chars and not a single generic word
+    //  - has a non-empty description
+    const genericNames = new Set(['event', 'market', 'festival', 'meeting', 'mass', 'gaa', 'bingo']);
+    const wordCount = e.name.trim().split(/\s+/).length;
+    const isGeneric = wordCount === 1 && genericNames.has(norm(e.name));
+    const futureDate = e.event_date >= todayDate;
+    const hasDescription = (e.description || '').trim().length > 0;
+    const looksGood = futureDate && matchedTown && !isGeneric && hasDescription;
+
+    const resolvedTown = e.town || fallbackLoc.town;
+    const record = {
       name: e.name,
       type: "What's On",
       category: ['Community Event'],
-      county: e.county || loc.county,
+      county: e.county || fallbackLoc.county,
       nearest_town: resolvedTown,
       town: resolvedTown,
       country: 'Ireland',
@@ -109,36 +141,63 @@ Deno.serve(async (req) => {
       phone: e.phone || '',
       event_date: e.event_date,
       event_time: e.event_time || '',
-      status: 'pending',
+      status: looksGood ? 'approved' : 'pending',
       is_verified: false,
       is_featured: false,
-    });
+    };
 
-    existingNames.add(e.name.toLowerCase().trim());
+    // Track which bucket it went into so the email can separate them
+    if (looksGood) {
+      autoApproved.push(record);
+      toCreateByStatus.approved.push(record);
+    } else {
+      needsReview.push({ ...record, _reason: !futureDate ? 'past date' : !matchedTown ? 'town not matched' : !hasDescription ? 'no description' : 'generic name' });
+      toCreateByStatus.pending.push(record);
+    }
+    existingKeys.add(dedupKey);
   }
 
-  if (toCreate.length > 0) {
-    await base44.asServiceRole.entities.CommunityListing.bulkCreate(toCreate);
-    console.log(`Created ${toCreate.length} new events`);
+  if (autoApproved.length > 0) {
+    await base44.asServiceRole.entities.CommunityListing.bulkCreate(autoApproved);
+    console.log(`Auto-approved: ${autoApproved.length} events`);
+  }
+  if (needsReview.length > 0) {
+    await base44.asServiceRole.entities.CommunityListing.bulkCreate(needsReview.map(({ _reason, ...r }) => r));
+    console.log(`Sent to pending review: ${needsReview.length} events`);
+  }
+  if (autoApproved.length === 0 && needsReview.length === 0) {
+    console.log('No new events to create');
+  }
 
-    const rows = toCreate.map((e) => {
-      const contact = [e.email, e.phone].filter(Boolean).join(' / ') || 'No contact info found';
-      return `- ${e.name} (${e.town}, Co. ${e.county}) on ${e.event_date}\n  Contact: ${contact}`;
-    }).join('\n\n');
-
+  // Daily summary email (only when something happened)
+  const totalNew = autoApproved.length + needsReview.length;
+  if (totalNew > 0) {
+    const parts = [];
+    if (autoApproved.length > 0) {
+      parts.push(`✅ Auto-published (${autoApproved.length}):\n` +
+        autoApproved.map(e => `- ${e.name} — ${e.event_date} (${e.nearest_town}, Co. ${e.county})`).join('\n'));
+    }
+    if (needsReview.length > 0) {
+      parts.push(`🔎 Needs your review (${needsReview.length}):\n` +
+        needsReview.map(e => `- ${e.name} — ${e.event_date} (${e.nearest_town}) [${e._reason}]`).join('\n') +
+        `\n\nReview/approve here: https://community-hub.base44.app/admin (Pending Approval tab)`);
+    }
     try {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: 'mary@maryhayden.com',
         from_name: 'Community Hub',
-        subject: `📅 ${toCreate.length} new What's On event${toCreate.length > 1 ? 's' : ''} awaiting review`,
-        body: `The daily events search found ${toCreate.length} new event${toCreate.length > 1 ? 's' : ''}. They've been added as pending so you can review and follow up before they go live:\n\n${rows}\n\n👉 Review and approve here: https://community-hub.base44.app/admin\n(Go to the "Pending Approval" tab)`,
+        subject: `📅 ${totalNew} new What's On event${totalNew > 1 ? 's' : ''} (auto-published + review)`,
+        body: parts.join('\n\n'),
       });
     } catch (err) {
-      console.error('Failed to send new events notification email:', err.message);
+      console.error('Failed to send events notification email:', err.message);
     }
-  } else {
-    console.log('No new events to create');
   }
 
-  return Response.json({ created: toCreate.length, total_found: events.length });
+  return Response.json({
+    created: totalNew,
+    auto_approved: autoApproved.length,
+    needs_review: needsReview.length,
+    total_found: events.length,
+  });
 });
