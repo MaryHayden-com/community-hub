@@ -1,16 +1,24 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// Token that authorises the scheduled automation (no user context) to run this endpoint.
+const SCHEDULER_TOKEN = 'actRem_7c2e9b1f4d6a';
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Allow scheduled (no user) or admin-only calls
     let user = null;
     try {
       user = await base44.auth.me();
     } catch {}
 
-    if (user && user.role !== 'admin') {
+    // A legitimate scheduled run carries the shared token (no user); an admin may also call directly.
+    // Any anonymous request lacking the token is rejected.
+    let body: any = {};
+    try { body = await req.json(); } catch {}
+    const isScheduler = body?.scheduler_token === SCHEDULER_TOKEN;
+    const isAdmin = !!user && user.role === 'admin';
+    if (!isScheduler && !isAdmin) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
