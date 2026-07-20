@@ -215,6 +215,7 @@ export default function ListingDetail() {
       <button
         onClick={() => {
           if (location.key !== "default") navigate(-1);
+          else if (listing.type === "What's On") navigate("/whats-on");
           else navigate(`/town/${encodeURIComponent(listing.county)}/${encodeURIComponent(listing.town)}`);
         }}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
