@@ -310,8 +310,8 @@ export default function Directory() {
             </div>
             <Button onClick={() => setShowSubmitForm(true)} className="gap-2 shrink-0" style={{ background: '#E2701B', border: 'none' }}>
               <PlusCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Your Listing</span>
-              <span className="sm:hidden">Add</span>
+              <span className="hidden sm:inline">Add Your Business or Group</span>
+              <span className="sm:hidden">Add Yours</span>
             </Button>
           </div>
         </div>
@@ -345,7 +345,7 @@ export default function Directory() {
           <p className="text-lg">No listings found</p>
           <p className="text-sm mt-1">Try adjusting your search or filters</p>
           <Button className="mt-4 gap-2" style={{ background: '#E2701B', border: 'none' }} onClick={() => setShowSubmitForm(true)}>
-            <PlusCircle className="w-4 h-4" /> Add Your Listing
+            <PlusCircle className="w-4 h-4" /> Add Your Business or Group
           </Button>
         </div>
       ) : type === "What's On" ? (
@@ -385,9 +385,9 @@ export default function Directory() {
         <>
           <div className="mt-10 rounded-xl p-6 text-center" style={{ background: '#097275' }}>
             <p className="text-white font-display text-xl font-bold mb-1">Is your business or group missing?</p>
-            <p className="text-white/80 text-sm mb-4">Add your free listing to the directory today — it only takes a minute.</p>
+            <p className="text-white/80 text-sm mb-4">Add yours to the directory today — it only takes a minute, and it's free.</p>
             <Button onClick={() => setShowSubmitForm(true)} className="gap-2" style={{ background: '#E2701B', border: 'none' }}>
-              <PlusCircle className="w-4 h-4" /> Add Your Listing — It's Free
+              <PlusCircle className="w-4 h-4" /> Add Your Business or Community Group
             </Button>
           </div>
           <div className="mt-4 md:hidden p-5 rounded-xl bg-primary/5 border border-primary/20">

@@ -3,7 +3,7 @@ import { Search, CalendarDays, PlusCircle, HeartHandshake } from "lucide-react";
 const BENEFITS = [
   { icon: Search, title: "Search anywhere in Ireland", desc: "Find businesses, clubs and services by county or town." },
   { icon: CalendarDays, title: "What's On events", desc: "See upcoming markets, meetups and community events." },
-  { icon: PlusCircle, title: "Add your free listing", desc: "List a business, group or event in just a few minutes." },
+  { icon: PlusCircle, title: "Add yours, free", desc: "Add a business, club, group or event in just a few minutes." },
   { icon: HeartHandshake, title: "Built for communities", desc: "From West Cork to every county — all in one free hub." },
 ];
 
@@ -31,7 +31,7 @@ export default function HomeHero({ onAddListing }) {
           className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm text-white shadow"
           style={{ background: "#E2701B" }}
         >
-          <PlusCircle className="w-4 h-4" /> Add Your Free Listing
+          <PlusCircle className="w-4 h-4" /> Add Your Business or Community Group
         </button>
       </div>
 
