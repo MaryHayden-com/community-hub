@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import {
-  ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle, Navigation
+  ChevronLeft, ChevronRight, CalendarDays, MapPin, List, Calendar, Loader2, PlusCircle, Navigation, Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -88,6 +88,7 @@ export default function WhatsOn() {
   const [viewMode, setViewMode] = useState("calendar"); // "list" | "calendar"
   const [filterCounty, setFilterCounty] = useState("");
   const [filterTown, setFilterTown] = useState("");
+  const [query, setQuery] = useState("");
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [userIsPaid, setUserIsPaid] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -119,7 +120,7 @@ export default function WhatsOn() {
   }, [user]);
 
   // Reset page when filters change
-  useEffect(() => { setPage(1); }, [filterCounty, filterTown, dateFrom, dateTo]);
+  useEffect(() => { setPage(1); }, [filterCounty, filterTown, dateFrom, dateTo, query]);
 
   const allCounties = useMemo(() =>
     [...new Set(listings.map(l => l.county).filter(Boolean))].sort(), [listings]);
@@ -128,11 +129,15 @@ export default function WhatsOn() {
     [...new Set(listings.filter(l => !filterCounty || l.county === filterCounty).map(l => l.area || l.town).filter(Boolean))].sort(),
     [listings, filterCounty]);
 
-  const filteredListings = useMemo(() => listings.filter(l => {
-    if (filterCounty && l.county !== filterCounty) return false;
-    if (filterTown && (l.area || l.town) !== filterTown) return false;
-    return true;
-  }), [listings, filterCounty, filterTown]);
+  const filteredListings = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return listings.filter(l => {
+      if (filterCounty && l.county !== filterCounty) return false;
+      if (filterTown && (l.area || l.town) !== filterTown) return false;
+      if (q && !`${l.name} ${l.description || ""} ${l.town || ""} ${l.area || ""} ${l.county || ""}`.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [listings, filterCounty, filterTown, query]);
 
   // ── LIST VIEW ─────────────────────────────────────────────────────────────
   const listItems = useMemo(() => expandAndSortEvents(filteredListings, dateFrom, dateTo), [filteredListings, dateFrom, dateTo]);
@@ -215,6 +220,16 @@ export default function WhatsOn() {
 
       {/* Filters row */}
       <div className="flex flex-wrap gap-3 mb-5">
+        <div className="relative w-full sm:w-auto">
+          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search events…"
+            className="h-9 w-full sm:w-64 rounded-md border border-input bg-card pl-9 pr-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
         <NearMeButton listings={listings} type="whatson" />
         
         <Select value={filterCounty} onValueChange={v => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>

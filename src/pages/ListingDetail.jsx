@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import {
@@ -61,6 +61,8 @@ function DetailRow({ icon: Icon, label, value, href }) {
 
 export default function ListingDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user, navigateToLogin } = useAuth();
   const [listing, setListing] = useState(null);
   usePageTitle(listing?.name);
@@ -210,12 +212,15 @@ export default function ListingDetail() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <Link
-        to={`/town/${encodeURIComponent(listing.county)}/${encodeURIComponent(listing.town)}`}
+      <button
+        onClick={() => {
+          if (location.key !== "default") navigate(-1);
+          else navigate(`/town/${encodeURIComponent(listing.county)}/${encodeURIComponent(listing.town)}`);
+        }}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to {listing.town}
-      </Link>
+        <ArrowLeft className="w-4 h-4" /> Back
+      </button>
 
       <div className="bg-card rounded-xl overflow-hidden" style={{ border: '2px solid #E2701B' }}>
         {listing.image_url && (
