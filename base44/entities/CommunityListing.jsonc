@@ -254,7 +254,7 @@
   ],
   "rls": {
     "create": null,
-    "read": true,
+    "read": null,
     "update": {
       "$or": [
         {
@@ -263,6 +263,11 @@
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "group_admin"
           }
         }
       ]
