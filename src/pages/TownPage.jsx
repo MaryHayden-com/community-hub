@@ -7,6 +7,7 @@ import ListingListRow from "../components/ListingListRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
 import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import usePageTitle from "@/hooks/usePageTitle";
 
@@ -16,6 +17,9 @@ const typeIcons = {
   "Education": GraduationCap,
   "What's On": Calendar,
 };
+
+const BATCH_SIZE = 200;
+const PAGE_SIZE = 30;
 
 export default function TownPage() {
   const { county, town } = useParams();
@@ -29,12 +33,26 @@ export default function TownPage() {
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState("");
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
 
+  // Load county listings in batches (removes the 1000-record cap) and filter to this town
   useEffect(() => {
-    // Fetch all county listings, then show those whose town OR area matches
-    base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", 1000)
-      .then((all) => setListings(all.filter((l) => l.town === decodedTown || l.area === decodedTown)))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      let all = [], skip = 0, hasMore = true, first = true;
+      while (hasMore && !cancelled) {
+        const batch = await base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", BATCH_SIZE, skip);
+        if (cancelled) return;
+        const townBatch = batch.filter((l) => l.town === decodedTown || l.area === decodedTown);
+        all = all.concat(townBatch);
+        hasMore = batch.length === BATCH_SIZE;
+        skip += BATCH_SIZE;
+        setListings(all);
+        if (first && (all.length > 0 || !hasMore)) { setLoading(false); first = false; }
+      }
+    })();
+    return () => { cancelled = true; };
   }, [decodedCounty, decodedTown]);
 
   // Keyword-filtered set (search across name, description, category) — counts + tabs reflect this
@@ -63,6 +81,12 @@ export default function TownPage() {
     }
     return sortByTypeOrder(base);
   }, [matched, activeType]);
+
+  // Reset paging when filters change
+  useEffect(() => { setPage(1); }, [query, activeType]);
+
+  const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
+  const hasMore = pagedItems.length < filtered.length;
 
   if (loading) {
     return (
@@ -152,15 +176,23 @@ export default function TownPage() {
         </div>
       ) : activeType === "What's On" ? (
         <div className="flex flex-col gap-3">
-          {filtered.map((entry) => (
+          {pagedItems.map((entry) => (
             <WhatsOnEventRow key={entry.listing.id} listing={entry.listing} overrideDate={entry.date} />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {filtered.map((l) => (
+          {pagedItems.map((l) => (
             <ListingListRow key={l.id} listing={l} />
           ))}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="flex justify-center mt-8">
+          <Button variant="outline" className="gap-2 px-8" onClick={() => setPage(p => p + 1)}>
+            Load more listings ({filtered.length - pagedItems.length} remaining)
+          </Button>
         </div>
       )}
     </div>

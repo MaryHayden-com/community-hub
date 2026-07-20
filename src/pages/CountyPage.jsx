@@ -24,6 +24,9 @@ const typeIcons = {
   "What's On": Calendar,
 };
 
+const BATCH_SIZE = 200;
+const PAGE_SIZE = 24;
+
 export default function CountyPage() {
   const { county } = useParams();
   const decodedCounty = decodeURIComponent(county);
@@ -37,11 +40,25 @@ export default function CountyPage() {
   const [query, setQuery] = useState("");
   const [activeType, setActiveType] = useState("");
   const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [page, setPage] = useState(1);
 
+  // Load all county listings in batches (removes the 1000-record cap; shows first batch fast)
   useEffect(() => {
-    base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", 1000)
-      .then(setListings)
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      let all = [], skip = 0, hasMore = true, first = true;
+      while (hasMore && !cancelled) {
+        const batch = await base44.entities.CommunityListing.filter({ county: decodedCounty }, "-created_date", BATCH_SIZE, skip);
+        if (cancelled) return;
+        all = all.concat(batch);
+        hasMore = batch.length === BATCH_SIZE;
+        skip += BATCH_SIZE;
+        setListings(all);
+        if (first) { setLoading(false); first = false; }
+      }
+    })();
+    return () => { cancelled = true; };
   }, [decodedCounty]);
 
   const towns = useMemo(() => {
@@ -76,6 +93,12 @@ export default function CountyPage() {
     const base = !activeType ? matched : matched.filter((l) => l.type === activeType);
     return sortByTypeOrder(base);
   }, [matched, activeType]);
+
+  // Reset paging when filters change
+  useEffect(() => { setPage(1); }, [query, activeType]);
+
+  const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
+  const hasMore = pagedItems.length < filtered.length;
 
   if (loading) {
     return (
@@ -205,15 +228,23 @@ export default function CountyPage() {
           </div>
         ) : viewMode === "grid" ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((l) => (
+            {pagedItems.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {filtered.map((l) => (
+            {pagedItems.map((l) => (
               <ListingListRow key={l.id} listing={l} />
             ))}
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="flex justify-center mt-8">
+            <Button variant="outline" className="gap-2 px-8" onClick={() => setPage(p => p + 1)}>
+              Load more listings ({filtered.length - pagedItems.length} remaining)
+            </Button>
           </div>
         )}
       </div>
