@@ -22,9 +22,9 @@ export default function HomeHero({ onAddListing }) {
           Hub4Community
         </h1>
         <p className="text-white/90 mt-3 text-sm sm:text-base leading-relaxed">
-          Hub4Community is a free directory for communities across Ireland. Find local businesses,
-          clubs, community services, schools and upcoming events near you — or add your own listing
-          so people can find you.
+          Hub4Community is a free directory for communities across Ireland. A <strong>listing</strong> is simply
+          a free profile page — for a business, club, group, school or event — that appears here so people can
+          find you. Browse what's near you, or add your own and your community can find you too.
         </p>
         <button
           onClick={onAddListing}
