@@ -63,6 +63,7 @@ export default function Directory() {
   const pullDelta = useRef(0);
 
   const searchDebounceRef = useRef(null);
+  const searchSectionRef = useRef(null);
 
   // ── Load all listings in batches (scales to any size) ───────────────────────
   const loadListings = useCallback(async () => {
@@ -266,7 +267,10 @@ export default function Directory() {
       )}
 
       {/* Brand summary — primary content for SEO & social link previews */}
-      <HomeHero onAddListing={() => setShowSubmitForm(true)} />
+      <HomeHero
+        onAddListing={() => setShowSubmitForm(true)}
+        onSearch={() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+      />
 
       {/* Header */}
       <div className="mb-5">
@@ -317,6 +321,7 @@ export default function Directory() {
         </div>
       </div>
 
+      <div ref={searchSectionRef}>
       <SearchFilter
         search={search} setSearch={setSearch}
         type={type} setType={setType}
@@ -333,7 +338,7 @@ export default function Directory() {
         dateTo={dateTo} setDateTo={setDateTo}
         todayStr={getTodayStr()}
         nearbyCounties={nearbyCounties} setNearbyCounties={setNearbyCounties}
-      />
+      /></div>
 
       {/* Results */}
       {viewMode === "map" ? (

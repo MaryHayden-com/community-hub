@@ -1,4 +1,4 @@
-import { Search, CalendarDays, PlusCircle, HeartHandshake, ArrowRight } from "lucide-react";
+import { Search, CalendarDays, PlusCircle, HeartHandshake, ArrowRight, Share2 } from "lucide-react";
 
 const BENEFITS = [
   { icon: Search, title: "Search anywhere in Ireland", desc: "Find businesses, clubs and services by county or town." },
@@ -7,7 +7,17 @@ const BENEFITS = [
   { icon: HeartHandshake, title: "Built for communities", desc: "From West Cork to every county — all in one hub." },
 ];
 
-export default function HomeHero({ onAddListing }) {
+export default function HomeHero({ onAddListing, onSearch }) {
+  const handleShare = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: "Hub4Community — Your free community directory", url }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(url);
+      alert("Link copied to clipboard!");
+    }
+  };
+
   return (
     <section className="mb-6" aria-labelledby="home-brand">
       {/* Image hero with teal overlay */}
@@ -38,25 +48,43 @@ export default function HomeHero({ onAddListing }) {
             and add your own so people can find you too.
           </p>
 
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+          {/* Search the directory */}
+          <div className="mt-6">
             <button
-              onClick={onAddListing}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px]"
-              style={{ background: "#E2701B" }}
+              onClick={onSearch}
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
+              style={{ background: "#097275" }}
             >
-              <PlusCircle className="w-4 h-4" /> Add Your Listing
-            </button>
-            <button
-              onClick={onAddListing}
-              className="inline-flex items-center justify-center gap-1.5 px-2 py-3 rounded-full font-medium text-sm text-white/90 hover:text-white transition-colors min-h-[44px]"
-            >
-              Already listed? Claim your listing
-              <ArrowRight className="w-4 h-4" />
+              <Search className="w-4 h-4" /> Search the directory
             </button>
           </div>
-          <p className="mt-2 text-white/70 text-xs">
-            A listing is a free profile page — for a business, club, group, school or event.
-          </p>
+
+          {/* Can't find it? Add your listing */}
+          <div className="mt-5">
+            <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
+              Can't find what you're looking for? If your business, club or group isn't listed yet, add it — it's free.
+            </p>
+            <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
+              <button
+                onClick={onAddListing}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px]"
+                style={{ background: "#E2701B" }}
+              >
+                <PlusCircle className="w-4 h-4" /> Add Your Listing
+              </button>
+              <p className="text-white/70 text-xs">
+                A listing is a free profile page — for a business, club, group, school or event.
+              </p>
+            </div>
+          </div>
+
+          {/* Share */}
+          <button
+            onClick={handleShare}
+            className="mt-5 inline-flex items-center gap-1.5 px-1 py-2 rounded-full font-medium text-sm text-white/90 hover:text-white transition-colors min-h-[44px]"
+          >
+            <Share2 className="w-4 h-4" /> Share this directory with others
+          </button>
         </div>
       </div>
 
