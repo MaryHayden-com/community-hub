@@ -25,7 +25,7 @@ export default function HomeHero({ onAddListing }) {
 
         <div className="relative px-6 sm:px-10 py-10 sm:py-14">
           <p className="text-white/80 text-[11px] font-semibold uppercase tracking-[0.2em] mb-3">
-            Ireland's free community directory
+            Your free community directory
           </p>
           <h1
             id="home-brand"
