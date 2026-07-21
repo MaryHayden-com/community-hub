@@ -273,15 +273,15 @@ export default function Admin() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-14 sm:pb-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="sticky top-0 z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-background/95 backdrop-blur border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
-          <h1 className="font-display text-3xl font-bold flex items-center gap-2">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold flex items-center gap-2">
             <Shield className="w-7 h-7 text-primary" />
             Admin Panel
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
+        <div className="flex items-center gap-2 flex-nowrap overflow-x-auto sm:flex-wrap justify-start sm:justify-end pb-1 -mb-1">
           {/* Always-visible utility buttons */}
           <Button
             variant="outline"
