@@ -1,4 +1,4 @@
-import { Search, CalendarDays, PlusCircle, HeartHandshake, ArrowRight, Share2 } from "lucide-react";
+import { Search, CalendarDays, PlusCircle, HeartHandshake } from "lucide-react";
 
 const BENEFITS = [
   { icon: Search, title: "Search anywhere in Ireland", desc: "Find businesses, clubs and services by county or town." },
@@ -8,16 +8,6 @@ const BENEFITS = [
 ];
 
 export default function HomeHero({ onAddListing, onSearch }) {
-  const handleShare = () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({ title: "Hub4Community — Your free community directory", url }).catch(() => {});
-    } else {
-      navigator.clipboard?.writeText(url);
-      alert("Link copied to clipboard!");
-    }
-  };
-
   return (
     <section className="mb-6" aria-labelledby="home-brand">
       {/* Image hero with teal overlay */}
@@ -70,18 +60,11 @@ export default function HomeHero({ onAddListing, onSearch }) {
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px]"
                 style={{ background: "#E2701B" }}
               >
-                <PlusCircle className="w-4 h-4" /> Add Your Listing
+                <PlusCircle className="w-4 h-4" /> Add Your Business or Group
               </button>
             </div>
           </div>
 
-          {/* Share */}
-          <button
-            onClick={handleShare}
-            className="mt-5 inline-flex items-center gap-1.5 px-1 py-2 rounded-full font-medium text-sm text-white/90 hover:text-white transition-colors min-h-[44px]"
-          >
-            <Share2 className="w-4 h-4" /> Share this directory with others
-          </button>
         </div>
       </div>
 

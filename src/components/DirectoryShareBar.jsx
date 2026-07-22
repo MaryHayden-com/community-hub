@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
-import { Share2, Copy } from "lucide-react";
+import { Share2, Copy, Download } from "lucide-react";
 
 export default function DirectoryShareBar() {
   const [url] = useState(() => window.location.href.split("?")[0].split("#")[0]);
@@ -72,6 +72,14 @@ export default function DirectoryShareBar() {
         >
           <Copy className="w-3.5 h-3.5" /> {copied ? "Copied!" : "Copy link"}
         </button>
+        <a
+          href={qrDataUrl || "#"}
+          download="hub4community-qr.png"
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border min-h-[40px]"
+          style={{ borderColor: "hsl(182 85% 25% / 0.4)", color: "#097275" }}
+        >
+          <Download className="w-3.5 h-3.5" /> QR
+        </a>
       </div>
     </div>
   );
