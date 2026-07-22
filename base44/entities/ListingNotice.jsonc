@@ -53,8 +53,19 @@
     "notice_type"
   ],
   "rls": {
-    "create": null,
-    "read": true,
+    "create": {
+      "$or": [
+        {
+          "data.listing_owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": null,
     "update": {
       "$or": [
         {

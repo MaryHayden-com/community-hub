@@ -29,7 +29,9 @@
     "user_email"
   ],
   "rls": {
-    "create": null,
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
     "read": null,
     "update": {
       "$or": [
