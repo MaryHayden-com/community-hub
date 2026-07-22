@@ -19,17 +19,32 @@ Deno.serve(async (req) => {
     const createdBy = listing?.created_by || 'Unknown';
     const location = [town, county].filter(Boolean).join(', ');
 
+    const link = 'https://community-hub.base44.app/admin#pending';
+    const html = `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
+        <div style="background:#097275;padding:18px 24px;border-radius:8px 8px 0 0;">
+          <h1 style="color:#fff;margin:0;font-size:18px;">New listing awaiting approval</h1>
+          <p style="color:#cfe9ea;margin:4px 0 0;font-size:12px;">Hub for Community</p>
+        </div>
+        <div style="background:#f9fafb;padding:24px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
+          <p style="margin-top:0;">A new listing has been submitted and is awaiting your approval:</p>
+          <table style="width:100%;font-size:14px;border-collapse:collapse;margin:6px 0 16px;">
+            <tr><td style="padding:4px 0;color:#6b7280;width:130px;">Name</td><td style="font-weight:600;">${name}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;">Type</td><td>${type}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;">Location</td><td>${location}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;">Submitted by</td><td>${createdBy}</td></tr>
+          </table>
+          <a href="${link}" style="display:inline-block;background:#E2701B;color:#fff;padding:13px 26px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Review & approve &rarr;</a>
+          <p style="margin-top:16px;font-size:12px;color:#9ca3af;">This opens the Pending Approval tab in your admin panel.</p>
+        </div>
+      </div>
+    `;
+
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: 'mary@maryhayden.com',
       from_name: 'Community Hub',
       subject: `New listing awaiting approval: ${name}`,
-      body: `A new listing has been submitted and is awaiting your approval.\n\n` +
-        `Name: ${name}\n` +
-        `Type: ${type}\n` +
-        `Location: ${location}\n` +
-        `Submitted by: ${createdBy}\n\n` +
-        `👉 Review and approve it here: https://community-hub.base44.app/admin\n` +
-        `(Go to the "Pending Approval" tab)`
+      body: html,
     });
 
     console.log(`[notifyNewListing] Email sent for new listing: ${name}`);
