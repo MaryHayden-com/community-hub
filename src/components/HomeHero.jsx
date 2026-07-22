@@ -1,4 +1,12 @@
-import { Search, CalendarDays, PlusCircle, HeartHandshake } from "lucide-react";
+import { Search, CalendarDays, PlusCircle, HeartHandshake, Share2 } from "lucide-react";
+
+function StepBadge({ n }) {
+  return (
+    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/15 text-white text-sm font-bold shrink-0 mr-3 mt-0.5 border border-white/30">
+      {n}
+    </span>
+  );
+}
 
 const BENEFITS = [
   { icon: Search, title: "Search anywhere in Ireland", desc: "Find businesses, clubs and services by county or town." },
@@ -8,6 +16,15 @@ const BENEFITS = [
 ];
 
 export default function HomeHero({ onAddListing, onSearch }) {
+  const handleShare = () => {
+    const url = window.location.href.split("?")[0].split("#")[0];
+    if (navigator.share) {
+      navigator.share({ title: "Hub4Community — Your free community directory", url }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(url).then(() => alert("Link copied to clipboard!")).catch(() => {});
+    }
+  };
+
   return (
     <section className="mb-6" aria-labelledby="home-brand">
       {/* Image hero with teal overlay */}
@@ -33,35 +50,60 @@ export default function HomeHero({ onAddListing, onSearch }) {
           >
             Hub4Community
           </h1>
-          <p className="mt-3 text-white/95 text-base sm:text-lg leading-relaxed max-w-xl">
-            Find and support the businesses, clubs and events that make up your community —
-            and add your own so people can find you too.
-          </p>
-
-          {/* Search the directory */}
+          {/* Step 1 — Find & search */}
           <div className="mt-6">
-            <button
-              onClick={onSearch}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
-              style={{ background: "#097275" }}
-            >
-              <Search className="w-4 h-4" /> Search the directory
-            </button>
+            <div className="flex items-start">
+              <StepBadge n={1} />
+              <div>
+                <p className="text-white/95 text-sm sm:text-base leading-relaxed max-w-xl">
+                  Find and support the businesses, clubs and events that make up your community —
+                  and add your own so people can find you too.
+                </p>
+                <button
+                  onClick={onSearch}
+                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
+                  style={{ background: "#097275" }}
+                >
+                  <Search className="w-4 h-4" /> Search the directory
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Can't find it? Add your listing */}
+          {/* Step 2 — Can't find it? Add yours */}
           <div className="mt-5">
-            <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-              Can't find what you're looking for? If your business, club or group isn't listed yet, add it — it's free.
-            </p>
-            <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
-              <button
-                onClick={onAddListing}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px]"
-                style={{ background: "#E2701B" }}
-              >
-                <PlusCircle className="w-4 h-4" /> Add Your Business or Group
-              </button>
+            <div className="flex items-start">
+              <StepBadge n={2} />
+              <div>
+                <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
+                  Can't find what you're looking for? If your business, club or group isn't listed yet, add it — it's free.
+                </p>
+                <button
+                  onClick={onAddListing}
+                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
+                  style={{ background: "#E2701B" }}
+                >
+                  <PlusCircle className="w-4 h-4" /> Add Your Business or Group
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 3 — Share */}
+          <div className="mt-5">
+            <div className="flex items-start">
+              <StepBadge n={3} />
+              <div>
+                <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
+                  Share this directory with others so your whole community can find what's local.
+                </p>
+                <button
+                  onClick={handleShare}
+                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
+                >
+                  <Share2 className="w-4 h-4" /> Share this directory
+                </button>
+              </div>
             </div>
           </div>
 
