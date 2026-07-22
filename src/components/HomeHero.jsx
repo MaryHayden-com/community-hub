@@ -72,9 +72,6 @@ export default function HomeHero({ onAddListing, onSearch }) {
               >
                 <PlusCircle className="w-4 h-4" /> Add Your Listing
               </button>
-              <p className="text-white/70 text-xs">
-                A listing is a free profile page — for a business, club, group, school or event.
-              </p>
             </div>
           </div>
 
