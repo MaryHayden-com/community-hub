@@ -149,7 +149,7 @@ export default function Directory() {
   // ── Derived filter options (always from browse dataset) ─────────────────────
   const countries = useMemo(() => [...new Set(browseListings.map(l => l.country).filter(Boolean))].sort(), [browseListings]);
 
-  const NI_COUNTIES = ["Antrim", "Armagh", "Down", "Fermanagh", "Tyrone", "Derry"];
+  const NI_COUNTIES = ["Antrim", "Armagh", "Down", "Fermanagh", "Tyrone", "Derry/Londonderry"];
 
   const counties = useMemo(() => {
     if (country === "Northern Ireland") return NI_COUNTIES.slice().sort();
