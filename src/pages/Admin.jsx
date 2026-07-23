@@ -61,7 +61,10 @@ export default function Admin() {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
-  const pendingListingsCount = listings.filter(l => l.status === "pending").length;
+  // Pending submissions are fetched directly (server-side filter) so they're always
+  // complete even when the main list (capped at 2000) excludes older pending records.
+  const [pendingListings, setPendingListings] = useState([]);
+  const pendingListingsCount = pendingListings.length;
   const DEFAULT_COLUMNS = { image: true, name: true, type: true, subcategory_group: true, category: true, county: true, town: true, area: false, address: false, phone: false, email: false, website: false, contact_name: false, is_featured: true };
   const [visibleColumns, setVisibleColumns] = useState(() => {
     try { return JSON.parse(localStorage.getItem("admin_columns")) || DEFAULT_COLUMNS; } catch { return DEFAULT_COLUMNS; }
@@ -194,6 +197,10 @@ export default function Admin() {
     base44.entities.CommunityListing.list("-created_date", 2000)
       .then(setListings)
       .finally(() => setLoading(false));
+    // Always fetch the full set of pending submissions (independent of the 2000 cap)
+    base44.entities.CommunityListing.filter({ status: "pending" }, "-created_date", 500)
+      .then(setPendingListings)
+      .catch(() => {});
   };
 
   useEffect(() => { loadListings(); }, []);
@@ -487,7 +494,7 @@ export default function Admin() {
 
       {activeTab === "pending" && (
         <AdminPendingTab
-          listings={listings}
+          listings={pendingListings}
           onListingUpdated={loadListings}
           onEdit={setEditing}
         />
