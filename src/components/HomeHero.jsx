@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
-import { Search, CalendarDays, PlusCircle, Share2, Copy, Download } from "lucide-react";
+import { Search, CalendarDays, PlusCircle, Share2, Copy, Download, Lightbulb } from "lucide-react";
 
 function StepBadge({ n }) {
   return (
@@ -10,7 +10,7 @@ function StepBadge({ n }) {
   );
 }
 
-export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
+export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSuggestBusiness }) {
   const [url] = useState(() => window.location.href.split("?")[0].split("#")[0]);
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -23,9 +23,14 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
     return () => { mounted = false; };
   }, [url]);
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (navigator.share) {
-      navigator.share({ title: "Hub4Community — Your free community directory", url }).catch(() => {});
+      try {
+        await navigator.share({ title: "Hub4Community — Your free community directory", url });
+      } catch (err) {
+        // Only fall back to copy if the share genuinely failed (not a user cancel)
+        if (err?.name !== "AbortError") handleCopy();
+      }
     } else {
       handleCopy();
     }
@@ -155,10 +160,27 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
             </div>
           </div>
 
-        </div>
-      </div>
+          {/* Step 4 — Suggest a business */}
+          <div className="mt-5">
+            <div className="flex items-start">
+              <StepBadge n={4} />
+              <div className="flex-1 min-w-0">
+                <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
+                  Know a local business, club or service that should be on the Hub but isn't? Tell us about it and we'll reach out to them.
+                </p>
+                <button
+                  onClick={onSuggestBusiness}
+                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
+                >
+                  <Lightbulb className="w-4 h-4" /> Suggest a business
+                </button>
+              </div>
+            </div>
+          </div>
 
+          </div>
+          </div>
 
-    </section>
+          </section>
   );
 }

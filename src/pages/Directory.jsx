@@ -19,7 +19,7 @@ import SuggestBusinessForm from "../components/SuggestBusinessForm";
 import usePageTitle from "@/hooks/usePageTitle";
 import HomeHero from "@/components/HomeHero";
 
-import { Lightbulb } from "lucide-react";
+
 
 const PAGE_SIZE = 50;
 const BATCH_SIZE = 200;
@@ -270,6 +270,7 @@ export default function Directory() {
       {/* Brand summary — primary content for SEO & social link previews */}
       <HomeHero
         onAddListing={() => setShowSubmitForm(true)}
+        onSuggestBusiness={() => setShowSuggestForm(true)}
         onSearch={() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
         onSearchWhatsOn={() => {
           setType("What's On");
@@ -291,13 +292,6 @@ export default function Directory() {
                 : <>{filtered.length} listing{filtered.length !== 1 ? "s" : ""} found</>
               }
             </p>
-            <button
-              onClick={() => setShowSuggestForm(true)}
-              className="text-sm mt-1 flex items-center gap-1.5 hover:underline"
-              style={{ color: '#E2701B' }}
-            >
-              <Lightbulb className="w-3.5 h-3.5" /> Know a business that should be listed? Suggest it
-            </button>
           </div>
           <div className="flex items-center gap-2">
             {/* List / Map toggle */}
