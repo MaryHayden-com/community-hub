@@ -122,32 +122,32 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
 
                 <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
                   {qrDataUrl ? (
-                    <div className="bg-white rounded-lg p-1.5 shrink-0 self-start" title="Scan to open this directory">
-                      <img src={qrDataUrl} alt="QR code for this directory" className="w-16 h-16 sm:w-20 sm:h-20" />
+                    <div className="bg-white rounded-lg p-1 shrink-0 self-center sm:self-start" title="Scan to open this directory">
+                      <img src={qrDataUrl} alt="QR code for this directory" className="w-14 h-14 sm:w-20 sm:h-20" />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-white/20 shrink-0 self-start" />
+                    <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-lg bg-white/20 shrink-0 self-center sm:self-start" />
                   )}
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 w-full sm:w-auto">
                     <button
                       onClick={handleShare}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] border border-white/40 bg-white/10 hover:bg-white/15"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
                     >
                       <Share2 className="w-4 h-4" /> Share
                     </button>
                     <button
                       onClick={handleCopy}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] border border-white/40 bg-white/10 hover:bg-white/15"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
                     >
                       <Copy className="w-4 h-4" /> {copied ? "Copied!" : "Copy link"}
                     </button>
                     <a
                       href={qrDataUrl || "#"}
                       download="hub4community-qr.png"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] border border-white/40 bg-white/10 hover:bg-white/15"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
                     >
-                      <Download className="w-4 h-4" /> QR
+                      <Download className="w-4 h-4" /> Download QR
                     </a>
                   </div>
                 </div>
