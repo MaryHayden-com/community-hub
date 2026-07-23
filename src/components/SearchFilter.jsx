@@ -5,9 +5,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
-export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
+export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countries, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const isWhatsOn = type === "What's On";
-  const hasFilters = search || type || (group && group.length > 0) || (category && category.length > 0) || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
+  const hasFilters = search || type || (group && group.length > 0) || (category && category.length > 0) || country || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
 
   return (
     <div className="space-y-3">
@@ -20,6 +20,19 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           className="pl-10 h-11 bg-card"
         />
       </div>
+
+      {/* Country filter (hierarchy above county) */}
+      <Select value={country || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCountry(val); setCounty(""); setTown(""); localStorage.setItem("dir_country", val); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}>
+        <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
+          <SelectValue placeholder="All Countries" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Countries</SelectItem>
+          {countries.map((c) => (
+            <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {/* Row 1: County + Town */}
       <div className="grid grid-cols-2 gap-2">
@@ -94,7 +107,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCounty(""); setTown(""); if (setNearbyCounties) setNearbyCounties(null); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType(""); setGroup([]); setCategory([]); setCountry(""); setCounty(""); setTown(""); if (setNearbyCounties) setNearbyCounties(null); localStorage.removeItem("dir_country"); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}

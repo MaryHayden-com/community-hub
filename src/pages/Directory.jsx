@@ -47,6 +47,7 @@ export default function Directory() {
   const [category, setCategory] = useState(() => params.get("category") ? [params.get("category")] : []);
   const [county, setCounty] = useState(() => readParam(params, "county") || localStorage.getItem("dir_county") || "");
   const [town, setTown] = useState(() => readParam(params, "town") || localStorage.getItem("dir_town") || "");
+  const [country, setCountry] = useState(() => localStorage.getItem("dir_country") || "");
   const [dateFrom, setDateFrom] = useState(getTodayStr);
   const [dateTo, setDateTo] = useState("");
   const [nearbyCounties, setNearbyCounties] = useState(null);
@@ -93,6 +94,7 @@ export default function Directory() {
     const urlTown = readParam(params, "town") || localStorage.getItem("dir_town") || "";
     setCounty(urlCounty);
     setTown(urlTown);
+    setCountry(localStorage.getItem("dir_country") || "");
   }, [location.search]);
 
   // ── Server-side search (debounced, ≥2 chars) ────────────────────────────────
@@ -145,7 +147,14 @@ export default function Directory() {
   }, [refreshing, loadListings]);
 
   // ── Derived filter options (always from browse dataset) ─────────────────────
-  const counties = useMemo(() => IRELAND_COUNTIES.map(c => c.county).sort(), []);
+  const countries = useMemo(() => [...new Set(browseListings.map(l => l.country).filter(Boolean))].sort(), [browseListings]);
+
+  const counties = useMemo(() => {
+    if (country && country !== "Ireland") {
+      return [...new Set(browseListings.filter(l => l.country === country).map(l => l.county).filter(Boolean))].sort();
+    }
+    return IRELAND_COUNTIES.map(c => c.county).sort();
+  }, [browseListings, country]);
 
   const groups = useMemo(() => {
     if (!type) return [];
@@ -200,7 +209,7 @@ export default function Directory() {
   }, [browseListings, county]);
 
   // ── Reset page when any filter changes ───────────────────────────────────────
-  useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, county, town, nearbyCounties, dateFrom, dateTo]);
+  useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo]);
 
   // ── Active dataset: server search results OR browse set ──────────────────────
   const activeListings = search.trim().length >= 2 ? searchResults : browseListings;
@@ -222,6 +231,7 @@ export default function Directory() {
           if (!coords) return false;
           if (haversineKm(nearbyCounties.lat, nearbyCounties.lng, coords.lat, coords.lng) > nearbyCounties.km) return false;
         } else {
+          if (country && l.country !== country) return false;
           if (county && l.county !== county) return false;
           if (town && l.town !== town) return false;
         }
@@ -232,7 +242,7 @@ export default function Directory() {
     if (!isWhatsOn) return sortByTypeOrder(base);
 
     return expandAndSortEvents(base, dateFrom, dateTo);
-  }, [activeListings, search, type, subcategoryGroup, category, county, town, nearbyCounties, dateFrom, dateTo]);
+  }, [activeListings, search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo]);
 
   const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = pagedItems.length < filtered.length;
@@ -327,6 +337,7 @@ export default function Directory() {
         category={category} setCategory={setCategory}
         categories={categories}
         categoryCounts={categoryCounts}
+        country={country} setCountry={setCountry} countries={countries}
         county={county} setCounty={setCounty}
         town={town} setTown={setTown}
         counties={counties} towns={towns} townGroups={townGroups}
