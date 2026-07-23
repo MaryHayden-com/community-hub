@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     const createdBy = listing?.created_by || 'Unknown';
     const location = [town, county].filter(Boolean).join(', ');
 
-    const link = 'https://community-hub.base44.app/admin#pending';
+    const link = 'https://hub4community.com/admin#pending';
     const html = `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
         <div style="background:#097275;padding:18px 24px;border-radius:8px 8px 0 0;">

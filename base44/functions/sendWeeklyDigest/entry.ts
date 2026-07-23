@@ -89,7 +89,7 @@ ${listing.type === "What's On" ? `\n🎉 **Event Update:**\n- Total RSVPs: ${att
 
 ${totalEngagement > 0 || savedCount > 0 ? `That's ${totalEngagement + savedCount} interactions with your listing this week!` : ''}
 
-👉 **View your full dashboard:** ${process.env.BASE44_APP_URL || 'https://yourapp.base44.app'}/dashboard
+👉 **View your full dashboard:** ${process.env.BASE44_APP_URL || 'https://hub4community.com'}/dashboard
 
 Keep your listing fresh and engaging to attract more visitors!
 

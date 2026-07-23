@@ -45,7 +45,7 @@ ${isPending
 
 Thanks,
 The Community Hub Team
-https://community-hub.base44.app`,
+https://hub4community.com`,
       });
     }
 
@@ -55,7 +55,7 @@ https://community-hub.base44.app`,
       const ownerEmail = parentListing?.owner_email;
 
       if (ownerEmail) {
-        const adminLink = `https://community-hub.base44.app/admin#whatson`;
+        const adminLink = `https://hub4community.com/admin#whatson`;
         const ownerHtml = `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
             <div style="background:#097275;padding:18px 24px;border-radius:8px 8px 0 0;">
