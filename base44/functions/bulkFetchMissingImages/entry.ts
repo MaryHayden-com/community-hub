@@ -34,6 +34,24 @@ function safeUrl(raw: string): string | null {
   return u.href;
 }
 
+// Fetch with manual redirect handling so every redirect hop is re-validated
+// against safeUrl(), preventing SSRF via attacker-controlled 3xx redirects.
+async function safeFetch(url: string, options: any, maxRedirects = 5): Promise<Response | null> {
+  let currentUrl = url;
+  for (let i = 0; i <= maxRedirects; i++) {
+    if (!safeUrl(currentUrl)) return null;
+    const res = await fetch(currentUrl, { ...options, redirect: 'manual' });
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get('location');
+      if (!location) return null;
+      try { currentUrl = new URL(location, currentUrl).toString(); } catch { return null; }
+      continue;
+    }
+    return res;
+  }
+  return null;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -82,11 +100,11 @@ Deno.serve(async (req) => {
 
           const safe = safeUrl(url);
           if (!safe) { console.log(`  Blocked unsafe URL: ${url}`); continue; }
-          const res = await fetch(safe, {
+          const res = await safeFetch(safe, {
             headers: { 'User-Agent': 'Mozilla/5.0 (compatible; IrishDirectory/1.0)' },
             signal: AbortSignal.timeout(10000),
           });
-          if (!res.ok) continue;
+          if (!res || !res.ok) continue;
           const html = await res.text();
 
           const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)

@@ -1,5 +1,16 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+// HTML-entity escape untrusted values before interpolating into email HTML.
+function esc(v: any): string {
+  if (v == null) return '';
+  return String(v)
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
+    .replace(/'/g, '&#39;');
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -52,12 +63,12 @@ https://community-hub.base44.app`,
               <p style="color:#cfe9ea;margin:4px 0 0;font-size:12px;">Hub for Community</p>
             </div>
             <div style="background:#f9fafb;padding:24px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
-              <p style="margin-top:0;">Hi ${parentListing.contact_name || "there"},</p>
-              <p>A new event has been submitted for your listing <strong>"${parentListing.name}"</strong> and is awaiting your approval.</p>
+              <p style="margin-top:0;">Hi ${esc(parentListing.contact_name) || "there"},</p>
+              <p>A new event has been submitted for your listing <strong>"${esc(parentListing.name)}"</strong> and is awaiting your approval.</p>
               <table style="width:100%;font-size:14px;border-collapse:collapse;margin:6px 0 16px;">
-                <tr><td style="padding:4px 0;color:#6b7280;width:130px;">Event</td><td style="font-weight:600;">${listing.name}</td></tr>
-                <tr><td style="padding:4px 0;color:#6b7280;">Submitted by</td><td>${listing.contact_name || "Anonymous"}${listing.email ? ` (${listing.email})` : ""}</td></tr>
-                <tr><td style="padding:4px 0;color:#6b7280;">Location</td><td>${listing.town}, Co. ${listing.county}</td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280;width:130px;">Event</td><td style="font-weight:600;">${esc(listing.name)}</td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280;">Submitted by</td><td>${esc(listing.contact_name) || "Anonymous"}${listing.email ? ` (${esc(listing.email)})` : ""}</td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280;">Location</td><td>${esc(listing.town)}, Co. ${esc(listing.county)}</td></tr>
               </table>
               <a href="${adminLink}" style="display:inline-block;background:#E2701B;color:#fff;padding:13px 26px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Review & approve &rarr;</a>
               <p style="margin-top:16px;font-size:12px;color:#9ca3af;">This opens the What's On tab in your admin panel.</p>
