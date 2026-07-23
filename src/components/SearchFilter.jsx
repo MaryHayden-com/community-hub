@@ -73,15 +73,21 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
       <div className="flex gap-2 flex-wrap items-center">
         <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup([]); setCategory([]); }}>
           <SelectTrigger className="h-11 bg-card font-bold flex-1 min-w-[130px]" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Categories" />
+            <SelectValue placeholder="All Listing Categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Categories</SelectItem>
-            <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business & Retail</SelectItem>
-            <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
-            <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
-            <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education & Training</SelectItem>
-            <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Listing Categories</SelectItem>
+            <SelectGroup>
+              <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Listings</SelectLabel>
+              <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business & Retail</SelectItem>
+              <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
+              <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
+              <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education & Training</SelectItem>
+            </SelectGroup>
+            <SelectGroup>
+              <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Events</SelectLabel>
+              <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
+            </SelectGroup>
           </SelectContent>
         </Select>
 
