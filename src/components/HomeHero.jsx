@@ -56,8 +56,7 @@ export default function HomeHero({ onAddListing, onSearch }) {
               <StepBadge n={1} />
               <div>
                 <p className="text-white/95 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Find and support the businesses, clubs and events that make up your community —
-                  and add your own so people can find you too.
+                  Search the directory to find local businesses, clubs, community services and events near you — and support the people behind them by shopping local and joining in.
                 </p>
                 <button
                   onClick={onSearch}
@@ -76,7 +75,7 @@ export default function HomeHero({ onAddListing, onSearch }) {
               <StepBadge n={2} />
               <div>
                 <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Can't find what you're looking for? If your business, club or group isn't listed yet, add it — it's free.
+                  Can't find what you need? Add your own business, club or group in minutes — it's free, and you'll stay in control of your listing to manage and update it yourself.
                 </p>
                 <button
                   onClick={onAddListing}
@@ -95,7 +94,7 @@ export default function HomeHero({ onAddListing, onSearch }) {
               <StepBadge n={3} />
               <div>
                 <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Share this directory with others so your whole community can find what's local.
+                  Share this directory with friends, neighbours and local groups so they can discover what's nearby — or add their own listing if it isn't here yet.
                 </p>
                 <button
                   onClick={handleShare}
