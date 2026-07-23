@@ -18,7 +18,7 @@ import NewsletterPopup from "../components/NewsletterPopup";
 import SuggestBusinessForm from "../components/SuggestBusinessForm";
 import usePageTitle from "@/hooks/usePageTitle";
 import HomeHero from "@/components/HomeHero";
-import DirectoryShareBar from "@/components/DirectoryShareBar";
+
 import { Lightbulb } from "lucide-react";
 
 const PAGE_SIZE = 50;
@@ -321,7 +321,6 @@ export default function Directory() {
           </div>
         </div>
 
-        <DirectoryShareBar />
       </div>
 
       <div ref={searchSectionRef}>

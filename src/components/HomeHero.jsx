@@ -1,4 +1,6 @@
-import { Search, CalendarDays, PlusCircle, Share2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import QRCode from "qrcode";
+import { Search, CalendarDays, PlusCircle, Share2, Copy, Download } from "lucide-react";
 
 function StepBadge({ n }) {
   return (
@@ -9,13 +11,32 @@ function StepBadge({ n }) {
 }
 
 export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
+  const [url] = useState(() => window.location.href.split("?")[0].split("#")[0]);
+  const [qrDataUrl, setQrDataUrl] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    QRCode.toDataURL(url, { width: 240, margin: 1, errorCorrectionLevel: "M" })
+      .then((d) => { if (mounted) setQrDataUrl(d); })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, [url]);
+
   const handleShare = () => {
-    const url = window.location.href.split("?")[0].split("#")[0];
     if (navigator.share) {
       navigator.share({ title: "Hub4Community — Your free community directory", url }).catch(() => {});
     } else {
-      navigator.clipboard?.writeText(url).then(() => alert("Link copied to clipboard!")).catch(() => {});
+      handleCopy();
     }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
   };
 
   return (
@@ -94,16 +115,42 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
           <div className="mt-5">
             <div className="flex items-start">
               <StepBadge n={3} />
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
                   Share this directory with friends, neighbours and local groups so they can discover what's nearby — or add their own listing if it isn't here yet.
                 </p>
-                <button
-                  onClick={handleShare}
-                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
-                >
-                  <Share2 className="w-4 h-4" /> Share this directory
-                </button>
+
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                  {qrDataUrl ? (
+                    <div className="bg-white rounded-lg p-1.5 shrink-0 self-start" title="Scan to open this directory">
+                      <img src={qrDataUrl} alt="QR code for this directory" className="w-16 h-16 sm:w-20 sm:h-20" />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-white/20 shrink-0 self-start" />
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={handleShare}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] border border-white/40 bg-white/10 hover:bg-white/15"
+                    >
+                      <Share2 className="w-4 h-4" /> Share
+                    </button>
+                    <button
+                      onClick={handleCopy}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] border border-white/40 bg-white/10 hover:bg-white/15"
+                    >
+                      <Copy className="w-4 h-4" /> {copied ? "Copied!" : "Copy link"}
+                    </button>
+                    <a
+                      href={qrDataUrl || "#"}
+                      download="hub4community-qr.png"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] border border-white/40 bg-white/10 hover:bg-white/15"
+                    >
+                      <Download className="w-4 h-4" /> QR
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
