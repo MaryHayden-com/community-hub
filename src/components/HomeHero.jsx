@@ -1,4 +1,4 @@
-import { Search, CalendarDays, PlusCircle, HeartHandshake, Share2 } from "lucide-react";
+import { Search, CalendarDays, PlusCircle, Share2 } from "lucide-react";
 
 function StepBadge({ n }) {
   return (
@@ -8,14 +8,7 @@ function StepBadge({ n }) {
   );
 }
 
-const BENEFITS = [
-  { icon: Search, title: "Search anywhere in Ireland", desc: "Find businesses, clubs and services by county or town." },
-  { icon: CalendarDays, title: "What's On events", desc: "See upcoming markets, meetups and community events." },
-  { icon: PlusCircle, title: "Add yours, free", desc: "Add a business, club, group or event in minutes." },
-  { icon: HeartHandshake, title: "Built for communities", desc: "From West Cork to every county — all in one hub." },
-];
-
-export default function HomeHero({ onAddListing, onSearch }) {
+export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn }) {
   const handleShare = () => {
     const url = window.location.href.split("?")[0].split("#")[0];
     if (navigator.share) {
@@ -58,13 +51,22 @@ export default function HomeHero({ onAddListing, onSearch }) {
                 <p className="text-white/95 text-sm sm:text-base leading-relaxed max-w-xl">
                   Search the directory to find local businesses, clubs, community services and events near you — and support the people behind them by shopping local and joining in.
                 </p>
-                <button
-                  onClick={onSearch}
-                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
-                  style={{ background: "#097275" }}
-                >
-                  <Search className="w-4 h-4" /> Search the directory
-                </button>
+                <div className="mt-3 flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <button
+                    onClick={onSearch}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
+                    style={{ background: "#097275" }}
+                  >
+                    <Search className="w-4 h-4" /> Search the directory
+                  </button>
+                  <button
+                    onClick={onSearchWhatsOn}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/30"
+                    style={{ background: "hsl(182 85% 30%)" }}
+                  >
+                    <CalendarDays className="w-4 h-4" /> Search What's On
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -109,22 +111,7 @@ export default function HomeHero({ onAddListing, onSearch }) {
         </div>
       </div>
 
-      {/* Benefits row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-        {BENEFITS.map((b) => (
-          <div
-            key={b.title}
-            className="rounded-xl bg-card border border-border p-4 text-center shadow-sm"
-            style={{ borderTop: "3px solid #E2701B" }}
-          >
-            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full mb-2" style={{ background: "hsl(182 85% 25% / 0.1)" }}>
-              <b.icon className="w-4 h-4" style={{ color: "#097275" }} aria-hidden="true" />
-            </span>
-            <p className="font-semibold text-sm" style={{ color: "#097275" }}>{b.title}</p>
-            <p className="text-muted-foreground text-xs mt-1 leading-snug">{b.desc}</p>
-          </div>
-        ))}
-      </div>
+
     </section>
   );
 }

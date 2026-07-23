@@ -271,6 +271,10 @@ export default function Directory() {
       <HomeHero
         onAddListing={() => setShowSubmitForm(true)}
         onSearch={() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        onSearchWhatsOn={() => {
+          setType("What's On");
+          searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
       />
 
       {/* Header */}
@@ -313,11 +317,7 @@ export default function Directory() {
                 <Map className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Map</span>
               </button>
             </div>
-            <Button onClick={() => setShowSubmitForm(true)} className="gap-2 shrink-0" style={{ background: '#E2701B', border: 'none' }}>
-              <PlusCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Your Business or Group</span>
-              <span className="sm:hidden">Add Yours</span>
-            </Button>
+
           </div>
         </div>
 
