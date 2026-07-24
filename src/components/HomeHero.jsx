@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
+import { base44 } from "@/api/base44Client";
 import {
   Search, CalendarDays, PlusCircle, Share2, Copy, Download, Lightbulb,
-  ArrowLeft, Store, ShieldCheck, LayoutDashboard, MapPin, Bell, Heart, Pencil, Check
+  ArrowLeft, Store, ShieldCheck, LayoutDashboard, Check
 } from "lucide-react";
 
 function BenefitList({ items }) {
@@ -19,25 +20,57 @@ function BenefitList({ items }) {
   );
 }
 
-function ShareCluster({ qrDataUrl, onShare, onCopy, copied }) {
+// Self-contained share widget: builds a QR + share/copy for whatever URL it's given.
+function ShareCluster({ shareUrl, shareTitle, primaryLabel }) {
+  const [qr, setQr] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let m = true;
+    QRCode.toDataURL(shareUrl, { width: 240, margin: 1, errorCorrectionLevel: "M" })
+      .then((d) => { if (m) setQr(d); })
+      .catch(() => {});
+    return () => { m = false; };
+  }, [shareUrl]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+      } catch (err) {
+        if (err?.name !== "AbortError") handleCopy();
+      }
+    } else {
+      handleCopy();
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-      {qrDataUrl ? (
-        <div className="bg-white rounded-lg p-1 shrink-0 self-center sm:self-start" title="Scan to open this directory">
-          <img src={qrDataUrl} alt="QR code for this directory" className="w-14 h-14 sm:w-16 sm:h-16" />
+      {qr ? (
+        <div className="bg-white rounded-lg p-1 shrink-0 self-center sm:self-start" title="Scan to open">
+          <img src={qr} alt="QR code" className="w-14 h-14 sm:w-16 sm:h-16" />
         </div>
       ) : (
         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-white/20 shrink-0 self-center sm:self-start" />
       )}
       <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-        <button onClick={onShare} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
-          <Share2 className="w-4 h-4" /> Share
+        <button onClick={handleShare} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
+          <Share2 className="w-4 h-4" /> {primaryLabel}
         </button>
-        <button onClick={onCopy} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
+        <button onClick={handleCopy} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
           <Copy className="w-4 h-4" /> {copied ? "Copied!" : "Copy link"}
         </button>
-        {qrDataUrl && (
-          <a href={qrDataUrl} download="hub4community-qr.png" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
+        {qr && (
+          <a href={qr} download="hub4community-qr.png" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
             <Download className="w-4 h-4" /> QR
           </a>
         )}
@@ -49,37 +82,26 @@ function ShareCluster({ qrDataUrl, onShare, onCopy, copied }) {
 export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSuggestBusiness }) {
   const navigate = useNavigate();
   const [path, setPath] = useState("landing");
-  const [url] = useState(() => window.location.href.split("?")[0].split("#")[0]);
-  const [qrDataUrl, setQrDataUrl] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [hubUrl] = useState(() => window.location.href.split("?")[0].split("#")[0]);
+  const [ownerListing, setOwnerListing] = useState(null);
 
+  // If a logged-in owner has a claimed listing, share *their* listing directly.
   useEffect(() => {
-    let mounted = true;
-    QRCode.toDataURL(url, { width: 240, margin: 1, errorCorrectionLevel: "M" })
-      .then((d) => { if (mounted) setQrDataUrl(d); })
-      .catch(() => {});
-    return () => { mounted = false; };
-  }, [url]);
-
-  const handleShare = async () => {
-    if (navigator.share) {
+    let m = true;
+    (async () => {
       try {
-        await navigator.share({ title: "Hub4Community — Your free community directory", url });
-      } catch (err) {
-        if (err?.name !== "AbortError") handleCopy();
-      }
-    } else {
-      handleCopy();
-    }
-  };
+        const authed = await base44.auth.isAuthenticated();
+        if (!authed) return;
+        const me = await base44.auth.me();
+        const items = await base44.entities.CommunityListing.filter({ owner_email: me.email }, "-updated_date", 20);
+        if (m && items && items.length) setOwnerListing(items[0]);
+      } catch { /* not logged in or no listings — fine */ }
+    })();
+    return () => { m = false; };
+  }, []);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* ignore */ }
-  };
+  const ownerShareUrl = ownerListing ? `https://hub4community.com/listing/${ownerListing.id}` : hubUrl;
+  const ownerShareTitle = ownerListing ? `${ownerListing.name} — Community Hub` : "Hub4Community — Your free community directory";
 
   const background = { background: "linear-gradient(180deg, hsl(182 85% 30%) 0%, hsl(182 85% 14%) 100%)" };
 
@@ -88,7 +110,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
       <div className="relative overflow-hidden rounded-2xl" style={background}>
         <div className="relative px-5 sm:px-10 py-8 sm:py-12 text-white">
 
-          {/* ── Landing ───────────────────────────────────────────── */}
+          {/* ── Screen 1 — Landing / Split ────────────────────────── */}
           {path === "landing" && (
             <div>
               <p className="text-white/80 text-[11px] font-semibold uppercase tracking-[0.2em] mb-3">Your free community directory</p>
@@ -98,7 +120,6 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               </p>
 
               <div className="mt-6 max-w-xl">
-                {/* Primary path: looking local */}
                 <button
                   onClick={() => setPath("user")}
                   className="w-full text-left rounded-2xl p-4 sm:p-5 mb-3 border bg-white/10 hover:bg-white/15 transition-colors"
@@ -114,7 +135,6 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                   </span>
                 </button>
 
-                {/* Owner path */}
                 <button
                   onClick={() => setPath("owner")}
                   className="w-full text-left rounded-2xl p-4 sm:p-5 border border-white/30 bg-white/10 hover:bg-white/15 transition-colors"
@@ -140,7 +160,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
             </div>
           )}
 
-          {/* ── General user path ─────────────────────────────────── */}
+          {/* ── Screen 2A — General user path ─────────────────────── */}
           {path === "user" && (
             <div>
               <button onClick={() => setPath("landing")} className="inline-flex items-center gap-1 text-white/80 hover:text-white text-xs mb-4">
@@ -165,13 +185,15 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 "Don't see a business you know? Suggest it — takes 30 seconds",
               ]} />
 
-              <button onClick={onSuggestBusiness} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-dashed border-white/40 bg-transparent hover:bg-white/10 mb-5">
-                <Lightbulb className="w-4 h-4" /> Suggest a Business
-              </button>
+              <div className="max-w-xl mb-5">
+                <button onClick={onSuggestBusiness} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full border border-dashed border-white/40 bg-transparent hover:bg-white/10">
+                  <Lightbulb className="w-4 h-4" /> Suggest a Business
+                </button>
+              </div>
 
               <hr className="border-white/15 my-5" />
               <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mb-3">Spread the word</p>
-              <ShareCluster qrDataUrl={qrDataUrl} onShare={handleShare} onCopy={handleCopy} copied={copied} />
+              <ShareCluster shareUrl={hubUrl} shareTitle="Hub4Community — Your free community directory" primaryLabel="Share This Hub" />
 
               <p className="text-white/70 text-xs text-center mt-5">
                 Run a business yourself?{" "}
@@ -180,7 +202,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
             </div>
           )}
 
-          {/* ── Owner path ────────────────────────────────────────── */}
+          {/* ── Screen 2B — Business / group owner path ───────────── */}
           {path === "owner" && (
             <div>
               <button onClick={() => setPath("landing")} className="inline-flex items-center gap-1 text-white/80 hover:text-white text-xs mb-4">
@@ -207,14 +229,20 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               </div>
 
               <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mb-2">Already listed?</p>
-              <button onClick={() => navigate("/dashboard")} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border mb-5" style={{ background: "#0a2f30", borderColor: "#14a3a0", color: "#14a3a0" }}>
-                <LayoutDashboard className="w-4 h-4" /> Go to My Dashboard
-              </button>
+              <div className="mb-5">
+                <button onClick={() => navigate("/dashboard")} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm min-h-[44px] w-full sm:w-auto border" style={{ background: "#0a2f30", borderColor: "#14a3a0", color: "#14a3a0" }}>
+                  <LayoutDashboard className="w-4 h-4" /> Go to My Dashboard
+                </button>
+              </div>
 
               <hr className="border-white/15 my-5" />
               <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mb-3">Grow your reach</p>
-              <ShareCluster qrDataUrl={qrDataUrl} onShare={handleShare} onCopy={handleCopy} copied={copied} />
-              <p className="text-white/70 text-xs mt-3">Sharing sends people straight to your listing — not just the Hub.</p>
+              <ShareCluster shareUrl={ownerShareUrl} shareTitle={ownerShareTitle} primaryLabel="Share My Listing" />
+              <p className="text-white/70 text-xs mt-3">
+                {ownerListing
+                  ? "Sharing sends people straight to your listing — not just the Hub."
+                  : "Add or claim a listing above, then share it here to send people straight to your page."}
+              </p>
             </div>
           )}
 
