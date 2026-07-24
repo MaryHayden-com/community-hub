@@ -1,16 +1,54 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
-import { Search, CalendarDays, PlusCircle, Share2, Copy, Download, Lightbulb } from "lucide-react";
+import {
+  Search, CalendarDays, PlusCircle, Share2, Copy, Download, Lightbulb,
+  ArrowLeft, Store, ShieldCheck, LayoutDashboard, MapPin, Bell, Heart, Pencil, Check
+} from "lucide-react";
 
-function StepBadge({ n }) {
+function BenefitList({ items }) {
   return (
-    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/15 text-white text-sm font-bold shrink-0 mr-3 mt-0.5 border border-white/30">
-      {n}
-    </span>
+    <ul className="space-y-2 mb-4">
+      {items.map((it, i) => (
+        <li key={i} className="flex items-start gap-2 text-white/90 text-sm leading-snug">
+          <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#E2701B" }} />
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ShareCluster({ qrDataUrl, onShare, onCopy, copied }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      {qrDataUrl ? (
+        <div className="bg-white rounded-lg p-1 shrink-0 self-center sm:self-start" title="Scan to open this directory">
+          <img src={qrDataUrl} alt="QR code for this directory" className="w-14 h-14 sm:w-16 sm:h-16" />
+        </div>
+      ) : (
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-white/20 shrink-0 self-center sm:self-start" />
+      )}
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <button onClick={onShare} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
+          <Share2 className="w-4 h-4" /> Share
+        </button>
+        <button onClick={onCopy} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
+          <Copy className="w-4 h-4" /> {copied ? "Copied!" : "Copy link"}
+        </button>
+        {qrDataUrl && (
+          <a href={qrDataUrl} download="hub4community-qr.png" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15">
+            <Download className="w-4 h-4" /> QR
+          </a>
+        )}
+      </div>
+    </div>
   );
 }
 
 export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSuggestBusiness }) {
+  const navigate = useNavigate();
+  const [path, setPath] = useState("landing");
   const [url] = useState(() => window.location.href.split("?")[0].split("#")[0]);
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -28,7 +66,6 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
       try {
         await navigator.share({ title: "Hub4Community — Your free community directory", url });
       } catch (err) {
-        // Only fall back to copy if the share genuinely failed (not a user cancel)
         if (err?.name !== "AbortError") handleCopy();
       }
     } else {
@@ -44,143 +81,145 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
     } catch { /* ignore */ }
   };
 
+  const background = { background: "linear-gradient(180deg, hsl(182 85% 30%) 0%, hsl(182 85% 14%) 100%)" };
+
   return (
     <section className="mb-6" aria-labelledby="home-brand">
-      {/* Image hero with teal overlay */}
-      <div className="relative overflow-hidden rounded-2xl">
-        <img
-          src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/7fe81efa0_generated_image.png"
-          alt="Community market scene in an Irish town"
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="eager"
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(115deg, hsl(182 85% 18% / 0.92) 0%, hsl(182 85% 22% / 0.78) 55%, hsl(182 85% 26% / 0.55) 100%)" }}
-        />
+      <div className="relative overflow-hidden rounded-2xl" style={background}>
+        <div className="relative px-5 sm:px-10 py-8 sm:py-12 text-white">
 
-        <div className="relative px-6 sm:px-10 py-10 sm:py-14">
-          <p className="text-white/80 text-[11px] font-semibold uppercase tracking-[0.2em] mb-3">
-            Your free community directory
-          </p>
-          <h1
-            id="home-brand"
-            className="font-display text-4xl sm:text-5xl font-bold text-white leading-tight"
-          >
-            Hub4Community
-          </h1>
-          {/* Step 1 — Find & search */}
-          <div className="mt-6">
-            <div className="flex items-start">
-              <StepBadge n={1} />
-              <div>
-                <p className="text-white/95 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Search the directory to find local businesses, clubs, community services and events near you — and support the people behind them by shopping local and joining in.
+          {/* ── Landing ───────────────────────────────────────────── */}
+          {path === "landing" && (
+            <div>
+              <p className="text-white/80 text-[11px] font-semibold uppercase tracking-[0.2em] mb-3">Your free community directory</p>
+              <h1 id="home-brand" className="font-display text-4xl sm:text-5xl font-bold leading-tight">Hub4Community</h1>
+              <p className="mt-3 text-white/90 text-sm sm:text-base max-w-xl leading-relaxed">
+                Find local businesses, clubs and events — or list your own. Free, and always yours to manage.
+              </p>
+
+              <div className="mt-6 max-w-xl">
+                {/* Primary path: looking local */}
+                <button
+                  onClick={() => setPath("user")}
+                  className="w-full text-left rounded-2xl p-4 sm:p-5 mb-3 border bg-white/10 hover:bg-white/15 transition-colors"
+                  style={{ borderColor: "#E2701B" }}
+                >
+                  <div className="flex items-center gap-2 font-semibold text-base">
+                    <Search className="w-5 h-5" style={{ color: "#E2701B" }} />
+                    I'm looking for something local
+                  </div>
+                  <p className="text-white/85 text-sm mt-1 mb-3">Search the directory, see what's on, save your favourites.</p>
+                  <span className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm min-h-[44px] w-full text-white" style={{ background: "#E2701B" }}>
+                    Explore the Hub
+                  </span>
+                </button>
+
+                {/* Owner path */}
+                <button
+                  onClick={() => setPath("owner")}
+                  className="w-full text-left rounded-2xl p-4 sm:p-5 border border-white/30 bg-white/10 hover:bg-white/15 transition-colors"
+                >
+                  <div className="flex items-center gap-2 font-semibold text-base">
+                    <Store className="w-5 h-5" style={{ color: "#14a3a0" }} />
+                    I run a business or group
+                  </div>
+                  <p className="text-white/85 text-sm mt-1 mb-3">Claim your free listing, or add a new one in minutes.</p>
+                  <span className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm min-h-[44px] w-full text-white border border-white/50 bg-transparent">
+                    Set Up My Listing
+                  </span>
+                </button>
+
+                <p className="text-white/70 text-xs text-center mt-4 leading-relaxed">
+                  Already listed?{" "}
+                  <button onClick={onSearch} className="underline hover:text-white">Claim your business</button>
+                  <br />
+                  Know a business that should be here?{" "}
+                  <button onClick={onSuggestBusiness} className="underline hover:text-white">Suggest one</button>
                 </p>
-                <div className="mt-3 flex flex-col sm:flex-row gap-2 sm:gap-3">
-                  <button
-                    onClick={onSearch}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
-                    style={{ background: "#097275" }}
-                  >
-                    <Search className="w-4 h-4" /> Search the directory
-                  </button>
-                  <button
-                    onClick={onSearchWhatsOn}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/30"
-                    style={{ background: "hsl(182 85% 30%)" }}
-                  >
-                    <CalendarDays className="w-4 h-4" /> Search What's On
-                  </button>
-                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Step 2 — Can't find it? Add yours */}
-          <div className="mt-5">
-            <div className="flex items-start">
-              <StepBadge n={2} />
-              <div>
-                <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Can't find what you need? Add your own business, club or group in minutes — it's free, and you'll stay in control of your listing to manage and update it yourself.
-                </p>
-                <button
-                  onClick={onAddListing}
-                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto"
-                  style={{ background: "#E2701B" }}
-                >
+          {/* ── General user path ─────────────────────────────────── */}
+          {path === "user" && (
+            <div>
+              <button onClick={() => setPath("landing")} className="inline-flex items-center gap-1 text-white/80 hover:text-white text-xs mb-4">
+                <ArrowLeft className="w-3.5 h-3.5" /> Back
+              </button>
+              <p className="text-white/80 text-[11px] font-semibold uppercase tracking-[0.2em]">Find what's near you</p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">What are you looking for?</h2>
+
+              <div className="mt-5 flex flex-col gap-2.5 max-w-xl">
+                <button onClick={onSearch} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full" style={{ background: "#E2701B" }}>
+                  <Search className="w-4 h-4" /> Search the Directory
+                </button>
+                <button onClick={onSearchWhatsOn} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full border border-white/40 bg-white/10 hover:bg-white/15">
+                  <CalendarDays className="w-4 h-4" /> See What's On
+                </button>
+              </div>
+
+              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mt-6 mb-2">While you're here</p>
+              <BenefitList items={[
+                "Save places and events with one tap",
+                "Share a listing with a neighbour or group chat",
+                "Don't see a business you know? Suggest it — takes 30 seconds",
+              ]} />
+
+              <button onClick={onSuggestBusiness} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border border-dashed border-white/40 bg-transparent hover:bg-white/10 mb-5">
+                <Lightbulb className="w-4 h-4" /> Suggest a Business
+              </button>
+
+              <hr className="border-white/15 my-5" />
+              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mb-3">Spread the word</p>
+              <ShareCluster qrDataUrl={qrDataUrl} onShare={handleShare} onCopy={handleCopy} copied={copied} />
+
+              <p className="text-white/70 text-xs text-center mt-5">
+                Run a business yourself?{" "}
+                <button onClick={() => setPath("owner")} className="underline hover:text-white">Set it up here</button> — free, and yours to manage.
+              </p>
+            </div>
+          )}
+
+          {/* ── Owner path ────────────────────────────────────────── */}
+          {path === "owner" && (
+            <div>
+              <button onClick={() => setPath("landing")} className="inline-flex items-center gap-1 text-white/80 hover:text-white text-xs mb-4">
+                <ArrowLeft className="w-3.5 h-3.5" /> Back
+              </button>
+              <p className="text-white/80 text-[11px] font-semibold uppercase tracking-[0.2em]">For business & group owners</p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">Get found by locals</h2>
+              <p className="text-white/90 text-sm mt-1 mb-4">Free to list. Yours to manage. No developer needed.</p>
+
+              <BenefitList items={[
+                "Show up when people search the directory or What's On",
+                "Keep your hours, offers and photos accurate — update anytime",
+                "One dashboard, no waiting on a website update",
+                "Free visibility, no ad spend",
+              ]} />
+
+              <div className="flex flex-col gap-2.5 max-w-xl mb-4">
+                <button onClick={onAddListing} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full" style={{ background: "#E2701B" }}>
                   <PlusCircle className="w-4 h-4" /> Add Your Business or Group
                 </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 3 — Share */}
-          <div className="mt-5">
-            <div className="flex items-start">
-              <StepBadge n={3} />
-              <div className="flex-1 min-w-0">
-                <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Share this directory with friends, neighbours and local groups so they can discover what's nearby — or add their own listing if it isn't here yet.
-                </p>
-
-                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
-                  {qrDataUrl ? (
-                    <div className="bg-white rounded-lg p-1 shrink-0 self-center sm:self-start" title="Scan to open this directory">
-                      <img src={qrDataUrl} alt="QR code for this directory" className="w-14 h-14 sm:w-20 sm:h-20" />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-lg bg-white/20 shrink-0 self-center sm:self-start" />
-                  )}
-
-                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={handleShare}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
-                    >
-                      <Share2 className="w-4 h-4" /> Share
-                    </button>
-                    <button
-                      onClick={handleCopy}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
-                    >
-                      <Copy className="w-4 h-4" /> {copied ? "Copied!" : "Copy link"}
-                    </button>
-                    <a
-                      href={qrDataUrl || "#"}
-                      download="hub4community-qr.png"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
-                    >
-                      <Download className="w-4 h-4" /> Download QR
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 4 — Suggest a business */}
-          <div className="mt-5">
-            <div className="flex items-start">
-              <StepBadge n={4} />
-              <div className="flex-1 min-w-0">
-                <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl">
-                  Know a local business, club or service that should be on the Hub but isn't? Tell us about it and we'll reach out to them.
-                </p>
-                <button
-                  onClick={onSuggestBusiness}
-                  className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white shadow-lg min-h-[44px] w-full sm:w-auto border border-white/40 bg-white/10 hover:bg-white/15"
-                >
-                  <Lightbulb className="w-4 h-4" /> Suggest a business
+                <button onClick={onSearch} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full border border-white/50 bg-transparent hover:bg-white/10">
+                  <ShieldCheck className="w-4 h-4" /> Claim an Existing Listing
                 </button>
               </div>
+
+              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mb-2">Already listed?</p>
+              <button onClick={() => navigate("/dashboard")} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full font-semibold text-sm text-white min-h-[44px] w-full sm:w-auto border mb-5" style={{ background: "#0a2f30", borderColor: "#14a3a0", color: "#14a3a0" }}>
+                <LayoutDashboard className="w-4 h-4" /> Go to My Dashboard
+              </button>
+
+              <hr className="border-white/15 my-5" />
+              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-[0.08em] mb-3">Grow your reach</p>
+              <ShareCluster qrDataUrl={qrDataUrl} onShare={handleShare} onCopy={handleCopy} copied={copied} />
+              <p className="text-white/70 text-xs mt-3">Sharing sends people straight to your listing — not just the Hub.</p>
             </div>
-          </div>
+          )}
 
-          </div>
-          </div>
-
-          </section>
+        </div>
+      </div>
+    </section>
   );
 }
