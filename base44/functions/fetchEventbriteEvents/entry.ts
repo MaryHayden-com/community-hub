@@ -301,6 +301,9 @@ Only return items where the town matches one of the listed towns. Prefer entries
     // Admin digest email (only on a real run that produced something)
     if (!dryRun && totalNew > 0) {
       try {
+        const reviewLine = totals.pending > 0
+          ? `Review pending items: https://hub4community.com/admin#pending (Pending Approval tab)`
+          : `Nothing needs review this run — all listings were auto-published.\nManage them: https://hub4community.com/admin`;
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: "mary@maryhayden.com",
           from_name: "Community Hub",
@@ -309,7 +312,7 @@ Only return items where the town matches one of the listed towns. Prefer entries
             + `Approved (live): ${totals.approved}\nNeeds review: ${totals.pending}\n`
             + `Businesses: ${totals.businesses}  Clubs/Groups: ${totals.clubs}  Events: ${totals.events}\n`
             + `Parent venue listings created: ${venuesCreated}\n\n`
-            + `Review pending items: https://community-hub.base44.app/admin (Pending Approval tab)`,
+            + reviewLine,
         });
       } catch (err) { console.error("digest email failed:", err.message); }
     }
