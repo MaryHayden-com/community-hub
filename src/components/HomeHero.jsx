@@ -49,7 +49,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 type="button"
                 onClick={() => navigate(path)}
                 className="flex flex-col items-center justify-center gap-2 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow min-h-[88px]"
-                style={{ background: "#F2F0F0", border: "2px solid #097275" }}
+                style={{ background: "rgba(226, 112, 27, 0.12)", border: "2px solid #E2701B" }}
               >
                 <Icon className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: "#097275" }} />
                 <span className="text-sm sm:text-base font-semibold" style={{ color: "#111111" }}>{label}</span>
