@@ -51,10 +51,10 @@ export default function About() {
         <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3">
           <span style={{ color: "#D67D3E" }}>Hub4</span><span style={{ color: "#2A7373" }}>Community</span>
         </h1>
-        <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#333333" }}>Why we built this</h2>
-        <p className="mt-3 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto" style={{ color: "#333333" }}>
+        <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#2A7373" }}>Why we built this</h2>
+        <p className="mt-3 text-base sm:text-lg font-bold leading-relaxed max-w-2xl mx-auto" style={{ color: "#2A7373" }}>
           Great local businesses, clubs and events shouldn't be hard to find — and finding your feet in a new place shouldn't feel lonely or be so complicated. We put the right people in front of the right business, service, event or community group, and help everything local get seen.
-          <span className="block mt-2 font-medium" style={{ color: TEAL }}>That's how communities come together.</span>
+          <span className="block mt-2" style={{ color: "#D67D3E" }}>That's how communities come together.</span>
         </p>
       </header>
 
