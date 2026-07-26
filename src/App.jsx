@@ -42,7 +42,6 @@ const GroupAdminDashboard = lazy(() => import('./pages/GroupAdminDashboard'));
 const Survey = lazy(() => import('./pages/Survey'));
 const CommunityGuidelines = lazy(() => import('./pages/CommunityGuidelines'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
-const About = lazy(() => import('./pages/About'));
 const CalendarView = lazy(() => import('./pages/CalendarView'));
 const WhatsOn = lazy(() => import('./pages/WhatsOn'));
 const SavedListings = lazy(() => import('./pages/SavedListings'));
@@ -96,7 +95,6 @@ const AuthenticatedApp = () => {
 
           <Route path="/guidelines" element={<CommunityGuidelines />} />
           <Route path="/terms" element={<TermsOfUse />} />
-          <Route path="/about" element={<About />} />
           <Route path="/billing" element={<RequireAuth><Billing /></RequireAuth>} />
           <Route path="/dashboard" element={<RequireAuth><OwnerDashboard /></RequireAuth>} />
           <Route path="/group-dashboard" element={<RequireAuth><GroupAdminDashboard /></RequireAuth>} />

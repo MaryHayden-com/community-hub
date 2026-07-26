@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
-  Tag, ChevronLeft, HeartHandshake, Heart, User, Sparkles,
+  Tag, ChevronLeft, HeartHandshake, Heart, User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommunityHubLogo from "@/components/CommunityHubLogo";
@@ -17,11 +17,10 @@ const navItems = [
   { to: "/directory?type=Community+Services", label: "Community Services", icon: HeartHandshake },
   { to: "/directory?type=Education", label: "Education & Training", icon: GraduationCap },
   { to: "/whats-on", label: "What's On", icon: Calendar },
-  { to: "/about", label: "About", icon: Sparkles },
 ];
 
 // Root paths that show the app title (no back button)
-const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard", "/billing", "/calendar", "/whats-on", "/about"];
+const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard", "/billing", "/calendar", "/whats-on"];
 
 // Bottom nav tabs (mobile)
 const BOTTOM_TABS = [
@@ -90,14 +89,14 @@ export default function Layout() {
             ) : null}
             <button
               onClick={() => {
-                if (location.pathname === "/about") {
+                if (location.pathname === "/" || location.pathname === "/directory") {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 } else {
-                  navigate("/about");
+                  navigate("/");
                 }
               }}
               className="flex items-center gap-2.5 cursor-pointer"
-              title="About Community Hub"
+              title="Community Hub"
             >
               <CommunityHubLogo className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
@@ -257,7 +256,7 @@ export default function Layout() {
               {" · "}
               <a href="mailto:communitywhatson@gmail.com" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
               {" · "}
-              <Link to="/about" className="hover:text-foreground underline underline-offset-2 transition-colors">About</Link>
+              <Link to="/directory#about" className="hover:text-foreground underline underline-offset-2 transition-colors">About</Link>
               {" · "}
               <Link to="/guidelines" className="hover:text-foreground underline underline-offset-2 transition-colors">Community guidelines</Link>
               {" · "}
