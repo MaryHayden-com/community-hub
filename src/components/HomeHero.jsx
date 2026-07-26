@@ -32,7 +32,9 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               Your local community, all in one place.
             </h1>
             <p className="text-sm sm:text-base leading-relaxed max-w-xl mx-auto" style={{ color: "#333333" }}>
-              Find local businesses, clubs, events and community services near you. Community Hub helps people discover what is happening locally and helps organisations become easier to find across Ireland, with a strong local starting point in Bandon and West Cork.
+              Find local businesses, clubs, events and community services near you.{" "}
+              <span style={{ fontWeight: 700 }}><span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span></span>{" "}
+              helps people discover what is happening locally and helps organisations become easier to find across Ireland, with a strong local starting point in Bandon and West Cork.
             </p>
           </div>
 

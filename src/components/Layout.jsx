@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommunityHubLogo from "@/components/CommunityHubLogo";
+import BrandName from "@/components/BrandName";
 
 const navItems = [
   { to: "/", label: "Explore", icon: MapPin },
@@ -96,12 +97,10 @@ export default function Layout() {
                 }
               }}
               className="flex items-center gap-2.5 cursor-pointer"
-              title="Community Hub"
+              title="Hub4Community"
             >
               <CommunityHubLogo className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
-              <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
-                Community<span className="text-[#E2701B]">Hub</span>
-              </span>
+              <BrandName className="font-display tracking-tight text-base sm:text-xl" />
             </button>
           </div>
 
@@ -245,7 +244,7 @@ export default function Layout() {
             <NewsletterSignup source="footer" />
           </div>
           <div className="text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Your Community Hub. Connecting communities across Ireland.</p>
+            <p>© {new Date().getFullYear()} <BrandName />. Connecting communities across Ireland.</p>
             <p className="mt-2 leading-relaxed">
               <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Browse by county</Link>
               {" · "}

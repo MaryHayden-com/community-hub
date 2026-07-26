@@ -1,4 +1,5 @@
 import { PlusCircle, MapPin, HeartHandshake, Store, CheckCircle2, Users, Calendar, GraduationCap, Handshake, Heart, Compass } from "lucide-react";
+import BrandName from "@/components/BrandName";
 
 const WHY_BULLETS = [
   "Find trusted local businesses and services.",
@@ -65,9 +66,9 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
 
       {/* Why people use Community Hub */}
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
-        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why people use Community Hub</h2>
+        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why people use <BrandName /></h2>
         <p className="text-sm mt-2 leading-relaxed" style={{ color: "#333333" }}>
-          Community Hub makes local life easier to navigate. Whether someone is looking for a trusted local service, a club to join, an event to attend or a community resource to access, the platform brings that information together in one place.
+          <BrandName /> makes local life easier to navigate. Whether someone is looking for a trusted local service, a club to join, an event to attend or a community resource to access, the platform brings that information together in one place.
         </p>
         <ul className="mt-3 space-y-1.5">
           {WHY_BULLETS.map((b) => (
@@ -83,7 +84,7 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
       <section className="rounded-2xl p-5 sm:p-6" style={{ background: "#097275" }}>
         <h2 className="font-display text-xl sm:text-2xl font-bold text-white">Make your organisation easier to find</h2>
         <p className="text-sm mt-2 leading-relaxed text-white/85">
-          If you run a business, club, venue, charity or community group, Community Hub gives people a simple way to discover what you do. Add your listing, share your events and make it easier for local people to connect with your organisation.
+          If you run a business, club, venue, charity or community group, <BrandName /> gives people a simple way to discover what you do. Add your listing, share your events and make it easier for local people to connect with your organisation.
         </p>
         <button
           type="button"
@@ -99,7 +100,7 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Built around real places and real communities</h2>
         <p className="text-sm mt-2 leading-relaxed" style={{ color: "#333333" }}>
-          Community Hub is not just a directory. It is a practical way to help local communities become easier to explore, support and take part in. Starting in Ireland, with a strong local focus on Bandon and West Cork, the platform keeps a clear local identity that runs across every page.
+          <BrandName /> is not just a directory. It is a practical way to help local communities become easier to explore, support and take part in. Starting in Ireland, with a strong local focus on Bandon and West Cork, the platform keeps a clear local identity that runs across every page.
         </p>
         {metricTiles.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
@@ -145,13 +146,13 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>A note from the founder — Mary Hayden</h2>
         <div className="mt-3 space-y-3 text-sm leading-relaxed" style={{ color: "#333333" }}>
           <p>
-            I'm Mary Hayden — mother of four and the founder behind Community Hub. I moved to Bandon in West Cork a few years ago, and like so many people who arrive somewhere new, I quickly found that the hardest part wasn't settling in — it was simply finding out what was going on.
+            I'm Mary Hayden — mother of four and the founder behind <BrandName />. I moved to Bandon in West Cork a few years ago, and like so many people who arrive somewhere new, I quickly found that the hardest part wasn't settling in — it was simply finding out what was going on.
           </p>
           <p>
             Local life here is rich and busy: clubs, classes, markets, gigs, community groups, small businesses doing brilliant things. But that information is scattered across Facebook, WhatsApp groups, notice boards and word of mouth. You only seemed to hear about an event after it had happened. I kept thinking — there must be a simpler way.
           </p>
           <p>
-            With a background in finance, operations and digital transformation, I work with founders and community-focused organisations to help them bring clarity to what they're building. Community Hub is me turning that same instinct on my own doorstep — one place where everything local gets seen, kept up to date by the people who run it, and free for anyone to browse.
+            With a background in finance, operations and digital transformation, I work with founders and community-focused organisations to help them bring clarity to what they're building. <BrandName /> is me turning that same instinct on my own doorstep — one place where everything local gets seen, kept up to date by the people who run it, and free for anyone to browse.
           </p>
           <p>
             I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
