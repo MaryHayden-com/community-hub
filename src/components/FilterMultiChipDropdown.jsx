@@ -97,7 +97,7 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground py-6 text-center">No matches for "{query}"</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-h-64 overflow-y-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-h-80 overflow-y-auto pr-1">
           {filtered.map((o) => {
             const isSel = selected.includes(o.value);
             return (
@@ -105,18 +105,16 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
                 key={o.value}
                 type="button"
                 onClick={() => toggle(o.value)}
-                className="flex items-center gap-2 px-2 py-2.5 text-sm rounded-md hover:bg-accent text-left min-h-[44px]"
+                className="flex items-start gap-2 px-2 py-2.5 text-sm rounded-md hover:bg-accent text-left min-h-[44px]"
               >
                 <div
-                  className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", !isSel && "border-input")}
+                  className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5", !isSel && "border-input")}
                   style={isSel ? { background: accent, borderColor: accent } : {}}
                 >
                   {isSel && <Check className="w-3 h-3 text-white" />}
                 </div>
-                <span className="flex-1 truncate">
-                  {o.value.length > 18 ? o.value.slice(0, 17) + "…" : o.value}
-                </span>
-                {o.count != null && <span className="text-[10px] text-muted-foreground shrink-0">{o.count}</span>}
+                <span className="flex-1 leading-tight break-words">{o.value}</span>
+                {o.count != null && <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">{o.count}</span>}
               </button>
             );
           })}
@@ -153,7 +151,7 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
   return (
     <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery(""); }}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent align="start" className="w-80 p-0">
+      <PopoverContent align="start" className="w-[min(92vw,640px)] p-0">
         {searchBox}
         {allRow}
         {grid}
