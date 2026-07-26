@@ -44,6 +44,7 @@ const CommunityGuidelines = lazy(() => import('./pages/CommunityGuidelines'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
 const CalendarView = lazy(() => import('./pages/CalendarView'));
 const WhatsOn = lazy(() => import('./pages/WhatsOn'));
+const About = lazy(() => import('./pages/About'));
 const SavedListings = lazy(() => import('./pages/SavedListings'));
 
 const AuthenticatedApp = () => {
@@ -101,6 +102,7 @@ const AuthenticatedApp = () => {
           <Route path="/survey" element={<Survey />} />
           <Route path="/calendar" element={<CalendarView />} />
           <Route path="/whats-on" element={<WhatsOn />} />
+          <Route path="/about" element={<About />} />
           <Route path="/saved" element={<SavedListings />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>

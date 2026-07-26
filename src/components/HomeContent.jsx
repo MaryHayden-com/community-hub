@@ -1,4 +1,4 @@
-import { PlusCircle, MapPin, HeartHandshake, Store, CheckCircle2, Users, Calendar, GraduationCap, Handshake, Heart, Compass } from "lucide-react";
+import { PlusCircle, MapPin, HeartHandshake, Store, CheckCircle2, Users, Calendar, GraduationCap } from "lucide-react";
 import BrandName from "@/components/BrandName";
 
 const WHY_BULLETS = [
@@ -23,47 +23,11 @@ const STEPS = [
   "Add your organisation so more people can find you.",
 ];
 
-const ABOUT_CARDS = [
-  { icon: Handshake, title: "Welcome newcomers", text: "New to the area? Everything local, in one friendly place — find your people and your next thing to do." },
-  { icon: Store, title: "Shop local", text: "Keep the community thriving by finding and supporting the businesses on your doorstep." },
-  { icon: Heart, title: "A platform for local business", text: "Be found by the people looking for you — your business, club or event, in front of your local community, for free." },
-  { icon: Compass, title: "Less friction, for everyone", text: "No account needed to browse. Adding your listing takes a minute. Finding what you need takes less." },
-];
-
 export default function HomeContent({ onAddListing, metrics = {} }) {
   const metricTiles = METRICS.filter((m) => (metrics[m.key] || 0) > 0);
 
   return (
     <div id="about" className="mt-10 space-y-6 scroll-mt-20">
-      {/* Why we built this */}
-      <section className="rounded-2xl border bg-card p-5 sm:p-6">
-        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why we built this</h2>
-        <p className="text-sm mt-3 leading-relaxed max-w-2xl" style={{ color: "#333333" }}>
-          Great local businesses, clubs and events shouldn't be hard to find — and finding your feet in a new place shouldn't feel lonely or be so complicated. We put the right people in front of the right business, service, event or community group, and help everything local get seen.
-          <span className="block mt-2 font-medium" style={{ color: "#097275" }}>That's how communities come together.</span>
-        </p>
-      </section>
-
-      {/* Keep this site updated */}
-      <section className="rounded-lg p-5 leading-relaxed" style={{ background: "#f5e6d9", border: "1px solid #e68a35" }}>
-        <p className="text-sm leading-relaxed" style={{ color: "#333333" }}>
-          There are so many ways to find information these days — Facebook, WhatsApp groups, notice boards, a flyer in the shop window. But when it comes down to it, it's still hard to know what's on, where it's on, and what time. Too often we only hear about it after the fact. If we all keep this site updated, we'll have everything local in one place — and no one misses out.
-        </p>
-      </section>
-
-      {/* Four-card grid */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {ABOUT_CARDS.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="rounded-xl border bg-card p-5" style={{ borderColor: "hsl(var(--border))" }}>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: "rgba(230,138,53,0.12)" }}>
-              <Icon className="w-5 h-5" style={{ color: "#E2701B" }} />
-            </div>
-            <h3 className="font-bold text-base" style={{ color: "#097275" }}>{title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "#333333" }}>{text}</p>
-          </div>
-        ))}
-      </section>
-
       {/* Why people use Community Hub */}
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why people use <BrandName /></h2>
@@ -139,25 +103,6 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
         <p className="text-sm mt-3 italic" style={{ color: "#097275" }}>
           Independent strategic partner helping community-focused organisations and SMEs make ideas clearer, more visible and easier to deliver.
         </p>
-      </section>
-
-      {/* A note from the founder */}
-      <section className="rounded-2xl p-5 sm:p-6" style={{ background: "rgba(9,114,117,0.06)", border: "1px solid #097275" }}>
-        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>A note from the founder — Mary Hayden</h2>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed" style={{ color: "#333333" }}>
-          <p>
-            I'm Mary Hayden — mother of four and the founder behind <BrandName />. I moved to Bandon in West Cork a few years ago, and like so many people who arrive somewhere new, I quickly found that the hardest part wasn't settling in — it was simply finding out what was going on.
-          </p>
-          <p>
-            Local life here is rich and busy: clubs, classes, markets, gigs, community groups, small businesses doing brilliant things. But that information is scattered across Facebook, WhatsApp groups, notice boards and word of mouth. You only seemed to hear about an event after it had happened. I kept thinking — there must be a simpler way.
-          </p>
-          <p>
-            With a background in finance, operations and digital transformation, I work with founders and community-focused organisations to help them bring clarity to what they're building. <BrandName /> is me turning that same instinct on my own doorstep — one place where everything local gets seen, kept up to date by the people who run it, and free for anyone to browse.
-          </p>
-          <p>
-            I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
-          </p>
-        </div>
       </section>
     </div>
   );
