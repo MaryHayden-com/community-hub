@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
-const SITE_NAME = "Your Community Hub";
+const SITE_NAME = "Hub4Community";
 const SITE_ORIGIN = "https://hub4community.com";
-const DEFAULT_TITLE = `${SITE_NAME} – Local business, club & event directory for Ireland`;
-const DEFAULT_DESCRIPTION = "Find local businesses, clubs, events and resources in your town. Your Community Hub connects people across Ireland — starting in Bandon and West Cork.";
+const DEFAULT_TITLE = `${SITE_NAME} – Ireland's free community directory & events`;
+const DEFAULT_DESCRIPTION = "Hub4Community is Ireland's free community directory. Find local businesses, clubs, community services, schools and upcoming events by county or town — or add your own free listing.";
 const DEFAULT_IMAGE = "https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png";
 const JSONLD_ID = "page-jsonld";
 
