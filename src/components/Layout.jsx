@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
-  Tag, ChevronLeft, HeartHandshake, Heart, User,
+  Tag, ChevronLeft, HeartHandshake, Heart, User, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,10 +16,11 @@ const navItems = [
   { to: "/directory?type=Community+Services", label: "Community Services", icon: HeartHandshake },
   { to: "/directory?type=Education", label: "Education & Training", icon: GraduationCap },
   { to: "/whats-on", label: "What's On", icon: Calendar },
+  { to: "/about", label: "About", icon: Sparkles },
 ];
 
 // Root paths that show the app title (no back button)
-const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard", "/billing", "/calendar", "/whats-on"];
+const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard", "/billing", "/calendar", "/whats-on", "/about"];
 
 // Bottom nav tabs (mobile)
 const BOTTOM_TABS = [
@@ -87,24 +88,7 @@ export default function Layout() {
               </button>
             ) : null}
             <button
-              onClick={() => {
-                const scrollToAbout = () => {
-                  const el = document.getElementById("about");
-                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                };
-                if (location.pathname === "/" || location.pathname === "/directory") {
-                  // Try immediately; retry a few times in case content is still mounting.
-                  scrollToAbout();
-                  let tries = 0;
-                  const iv = setInterval(() => {
-                    if (document.getElementById("about")) { scrollToAbout(); clearInterval(iv); }
-                    else if (++tries > 20) clearInterval(iv);
-                  }, 80);
-                } else {
-                  sessionStorage.setItem("scrollToAbout", "1");
-                  navigate("/");
-                }
-              }}
+              onClick={() => navigate("/about")}
               className="flex items-center gap-2.5 cursor-pointer"
               title="About"
             >
@@ -265,6 +249,8 @@ export default function Layout() {
               <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Add a listing</Link>
               {" · "}
               <a href="mailto:communitywhatson@gmail.com" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
+              {" · "}
+              <Link to="/about" className="hover:text-foreground underline underline-offset-2 transition-colors">About</Link>
               {" · "}
               <Link to="/guidelines" className="hover:text-foreground underline underline-offset-2 transition-colors">Community guidelines</Link>
               {" · "}
