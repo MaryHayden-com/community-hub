@@ -34,24 +34,23 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         placeholder="All Types"
       />
 
-      {/* Country — single-select dropdown */}
-      <Select value={country || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCountry(val); setCounty(""); setTown(""); localStorage.setItem("dir_country", val); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}>
-        <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
-          <SelectValue placeholder="All Countries" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Countries</SelectItem>
-          {countries.map((c) => (
-            <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {/* Country / County / Town — three single-select dropdowns side by side */}
+      <div className="grid grid-cols-3 gap-2">
+        <Select value={country || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCountry(val); setCounty(""); setTown(""); localStorage.setItem("dir_country", val); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}>
+          <SelectTrigger className="h-11 bg-card font-bold w-full text-xs px-2" style={{ color: '#097275' }}>
+            <SelectValue placeholder="Country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Countries</SelectItem>
+            {countries.map((c) => (
+              <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-      {/* County + Town — single-select dropdowns */}
-      <div className="grid grid-cols-2 gap-2">
         <Select value={county || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCounty(val); setTown(""); localStorage.setItem("dir_county", val); localStorage.removeItem("dir_town"); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Counties" />
+          <SelectTrigger className="h-11 bg-card font-bold w-full text-xs px-2" style={{ color: '#097275' }}>
+            <SelectValue placeholder="County" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Counties</SelectItem>
@@ -62,8 +61,8 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         </Select>
 
         <Select value={town || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setTown(val); localStorage.setItem("dir_town", val); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Towns & Villages" />
+          <SelectTrigger className="h-11 bg-card font-bold w-full text-xs px-2" style={{ color: '#097275' }}>
+            <SelectValue placeholder="Town" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns & Villages</SelectItem>
