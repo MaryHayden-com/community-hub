@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
   Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
-  Tag, ChevronLeft, HeartHandshake, Heart, User,
+  Tag, ChevronLeft, HeartHandshake, Heart, User, Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -175,6 +175,11 @@ export default function Layout() {
               Saved
               <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
             </Link>
+            <Link to="/about" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
+              <Info className="w-4 h-4" style={{ color: '#097275' }} />
+              About
+              <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
+            </Link>
             {isListingOwner && (
               <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors">
                 <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> My Dashboard
@@ -219,10 +224,13 @@ export default function Layout() {
           <div className="text-center text-sm text-muted-foreground">
             <p>© {new Date().getFullYear()} Your Community Hub. Connecting communities across Ireland.</p>
             <p className="mt-2">
+              <Link to="/about" className="hover:text-foreground underline underline-offset-2 transition-colors">About</Link>
+              {" · "}
               <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
               {" · "}
-              <a href="mailto:privacy@communityhub.ie" className="hover:text-foreground underline underline-offset-2 transition-colors">privacy@communityhub.ie</a>
+              <a href="mailto:privacy@communityhub.ie" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
             </p>
+            <p className="mt-2 text-xs">Built locally, for Bandon and beyond — your community, in one place.</p>
           </div>
         </div>
       </footer>
