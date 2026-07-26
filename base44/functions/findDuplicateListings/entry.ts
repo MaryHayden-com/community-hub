@@ -25,7 +25,17 @@ Deno.serve(async (req) => {
     const byKey = new Map<string, any[]>();
     (all as any[]).forEach((l) => {
       const townPart = norm(l.town || l.nearest_town || l.area || l.county);
-      const key = norm(l.name) + "||" + townPart;
+      const baseKey = norm(l.name) + "||" + townPart;
+      // What's On events are only flagged as duplicates when they also share the
+      // same event date (or recurrence schedule) — two events with the same name
+      // at the same venue on different dates are legitimate separate listings.
+      let key = baseKey;
+      if (l.type === "What's On") {
+        let dateKey = l.event_date || "";
+        if (!dateKey) dateKey = (l.recurring_type || "") + "|" + (l.recurring_day || "");
+        if (!dateKey) dateKey = "nodate";
+        key = baseKey + "||" + dateKey;
+      }
       const arr = byKey.get(key) || [];
       arr.push(l);
       byKey.set(key, arr);
@@ -57,6 +67,10 @@ Deno.serve(async (req) => {
             image_url: l.image_url,
             owner_email: l.owner_email,
             is_featured: l.is_featured,
+            event_date: l.event_date,
+            is_recurring: l.is_recurring,
+            recurring_type: l.recurring_type,
+            recurring_day: l.recurring_day,
             updated_date: l.updated_date,
           }))
       )

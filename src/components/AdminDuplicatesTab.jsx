@@ -75,6 +75,10 @@ export default function AdminDuplicatesTab() {
                     {l.type}
                     {" · "}
                     {Array.isArray(l.category) ? l.category.join(", ") : (l.category || "")}
+                    {l.type === "What's On" && l.event_date ? (
+                      <>{" · "}{new Date(l.event_date + "T12:00:00").toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric" })}</>
+                    ) : null}
+                    {l.type === "What's On" && l.is_recurring ? <>{" · "}{l.recurring_type || "recurring"}</> : null}
                     {" · "}
                     updated {new Date(l.updated_date).toLocaleDateString("en-IE", { month: "short", year: "numeric" })}
                   </p>
