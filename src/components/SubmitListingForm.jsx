@@ -78,7 +78,7 @@ export default function SubmitListingForm({ open, onClose }) {
       // Admin alert
       base44.integrations.Core.SendEmail({
         from_name: "Community Hub",
-        to: "mary@maryhayden.com",
+        to: "communitywhatson@gmail.com",
         subject: `New listing submission: ${form.name}`,
         body: `A new listing has been submitted for review.\n\nName: ${form.name}\nType: ${form.type}\nTown: ${form.town}, ${form.county}\nContact: ${form.contact_name} (${form.email})\n\nReview in Admin → Pending.`,
       }).catch(() => {});

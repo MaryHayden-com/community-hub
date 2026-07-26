@@ -48,7 +48,7 @@ export default function ClaimListingForm({ listing, onClose, user }) {
     // Alert admin
     base44.integrations.Core.SendEmail({
       from_name: "Community Hub",
-      to: "mary@maryhayden.com",
+      to: "communitywhatson@gmail.com",
       subject: `New claim request: ${listing.name}`,
       body: `A new claim request has been submitted.\n\nListing: ${listing.name}\nClaimant: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone || "—"}\nRole: ${form.role || "—"}\nMessage: ${form.message || "—"}\n\nReview in Admin → Claim Requests.`,
     }).catch(() => {});

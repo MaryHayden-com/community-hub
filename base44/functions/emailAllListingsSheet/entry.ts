@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     // 3. Email Mary a link to the spreadsheet (SendEmail can't attach files, so a link is used).
     const byTypeLines = LISTING_TYPES.map((t) => `- ${t}: ${counts[t]}`).join("\n");
     await base44.asServiceRole.integrations.Core.SendEmail({
-      to: "mary@maryhayden.com",
+      to: "communitywhatson@gmail.com",
       from_name: "Community Hub",
       subject: `📋 All listings export — ${allListings.length} listings (${pending} pending)`,
       body:
@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
         `Total listings: ${allListings.length}\nApproved (live): ${approved}\nPending approval: ${pending}\n\n` +
         `By type:\n${byTypeLines}\n\n` +
         `Open the spreadsheet to review, approve and manage everything in one place:\n${spreadsheetUrl}\n\n` +
-        `— Hub for Community`,
+        `— Community Hub`,
     });
 
     return Response.json({

@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: email,
+          from_name: "Community Hub",
           subject,
           body,
         });

@@ -305,7 +305,7 @@ Only return items where the town matches one of the listed towns. Prefer entries
           ? `Review pending items: https://hub4community.com/admin#pending (Pending Approval tab)`
           : `Nothing needs review this run — all listings were auto-published.\nManage them: https://hub4community.com/admin`;
         await base44.asServiceRole.integrations.Core.SendEmail({
-          to: "mary@maryhayden.com",
+          to: "communitywhatson@gmail.com",
           from_name: "Community Hub",
           subject: `📍 ${totalNew} new listings imported (auto-published + review)`,
           body: `Auto-import summary across ${PROVINCES.length} provinces / ${PROVINCES.reduce((n,p)=>n+p.counties.length,0)} counties.\n\n`

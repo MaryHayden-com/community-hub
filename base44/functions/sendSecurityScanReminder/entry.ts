@@ -42,9 +42,9 @@ Deno.serve(async (req) => {
     const html = `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
         <div style="background:#097275;padding:20px 24px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:12px;">
-          <img src="${LOGO_URL}" alt="Hub for Community" style="width:40px;height:40px;border-radius:10px;background:#fff;padding:2px;" />
+          <img src="${LOGO_URL}" alt="Community Hub" style="width:40px;height:40px;border-radius:10px;background:#fff;padding:2px;" />
           <div>
-            <h1 style="color:#fff;margin:0;font-size:20px;">Hub for Community</h1>
+            <h1 style="color:#fff;margin:0;font-size:20px;">Community Hub</h1>
             <p style="color:#cfe9ea;margin:2px 0 0;font-size:12px;">Security status check</p>
           </div>
         </div>
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
             Tip: re-run the scan after adding new entities, changing permissions, or connecting new integrations.
           </p>
           <p style="margin-top:24px;font-size:12px;color:#9ca3af;">
-            You're receiving this because you're an admin on Hub for Community.
+            You're receiving this because you're an admin on Community Hub.
           </p>
         </div>
       </div>
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
           to: admin.email,
           subject,
           body: html,
-          from_name: 'Hub for Community',
+          from_name: 'Community Hub',
         });
         sent++;
       } catch (err) {

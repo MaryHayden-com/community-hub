@@ -82,7 +82,7 @@ export default function Layout() {
             <Link to="/" className="flex items-center gap-2.5">
               <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
-                Community Hub
+                Your Community Hub
               </span>
             </Link>
           </div>
@@ -212,7 +212,7 @@ export default function Layout() {
             <NewsletterSignup source="footer" />
           </div>
           <div className="text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Community Hub. Connecting communities across Ireland.</p>
+            <p>© {new Date().getFullYear()} Your Community Hub. Connecting communities across Ireland.</p>
             <p className="mt-2">
               <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
               {" · "}

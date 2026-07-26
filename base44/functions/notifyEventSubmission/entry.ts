@@ -29,11 +29,11 @@ Deno.serve(async (req) => {
     if (submitterEmail) {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: submitterEmail,
-        from_name: "Hub for Community",
+        from_name: "Community Hub",
         subject: `✅ We received your event: ${listing.name}`,
         body: `Hi ${listing.contact_name || "there"},
 
-Thanks for submitting your event to Hub for Community!
+Thanks for submitting your event to Community Hub!
 
 Event: ${listing.name}
 Location: ${listing.town}, Co. ${listing.county}${eventDateLine}
@@ -60,7 +60,7 @@ https://hub4community.com`,
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
             <div style="background:#097275;padding:18px 24px;border-radius:8px 8px 0 0;">
               <h1 style="color:#fff;margin:0;font-size:18px;">📅 New event awaiting your approval</h1>
-              <p style="color:#cfe9ea;margin:4px 0 0;font-size:12px;">Hub for Community</p>
+              <p style="color:#cfe9ea;margin:4px 0 0;font-size:12px;">Community Hub</p>
             </div>
             <div style="background:#f9fafb;padding:24px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
               <p style="margin-top:0;">Hi ${esc(parentListing.contact_name) || "there"},</p>
@@ -77,7 +77,7 @@ https://hub4community.com`,
         `;
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: ownerEmail,
-          from_name: "Hub for Community",
+          from_name: "Community Hub",
           subject: `📅 New event awaiting your approval: ${listing.name}`,
           body: ownerHtml,
         });

@@ -65,7 +65,7 @@ const AuthenticatedApp = () => {
       navigateToLogin();
       return (
         <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 bg-background">
-          <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub" className="w-16 h-16 rounded-2xl" />
+          <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Your Community Hub" className="w-16 h-16 rounded-2xl" />
           <p className="text-sm text-muted-foreground">Redirecting you to sign in…</p>
           <div className="w-8 h-8 border-4 border-slate-200 border-t-primary rounded-full animate-spin"></div>
         </div>

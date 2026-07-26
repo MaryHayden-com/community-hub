@@ -94,12 +94,13 @@ ${totalEngagement > 0 || savedCount > 0 ? `That's ${totalEngagement + savedCount
 Keep your listing fresh and engaging to attract more visitors!
 
 Best regards,
-Hub for Community Team
+Community Hub Team
       `.trim();
 
       try {
         await base44.integrations.Core.SendEmail({
           to: listing.owner_email,
+          from_name: "Community Hub",
           subject,
           body,
         });
