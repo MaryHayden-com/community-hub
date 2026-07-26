@@ -23,7 +23,7 @@ export default function RemovalRequestForm({ listing, onClose }) {
     setSaving(true);
     await base44.integrations.Core.SendEmail({
       to: "communitywhatson@gmail.com",
-      from_name: "Community Hub",
+      from_name: "Hub4Community",
       subject: `Listing Removal Request: ${listing.name}`,
       body: `Listing Removal Request\n\nListing: ${listing.name} (ID: ${listing.id})\nCounty: ${listing.county}\n\nRequested by: ${form.name}\nEmail: ${form.email}\n\nReason:\n${form.reason}`,
     });

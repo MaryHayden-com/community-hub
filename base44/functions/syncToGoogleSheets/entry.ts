@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        properties: { title: `Community Hub Listings — ${new Date().toISOString().slice(0, 10)}` },
+        properties: { title: `Hub4Community Listings — ${new Date().toISOString().slice(0, 10)}` },
         sheets: LISTING_TYPES.map(t => ({ properties: { title: t } }))
       })
     });

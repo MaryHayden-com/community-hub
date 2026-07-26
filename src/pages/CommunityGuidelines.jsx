@@ -3,7 +3,7 @@ import usePageTitle from "@/hooks/usePageTitle";
 
 export default function CommunityGuidelines() {
   usePageTitle("Community Guidelines", {
-    description: "How we keep Community Hub welcoming, accurate and useful for everyone across Bandon, West Cork and Ireland.",
+    description: "How we keep Hub4Community welcoming, accurate and useful for everyone across Bandon, West Cork and Ireland.",
     path: "/guidelines",
   });
   return (
@@ -13,7 +13,7 @@ export default function CommunityGuidelines() {
       </p>
       <h1 className="font-display text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#097275" }}>Community Guidelines</h1>
       <p className="text-base leading-relaxed mb-4" style={{ color: "#333333" }}>
-        Community Hub brings local businesses, clubs, services and events together in one place. These guidelines help keep it welcoming, accurate and genuinely useful for everyone.
+        Hub4Community brings local businesses, clubs, services and events together in one place. These guidelines help keep it welcoming, accurate and genuinely useful for everyone.
       </p>
       <ol className="space-y-3 text-sm leading-relaxed" style={{ color: "#333333" }}>
         <li><strong style={{ color: "#097275" }}>Be accurate and honest.</strong> Listings should describe real organisations, with correct contact details and up-to-date information. Misleading claims aren't welcome.</li>

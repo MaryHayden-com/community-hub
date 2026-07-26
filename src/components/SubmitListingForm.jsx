@@ -69,15 +69,15 @@ export default function SubmitListingForm({ open, onClose }) {
       // Confirmation email to submitter
       if (form.email) {
         base44.integrations.Core.SendEmail({
-          from_name: "Community Hub",
+          from_name: "Hub4Community",
           to: form.email,
           subject: `Your listing has been submitted — ${form.name}`,
-          body: `Hi ${(form.contact_name || "there").split(" ")[0]},\n\nThank you for submitting "${form.name}" to Community Hub!\n\nYour listing is now under review and will be live in the directory shortly. We'll be in touch if we need anything from you.\n\nBest regards,\nThe Community Hub Team`,
+          body: `Hi ${(form.contact_name || "there").split(" ")[0]},\n\nThank you for submitting "${form.name}" to Hub4Community!\n\nYour listing is now under review and will be live in the directory shortly. We'll be in touch if we need anything from you.\n\nBest regards,\nThe Hub4Community Team`,
         }).catch(() => {});
       }
       // Admin alert
       base44.integrations.Core.SendEmail({
-        from_name: "Community Hub",
+        from_name: "Hub4Community",
         to: "communitywhatson@gmail.com",
         subject: `New listing submission: ${form.name}`,
         body: `A new listing has been submitted for review.\n\nName: ${form.name}\nType: ${form.type}\nTown: ${form.town}, ${form.county}\nContact: ${form.contact_name} (${form.email})\n\nReview in Admin → Pending.`,
@@ -144,7 +144,7 @@ export default function SubmitListingForm({ open, onClose }) {
         {step === 1 && (
           <div className="space-y-4 mt-1">
             <p className="text-sm text-muted-foreground">
-              Fill in the details below. Listing on Community Hub is free — no payment required.
+              Fill in the details below. Listing on Hub4Community is free — no payment required.
             </p>
 
             <div>

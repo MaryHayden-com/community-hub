@@ -33,7 +33,7 @@ export default function CommunityContributionBanner({ town, onAddListing }) {
         Every listing strengthens {town ? town : "your community"}
       </h2>
       <p className="text-white/85 mt-2 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
-        Community Hub is built by people like you. Adding your business, club or event is free,
+        Hub4Community is built by people like you. Adding your business, club or event is free,
         takes a minute, and makes it easier for neighbours to find what's on their doorstep.
         The more of us who list, the more useful this becomes for everyone.
       </p>

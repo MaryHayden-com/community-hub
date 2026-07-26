@@ -608,7 +608,7 @@ export default function ListingDetail() {
               variant="outline"
               size="sm"
               onClick={() => {
-                const text = `Check out ${listing.name} on Local Community Hub: ${window.location.href}`;
+                const text = `Check out ${listing.name} on Local Hub4Community: ${window.location.href}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
               }}
             >

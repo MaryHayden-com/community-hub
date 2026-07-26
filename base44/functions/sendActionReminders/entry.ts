@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
       const body = `
         <div style="font-family:sans-serif;max-width:640px;margin:0 auto;color:#111;">
           <div style="background:#166534;padding:20px 24px;border-radius:8px 8px 0 0;">
-            <h1 style="color:#fff;margin:0;font-size:20px;">Community Hub — Action Reminders</h1>
+            <h1 style="color:#fff;margin:0;font-size:20px;">Hub4Community — Action Reminders</h1>
           </div>
           <div style="background:#f9fafb;padding:20px 24px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
             <p style="margin-top:0;">Hi,</p>
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
             <a href="https://communityhub.ie/admin#stream" style="display:inline-block;background:#166534;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:4px;">Open Admin Panel → Action Stream</a>
 
             <p style="margin-top:24px;font-size:12px;color:#9ca3af;">
-              You are receiving this because you are assigned to these actions in Community Hub.
+              You are receiving this because you are assigned to these actions in Hub4Community.
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: email,
-          from_name: "Community Hub",
+          from_name: "Hub4Community",
           subject,
           body,
         });

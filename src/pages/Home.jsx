@@ -86,7 +86,7 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 text-center">
           <p className="text-white/70 text-sm font-sans uppercase tracking-widest mb-2">Bandon · West Cork · Ireland</p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
-            Welcome to <span style={{ color: '#E2701B' }}>Your Community Hub</span>.
+            Welcome to <span style={{ color: '#E2701B' }}>Your Hub4Community</span>.
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed font-sans">
             Your free local directory for Bandon and the surrounding area. Find businesses, clubs, schools, community services and upcoming events — all in one place.

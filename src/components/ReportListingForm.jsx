@@ -23,7 +23,7 @@ export default function ReportListingForm({ listing, onClose }) {
     setSaving(true);
     await base44.integrations.Core.SendEmail({
       to: "communitywhatson@gmail.com",
-      from_name: "Community Hub",
+      from_name: "Hub4Community",
       subject: `Listing Reported: ${listing.name}`,
       body: `A listing has been reported.\n\nListing: ${listing.name} (ID: ${listing.id})\nCounty: ${listing.county}\n\nReported by: ${form.name || "Not provided"}\nEmail: ${form.email || "Not provided"}\nPhone: ${form.phone || "Not provided"}\n\nIssue:\n${form.details}`,
     });

@@ -1,4 +1,4 @@
-// Community Hub logo — interlocking atom rings using Mary Hayden brand colours.
+// Hub4Community logo — interlocking atom rings using Mary Hayden brand colours.
 // Zest #E2701B · Atoll #097275 · Brick #911B1B
 export default function CommunityHubLogo({ className = "" }) {
   return (

@@ -1,5 +1,6 @@
 {
-  "name": "Community Hub",
+  "name": "Hub4Community",
+  "description": "Hub4Community helps local businesses, clubs, events and community services get found, and helps everyone find what's on near them. Be seen by the people looking for you — across towns and counties in Ireland, starting in Bandon and West Cork.",
   "site": {
     "installCommand": "npm install",
     "buildCommand": "npm run build",

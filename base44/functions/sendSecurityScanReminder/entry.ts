@@ -37,14 +37,14 @@ Deno.serve(async (req) => {
       return Response.json({ sent: 0, message: 'No admin users found' });
     }
 
-    const subject = 'Weekly reminder: run your Community Hub security scan';
+    const subject = 'Weekly reminder: run your Hub4Community security scan';
 
     const html = `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
         <div style="background:#097275;padding:20px 24px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:12px;">
-          <img src="${LOGO_URL}" alt="Community Hub" style="width:40px;height:40px;border-radius:10px;background:#fff;padding:2px;" />
+          <img src="${LOGO_URL}" alt="Hub4Community" style="width:40px;height:40px;border-radius:10px;background:#fff;padding:2px;" />
           <div>
-            <h1 style="color:#fff;margin:0;font-size:20px;">Community Hub</h1>
+            <h1 style="color:#fff;margin:0;font-size:20px;">Hub4Community</h1>
             <p style="color:#cfe9ea;margin:2px 0 0;font-size:12px;">Security status check</p>
           </div>
         </div>
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
             Tip: re-run the scan after adding new entities, changing permissions, or connecting new integrations.
           </p>
           <p style="margin-top:24px;font-size:12px;color:#9ca3af;">
-            You're receiving this because you're an admin on Community Hub.
+            You're receiving this because you're an admin on Hub4Community.
           </p>
         </div>
       </div>
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
           to: admin.email,
           subject,
           body: html,
-          from_name: 'Community Hub',
+          from_name: 'Hub4Community',
         });
         sent++;
       } catch (err) {

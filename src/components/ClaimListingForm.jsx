@@ -40,14 +40,14 @@ export default function ClaimListingForm({ listing, onClose, user }) {
     });
     // Send confirmation to claimant
     base44.integrations.Core.SendEmail({
-      from_name: "Community Hub",
+      from_name: "Hub4Community",
       to: form.email,
       subject: `We've received your claim request — ${listing.name}`,
-      body: `Hi ${form.name.split(" ")[0]},\n\nThank you for claiming "${listing.name}" on Community Hub.\n\nWe'll review your request and be in touch within 1–2 business days. Once approved, you'll receive an invitation to manage your listing.\n\nBest regards,\nThe Community Hub Team`,
+      body: `Hi ${form.name.split(" ")[0]},\n\nThank you for claiming "${listing.name}" on Hub4Community.\n\nWe'll review your request and be in touch within 1–2 business days. Once approved, you'll receive an invitation to manage your listing.\n\nBest regards,\nThe Hub4Community Team`,
     }).catch(() => {});
     // Alert admin
     base44.integrations.Core.SendEmail({
-      from_name: "Community Hub",
+      from_name: "Hub4Community",
       to: "communitywhatson@gmail.com",
       subject: `New claim request: ${listing.name}`,
       body: `A new claim request has been submitted.\n\nListing: ${listing.name}\nClaimant: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone || "—"}\nRole: ${form.role || "—"}\nMessage: ${form.message || "—"}\n\nReview in Admin → Claim Requests.`,

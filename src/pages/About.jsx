@@ -106,7 +106,7 @@ export default function About() {
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: TEAL }}>A note from the founder — Mary Hayden</h2>
         <div className="mt-3 space-y-3 text-sm sm:text-base leading-relaxed" style={{ color: "#333333" }}>
           <p>
-            I'm Mary Hayden — mother of four and the founder behind Community Hub. We recently relocated to Bandon, West Cork, and have thrown ourselves into local community groups and schools, meeting some truly fabulous people along the way.
+            I'm Mary Hayden — mother of four and the founder behind Hub4Community. We recently relocated to Bandon, West Cork, and have thrown ourselves into local community groups and schools, meeting some truly fabulous people along the way.
           </p>
           <p>
             I work independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, how they communicate it and how they grow it. With a background in finance, operations and digital transformation, I bring practical outside perspective without the jargon, helping good ideas become clearer, stronger and easier to deliver.

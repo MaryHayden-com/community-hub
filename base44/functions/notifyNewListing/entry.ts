@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111;">
         <div style="background:#097275;padding:18px 24px;border-radius:8px 8px 0 0;">
           <h1 style="color:#fff;margin:0;font-size:18px;">New listing awaiting approval</h1>
-          <p style="color:#cfe9ea;margin:4px 0 0;font-size:12px;">Community Hub</p>
+          <p style="color:#cfe9ea;margin:4px 0 0;font-size:12px;">Hub4Community</p>
         </div>
         <div style="background:#f9fafb;padding:24px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
           <p style="margin-top:0;">A new listing has been submitted and is awaiting your approval:</p>
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
 
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: 'communitywhatson@gmail.com',
-      from_name: 'Community Hub',
+      from_name: 'Hub4Community',
       subject: `New listing awaiting approval: ${name}`,
       body: html,
     });

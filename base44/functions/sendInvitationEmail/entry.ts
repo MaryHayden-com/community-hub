@@ -6,7 +6,7 @@ function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your listing is live on Community Hub</title>
+<title>Your listing is live on Hub4Community</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:30px 0;">
@@ -20,10 +20,10 @@ function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="vertical-align:middle;padding-right:16px;">
-                    <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="56" height="56" style="border-radius:10px;display:block;" />
+                    <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Hub4Community Logo" width="56" height="56" style="border-radius:10px;display:block;" />
                   </td>
                   <td style="vertical-align:middle;text-align:left;">
-                    <h1 style="color:#ffffff;margin:0 0 1px 0;font-size:26px;font-weight:bold;letter-spacing:0.5px;line-height:1.1;">Community Hub</h1>
+                    <h1 style="color:#ffffff;margin:0 0 1px 0;font-size:26px;font-weight:bold;letter-spacing:0.5px;line-height:1.1;">Hub4Community</h1>
                     <p style="color:#a8d8da;margin:0;font-size:15px;font-weight:500;line-height:1.1;letter-spacing:0.3px;">${town}</p>
                   </td>
                 </tr>
@@ -38,7 +38,7 @@ function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
                 Hi ${firstName},
               </p>
               <p style="margin:0 0 20px 0;font-size:16px;color:#333333;line-height:1.6;">
-                Great news — <strong>${name}</strong> is now listed on <strong>Community Hub</strong>, Bandon's new community directory and events hub.
+                Great news — <strong>${name}</strong> is now listed on <strong>Hub4Community</strong>, Bandon's new community directory and events hub.
               </p>
 
               <!-- CTA Button -->
@@ -70,7 +70,7 @@ function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
               <hr style="border:none;border-top:1px solid #e8e8e8;margin:30px 0;">
 
               <p style="margin:0 0 20px 0;font-size:15px;color:#555555;line-height:1.6;">
-                Community Hub is built for Bandon, by Bandon — helping local businesses, clubs, and community groups get discovered online.
+                Hub4Community is built for Bandon, by Bandon — helping local businesses, clubs, and community groups get discovered online.
               </p>
 
               <p style="margin:0 0 20px 0;font-size:15px;color:#555555;line-height:1.6;">
@@ -79,8 +79,8 @@ function buildEmailHtml({ name, firstName, town, claimUrl, appUrl }) {
 
               <p style="margin:0;font-size:15px;color:#555555;line-height:1.6;">
                 Best regards,<br>
-                <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" width="36" height="36" style="border-radius:6px;vertical-align:middle;margin-right:8px;display:inline-block;" />
-                <strong style="vertical-align:middle;">The Community Hub Team</strong>
+                <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Hub4Community Logo" width="36" height="36" style="border-radius:6px;vertical-align:middle;margin-right:8px;display:inline-block;" />
+                <strong style="vertical-align:middle;">The Hub4Community Team</strong>
               </p>
             </td>
           </tr>
@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
       const contactName = listing.contact_name || listing.name || '';
       const firstName = contactName.split(' ')[0] || 'there';
 
-      const subject = `Your listing is live on Community Hub, ${firstName} 🎉 — Discover the businesses, clubs, schools and events that bring your community together.`;
+      const subject = `Your listing is live on Hub4Community, ${firstName} 🎉 — Discover the businesses, clubs, schools and events that bring your community together.`;
 
       const html = buildEmailHtml({
         name: listing.name,
@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
 
       try {
         await base44.integrations.Core.SendEmail({
-          from_name: 'Community Hub',
+          from_name: 'Hub4Community',
           to: listing.owner_email,
           subject,
           body: html,

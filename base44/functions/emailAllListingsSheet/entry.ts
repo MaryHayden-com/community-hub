@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
 
     // 2. Build a fresh spreadsheet (one tab per type) with all statuses + Status column.
     const { accessToken } = await base44.asServiceRole.connectors.getConnection("googlesheets");
-    const title = `Community Hub — All Listings ${new Date().toISOString().slice(0, 10)}`;
+    const title = `Hub4Community — All Listings ${new Date().toISOString().slice(0, 10)}`;
     const createRes = await fetch("https://sheets.googleapis.com/v4/spreadsheets", {
       method: "POST",
       headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
@@ -78,14 +78,14 @@ Deno.serve(async (req) => {
     const byTypeLines = LISTING_TYPES.map((t) => `- ${t}: ${counts[t]}`).join("\n");
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: "communitywhatson@gmail.com",
-      from_name: "Community Hub",
+      from_name: "Hub4Community",
       subject: `📋 All listings export — ${allListings.length} listings (${pending} pending)`,
       body:
-        `Hi Mary,\n\nHere's your full Community Hub listings export for ${new Date().toISOString().slice(0, 10)}.\n\n` +
+        `Hi Mary,\n\nHere's your full Hub4Community listings export for ${new Date().toISOString().slice(0, 10)}.\n\n` +
         `Total listings: ${allListings.length}\nApproved (live): ${approved}\nPending approval: ${pending}\n\n` +
         `By type:\n${byTypeLines}\n\n` +
         `Open the spreadsheet to review, approve and manage everything in one place:\n${spreadsheetUrl}\n\n` +
-        `— Community Hub`,
+        `— Hub4Community`,
     });
 
     return Response.json({

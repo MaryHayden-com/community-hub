@@ -306,7 +306,7 @@ Only return items where the town matches one of the listed towns. Prefer entries
           : `Nothing needs review this run — all listings were auto-published.\nManage them: https://hub4community.com/admin`;
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: "communitywhatson@gmail.com",
-          from_name: "Community Hub",
+          from_name: "Hub4Community",
           subject: `📍 ${totalNew} new listings imported (auto-published + review)`,
           body: `Auto-import summary across ${PROVINCES.length} provinces / ${PROVINCES.reduce((n,p)=>n+p.counties.length,0)} counties.\n\n`
             + `Approved (live): ${totals.approved}\nNeeds review: ${totals.pending}\n`

@@ -28,7 +28,7 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
 
   return (
     <div id="about" className="mt-10 space-y-6 scroll-mt-20">
-      {/* Why people use Community Hub */}
+      {/* Why people use Hub4Community */}
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why people use <BrandName /></h2>
         <p className="text-sm mt-2 leading-relaxed" style={{ color: "#333333" }}>

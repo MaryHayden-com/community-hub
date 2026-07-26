@@ -30,7 +30,7 @@ export default function SuggestBusinessForm({ open, onClose }) {
     setSaving(true);
     await base44.integrations.Core.SendEmail({
       to: "communitywhatson@gmail.com",
-      from_name: "Community Hub",
+      from_name: "Hub4Community",
       subject: `Business Suggestion: ${form.business_name}`,
       body: `Someone suggested a business/group to add to the directory.\n\nName: ${form.business_name}\nLocation: ${form.location || "Not provided"}\nNote: ${form.note || "Not provided"}\n\nSuggested by: ${form.your_name || "Anonymous"}${form.your_email ? ` (${form.your_email})` : ""}`,
     });

@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
         <section className="bg-card border rounded-xl p-6">
           <h2 className="font-semibold text-lg mb-2">1. Who We Are</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Community Hub is an online directory connecting people with local businesses, clubs, groups, educational 
+            Hub4Community is an online directory connecting people with local businesses, clubs, groups, educational 
             institutions, and events across Ireland. We are committed to protecting your personal data and being 
             transparent about how we use it in accordance with the General Data Protection Regulation (GDPR) and 
             the Irish Data Protection Act 2018.
@@ -55,7 +55,7 @@ export default function PrivacyPolicy() {
         <section className="bg-card border rounded-xl p-6">
           <h2 className="font-semibold text-lg mb-2">4. How We Use Your Data</h2>
           <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside leading-relaxed">
-            <li>To display your listing in the Community Hub directory</li>
+            <li>To display your listing in the Hub4Community directory</li>
             <li>To process and review listing claim requests</li>
             <li>To contact you regarding your listing or claim</li>
             <li>To improve the directory and user experience</li>
