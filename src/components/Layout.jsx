@@ -8,9 +8,10 @@ import {
   Tag, ChevronLeft, HeartHandshake, Heart, User, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CommunityHubLogo from "@/components/CommunityHubLogo";
 
 const navItems = [
-  { to: "/", label: "Directory", icon: MapPin },
+  { to: "/", label: "Explore", icon: MapPin },
   { to: "/directory?type=Business", label: "Business & Retail", icon: Building2 },
   { to: "/directory?type=Club+%26+Group", label: "Clubs & Groups", icon: Users },
   { to: "/directory?type=Community+Services", label: "Community Services", icon: HeartHandshake },
@@ -24,7 +25,7 @@ const ROOT_PATHS = ["/", "/directory", "/admin", "/dashboard", "/group-dashboard
 
 // Bottom nav tabs (mobile)
 const BOTTOM_TABS = [
-  { to: "/", label: "Directory", icon: MapPin },
+  { to: "/", label: "Explore", icon: MapPin },
   { to: "/whats-on", label: "What's On", icon: Calendar },
   { to: "/saved", label: "Saved", icon: Heart },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -88,13 +89,19 @@ export default function Layout() {
               </button>
             ) : null}
             <button
-              onClick={() => navigate("/about")}
+              onClick={() => {
+                if (location.pathname === "/" || location.pathname === "/directory") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                } else {
+                  navigate("/");
+                }
+              }}
               className="flex items-center gap-2.5 cursor-pointer"
-              title="About"
+              title="Community Hub – home"
             >
-              <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
+              <CommunityHubLogo className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
-                About
+                Community<span className="text-[#E2701B]">Hub</span>
               </span>
             </button>
           </div>
