@@ -65,6 +65,8 @@ function formatTime(t) {
 }
 
 
+function cleanName(n){ return (n || "").replace(/\s*[—–-]\s*\d{4}-\d{2}-\d{2}\s*$/, "").trim(); }
+
 export default function WhatsOnEventRow({ listing, overrideDate }) {
   let dateObj = overrideDate || null;
 
@@ -116,7 +118,7 @@ export default function WhatsOnEventRow({ listing, overrideDate }) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <h3 className="font-bold leading-snug" style={{ color: '#097275' }}>
-              {listing.name}
+              {cleanName(listing.name)}
             </h3>
             {listing.description && (
               <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">

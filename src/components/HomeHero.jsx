@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { Search, Store, Users, GraduationCap, Calendar, Compass, PlusCircle, Heart } from "lucide-react";
+import { Search, Store, Users, GraduationCap, Calendar, Compass, PlusCircle, Heart, HeartHandshake } from "lucide-react";
 
 const TILES = [
   { key: "Business", label: "Business", icon: Store, path: "/directory?type=Business" },
   { key: "Club & Group", label: "Clubs", icon: Users, path: "/directory?type=Club%20%26%20Group" },
+  { key: "Community Services", label: "Community", icon: HeartHandshake, path: "/directory?type=Community%20Services" },
   { key: "Education", label: "Education", icon: GraduationCap, path: "/directory?type=Education" },
   { key: "What's On", label: "What's On", icon: Calendar, path: "/directory?type=What's%20On" },
 ];
@@ -71,7 +72,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 className="w-full rounded-lg px-3 py-2.5 text-white text-sm font-bold min-h-[44px]"
                 style={{ background: "#E2701B" }}
               >
-                Login to add your business or group
+                Add your business or group — free
               </button>
             </div>
           </div>

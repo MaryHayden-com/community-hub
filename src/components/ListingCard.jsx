@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Building2, Users, GraduationCap, Calendar, MapPin, Star, Globe, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ export default function ListingCard({ listing, isOwned }) {
   const config = typeConfig[listing.type] || typeConfig["Business"];
   const Icon = config.icon;
   const gradient = typeGradients[listing.type] || "from-slate-50 to-slate-100";
+  const [imgError, setImgError] = useState(false);
 
     return (
     <Link
@@ -28,10 +30,11 @@ export default function ListingCard({ listing, isOwned }) {
       style={{ border: `2px solid ${isOwned ? '#6ee7b7' : '#E2701B'}` }}
     >
       <div className="h-36 overflow-hidden relative">
-        {listing.image_url ? (
+        {listing.image_url && !imgError ? (
           <img
             src={listing.image_url}
             alt={listing.name}
+            onError={() => setImgError(true)}
             className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
@@ -78,9 +81,11 @@ export default function ListingCard({ listing, isOwned }) {
           )}
         </div>
 
-        {listing.category && (
-          <p className="text-xs text-muted-foreground">{listing.category}</p>
-        )}
+        {(() => {
+          const cats = Array.isArray(listing.category) ? listing.category : (listing.category ? [listing.category] : []);
+          if (cats.length === 0) return null;
+          return <p className="text-xs text-muted-foreground">{cats.join(" · ")}</p>;
+        })()}
 
         {listing.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
