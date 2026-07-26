@@ -141,7 +141,7 @@ export default function Layout() {
 
           {/* User + Mobile Hamburger */}
           <div className="flex items-center gap-2">
-            {user && (
+            {isListingOwner && (
               <Link
                 to="/dashboard"
                 className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
