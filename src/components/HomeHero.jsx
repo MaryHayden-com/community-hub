@@ -71,7 +71,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 className="w-full rounded-lg px-3 py-2.5 text-white text-sm font-bold min-h-[44px]"
                 style={{ background: "#E2701B" }}
               >
-                Add your business or group — free
+                Login to add your business or group
               </button>
             </div>
           </div>
