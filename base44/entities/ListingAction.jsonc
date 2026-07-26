@@ -68,6 +68,11 @@
     "created_by_name": {
       "type": "string",
       "title": "Created By Name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
     }
   },
   "required": [

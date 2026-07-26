@@ -22,6 +22,11 @@
       "type": "boolean",
       "title": "Attending",
       "default": true
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
     }
   },
   "required": [

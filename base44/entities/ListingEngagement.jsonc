@@ -22,6 +22,11 @@
     "listing_owner_email": {
       "type": "string",
       "title": "Listing Owner Email"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
     }
   },
   "required": [

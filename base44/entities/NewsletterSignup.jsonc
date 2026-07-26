@@ -18,6 +18,11 @@
       "type": "string",
       "title": "Source",
       "description": "Where they signed up from (footer, homepage, etc.)"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
     }
   },
   "required": [
