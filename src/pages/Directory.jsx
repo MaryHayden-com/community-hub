@@ -113,8 +113,14 @@ export default function Directory() {
   // from another page, e.g. coming from "What's On").
   useEffect(() => {
     if (loading) return;
+    const scrollToAbout = () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (window.sessionStorage.getItem("scrollToAbout")) {
+      window.sessionStorage.removeItem("scrollToAbout");
+      requestAnimationFrame(() => scrollToAbout());
+      return;
+    }
     if (location.hash === "#about") {
-      requestAnimationFrame(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      requestAnimationFrame(() => scrollToAbout());
       return;
     }
     if (params.get("type")) {

@@ -53,6 +53,8 @@ export default function Layout() {
 
   // Scroll to top whenever we navigate to a different page (desktop header links etc.)
   useEffect(() => {
+    // Don't fight an explicit "scroll to About" cross-page request.
+    if (window.sessionStorage.getItem("scrollToAbout")) return;
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [location.pathname]);
 
@@ -84,11 +86,23 @@ export default function Layout() {
                 Back
               </button>
             ) : null}
-            <Link
-              to="/#about"
+            <button
               onClick={() => {
-                if ((location.pathname === "/" || location.pathname === "/directory") && location.hash !== "#about") {
-                  requestAnimationFrame(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+                const scrollToAbout = () => {
+                  const el = document.getElementById("about");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                };
+                if (location.pathname === "/" || location.pathname === "/directory") {
+                  // Try immediately; retry a few times in case content is still mounting.
+                  scrollToAbout();
+                  let tries = 0;
+                  const iv = setInterval(() => {
+                    if (document.getElementById("about")) { scrollToAbout(); clearInterval(iv); }
+                    else if (++tries > 20) clearInterval(iv);
+                  }, 80);
+                } else {
+                  sessionStorage.setItem("scrollToAbout", "1");
+                  navigate("/");
                 }
               }}
               className="flex items-center gap-2.5 cursor-pointer"
@@ -98,7 +112,7 @@ export default function Layout() {
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
                 About
               </span>
-            </Link>
+            </button>
           </div>
 
           {/* Desktop Nav */}
