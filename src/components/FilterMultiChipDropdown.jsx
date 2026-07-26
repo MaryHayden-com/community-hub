@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -15,22 +16,15 @@ function useIsMobile() {
 }
 
 /**
- * A tappable filter chip that opens a multi-select dropdown with tick boxes + counts.
+ * A tappable filter chip that opens a PORTALED multi-select list with tick boxes + counts.
+ * Portaling avoids the list being clipped by the horizontally-scrollable chip row.
  * - value: array of selected values
  * - options: [{ value, count }]
  * - onChange(array)
  */
 export default function FilterMultiChipDropdown({ label, value = [], options, onChange, accent = "#097275" }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (isMobile) return;
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [isMobile]);
 
   const hasOptions = Array.isArray(options) && options.length > 0;
   const selected = Array.isArray(value) ? value : [];
@@ -48,7 +42,6 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
     <button
       type="button"
       disabled={!hasOptions}
-      onClick={() => hasOptions && setOpen((o) => !o)}
       className={`flex items-center gap-1.5 rounded-full px-3 py-2 min-h-[40px] text-xs font-semibold whitespace-nowrap transition-colors border ${
         !hasOptions
           ? "opacity-40 cursor-not-allowed bg-card border-border"
@@ -67,7 +60,7 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
   if (!hasOptions) return trigger;
 
   const optionsList = (
-    <div className={cn("overflow-y-auto", isMobile ? "max-h-[60vh] py-2" : "max-h-72")}>
+    <div className="overflow-y-auto max-h-72 py-1">
       <div
         onClick={clearAll}
         className="flex items-center gap-2 px-4 py-3 text-sm cursor-pointer hover:bg-accent transition-colors"
@@ -100,37 +93,33 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
 
   if (isMobile) {
     return (
-      <div>
-        {trigger}
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>{label}</DrawerTitle>
-            </DrawerHeader>
-            {optionsList}
-            <div className="px-4 pb-6 pt-2">
-              <button
-                onClick={() => setOpen(false)}
-                className="w-full h-11 rounded-lg text-white text-sm font-semibold"
-                style={{ background: accent }}
-              >
-                Done ({selCount} ticked)
-              </button>
-            </div>
-          </DrawerContent>
-        </Drawer>
-      </div>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{label}</DrawerTitle>
+          </DrawerHeader>
+          {optionsList}
+          <div className="px-4 pb-6 pt-2">
+            <button
+              onClick={() => setOpen(false)}
+              className="w-full h-11 rounded-lg text-white text-sm font-semibold"
+              style={{ background: accent }}
+            >
+              Done ({selCount} ticked)
+            </button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     );
   }
 
   return (
-    <div ref={ref} className="relative">
-      {trigger}
-      {open && (
-        <div className="absolute z-50 mt-1 w-56 rounded-md border bg-popover shadow-md">
-          {optionsList}
-        </div>
-      )}
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent align="start" className="w-56 p-0">
+        {optionsList}
+      </PopoverContent>
+    </Popover>
   );
 }
