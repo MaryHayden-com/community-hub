@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { Handshake, Store, Heart, Compass, PlusCircle, Compass as ExploreIcon } from "lucide-react";
+import { Store, Heart, Leaf, Compass, PlusCircle, Compass as ExploreIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import BrandName from "@/components/BrandName";
 import usePageTitle from "@/hooks/usePageTitle";
 
 const TEAL = "#006767";
@@ -12,7 +11,7 @@ const MINT = "#eef5f5";
 
 const CARDS = [
   {
-    icon: Handshake,
+    icon: Heart,
     title: "Welcome newcomers",
     text: "New to the area? Everything local, in one friendly place — find your people and your next thing to do.",
   },
@@ -27,7 +26,7 @@ const CARDS = [
     text: "Be found by the people looking for you — your business, club or event, in front of your local community, for free.",
   },
   {
-    icon: Compass,
+    icon: Leaf,
     title: "Less friction, for everyone",
     text: "No account needed to browse. Adding your listing takes a minute. Finding what you need takes less.",
   },
@@ -49,11 +48,11 @@ export default function About() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8" style={{ background: "#fcfcfc" }}>
       {/* Header / Intro */}
       <header className="text-center">
-        <p className="text-xs font-bold tracking-[0.25em] uppercase">
-          <span style={{ color: ORANGE_BTN }}>HUB4</span><span style={{ color: TEAL }}>COMMUNITY</span>
+        <p className="text-xs font-bold tracking-[0.25em] uppercase" style={{ color: TEAL }}>
+          HUB4COMMUNITY
         </p>
         <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3" style={{ color: TEAL }}>
-          Welcome to <BrandName />
+          Your Community Hub
         </h1>
         <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#333333" }}>Why we built this</h2>
         <p className="mt-3 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto" style={{ color: "#333333" }}>
@@ -110,16 +109,13 @@ export default function About() {
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: TEAL }}>A note from the founder — Mary Hayden</h2>
         <div className="mt-3 space-y-3 text-sm sm:text-base leading-relaxed" style={{ color: "#333333" }}>
           <p>
-            I'm Mary Hayden — mother of four and the founder behind <BrandName />. I moved to Bandon in West Cork a few years ago, and like so many people who arrive somewhere new, I quickly found that the hardest part wasn't settling in — it was simply finding out what was going on.
+            I'm Mary Hayden — mother of four and the founder behind Community Hub. We recently relocated to Bandon, West Cork, and have thrown ourselves into local community groups and schools, meeting some truly fabulous people along the way.
           </p>
           <p>
-            Local life here is rich and busy: clubs, classes, markets, gigs, community groups, small businesses doing brilliant things. But that information is scattered across Facebook, WhatsApp groups, notice boards and word of mouth. You only seemed to hear about an event after it had happened. I kept thinking — there must be a simpler way.
+            I work independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, how they communicate it and how they grow it. With a background in finance, operations and digital transformation, I bring practical outside perspective without the jargon, helping good ideas become clearer, stronger and easier to deliver.
           </p>
           <p>
-            With a background in finance, operations and digital transformation, I work with founders and community-focused organisations to help them bring clarity to what they're building. <BrandName /> is me turning that same instinct on my own doorstep — one place where everything local gets seen, kept up to date by the people who run it, and free for anyone to browse.
-          </p>
-          <p>
-            I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
+            Now I want to translate that work for our local communities, by "Streamlining communities", if you like — taking the same clarity and structure I bring to businesses, and applying it to making everything local easier to find, and every local organisation easier to be seen. Not everyone has kids to help them integrate to a new place, so I built this app to take the pain out of getting the right people in front of the right Product, Service or Event — and to help others navigate a new community. I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
           </p>
         </div>
       </section>
