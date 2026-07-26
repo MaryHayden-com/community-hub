@@ -106,6 +106,11 @@ export default function Directory() {
     setCounty(urlCounty);
     setTown(urlTown);
     setCountry(localStorage.getItem("dir_country") || "");
+    // When a category link (e.g. "Clubs & Groups") is clicked from the header,
+    // scroll down to the search fields so users land where they expect.
+    if (params.get("type")) {
+      requestAnimationFrame(() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
   }, [location.search]);
 
   // ── Server-side search (debounced, ≥2 chars) ────────────────────────────────
