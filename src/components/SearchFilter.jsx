@@ -1,7 +1,7 @@
 import { Search, X, CalendarRange } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
@@ -67,9 +67,24 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           <SelectContent>
             <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns & Villages</SelectItem>
             {townGroups ? (
-              [...townGroups.towns, ...townGroups.villages].map((t) => (
-                <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-              ))
+              <>
+                {townGroups.towns.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel className="text-xs uppercase tracking-wide" style={{ color: '#E2701B' }}>Towns</SelectLabel>
+                    {townGroups.towns.map((t) => (
+                      <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+                {townGroups.villages.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel className="text-xs uppercase tracking-wide" style={{ color: '#E2701B' }}>Villages</SelectLabel>
+                    {townGroups.villages.map((v) => (
+                      <SelectItem key={v} value={v} className="font-bold" style={{ color: '#097275' }}>{v}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+              </>
             ) : (
               [...towns].sort().map((t) => (
                 <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
