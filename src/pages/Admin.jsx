@@ -402,12 +402,12 @@ export default function Admin() {
           { key: "listings", label: "Listings" },
           { key: "whatson", label: "🗓️ What's On", badge: listings.filter(l => l.type === "What's On" && !l.is_verified).length, badgeColor: "bg-amber-500 text-white" },
           { key: "claims", label: "Claim Requests", icon: <Inbox className="w-4 h-4" />, badge: pendingClaimsCount, badgeColor: "bg-primary text-primary-foreground" },
+          { key: "duplicates", label: "Duplicates", icon: <Copy className="w-4 h-4" /> },
           { key: "stream", label: "Action Stream", icon: <Zap className="w-4 h-4" /> },
           { key: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
           { key: "engagement", label: "📈 Engagement" },
           { key: "analytics", label: "📊 Analytics" },
           { key: "survey", label: "📋 Survey Results" },
-          { key: "duplicates", label: "Duplicates", icon: <Copy className="w-4 h-4" /> },
         ].map(({ key, label, icon, badge, badgeColor }) => (
           <button
             key={key}
