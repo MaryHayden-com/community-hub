@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import WhatsOnEventRow from "@/components/WhatsOnEventRow";
 import SubmitEventForm from "@/components/SubmitEventForm";
 import NearMeButton from "@/components/NearMeButton";
-import { getNextOccurrence, expandAndSortEvents, toArr } from "@/utils/recurringEvents";
+import FilterMultiChipDropdown from "@/components/FilterMultiChipDropdown";
+import { getNextOccurrence, expandAndSortEvents } from "@/utils/recurringEvents";
+import { getListingTags } from "@/utils/whatsOnCategories";
 import usePageTitle from "@/hooks/usePageTitle";
 import {
   addMonths, subMonths, format, startOfMonth, endOfMonth,
@@ -95,8 +97,7 @@ export default function WhatsOn() {
     return raw ? raw.split(",")[0].trim() : "";
   });
   const [query, setQuery] = useState("");
-  const [filterGroup, setFilterGroup] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
+  const [filterCategories, setFilterCategories] = useState([]);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [userIsPaid, setUserIsPaid] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -128,7 +129,7 @@ export default function WhatsOn() {
   }, [user]);
 
   // Reset page when filters change
-  useEffect(() => { setPage(1); }, [filterCounty, filterTown, filterGroup, filterCategory, dateFrom, dateTo, query]);
+  useEffect(() => { setPage(1); }, [filterCounty, filterTown, filterCategories, dateFrom, dateTo, query]);
 
   const allCounties = useMemo(() =>
     [...new Set(listings.map(l => l.county).filter(Boolean))].sort(), [listings]);
@@ -137,24 +138,30 @@ export default function WhatsOn() {
     [...new Set(listings.filter(l => !filterCounty || l.county === filterCounty).map(l => l.area || l.town).filter(Boolean))].sort(),
     [listings, filterCounty]);
 
-  const allGroups = useMemo(() =>
-    [...new Set(listings.flatMap(l => toArr(l.subcategory_group)).filter(Boolean))].sort(), [listings]);
-
-  const allCategories = useMemo(() =>
-    [...new Set(listings.filter(l => !filterGroup || toArr(l.subcategory_group).includes(filterGroup)).flatMap(l => toArr(l.category)).filter(Boolean))].sort(),
-    [listings, filterGroup]);
+  // Streamlined category options (messy free-text merged into clean labels, with counts)
+  const categoryOptions = useMemo(() => {
+    const counts = {};
+    listings.forEach((l) => {
+      getListingTags(l).forEach((t) => { counts[t] = (counts[t] || 0) + 1; });
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([value, count]) => ({ value, count }));
+  }, [listings]);
 
   const filteredListings = useMemo(() => {
     const q = query.trim().toLowerCase();
     return listings.filter(l => {
       if (filterCounty && l.county !== filterCounty) return false;
       if (filterTown && (l.area || l.town) !== filterTown) return false;
-      if (filterGroup && !toArr(l.subcategory_group).includes(filterGroup)) return false;
-      if (filterCategory && !toArr(l.category).includes(filterCategory)) return false;
+      if (filterCategories.length > 0) {
+        const tags = getListingTags(l);
+        if (!filterCategories.some(c => tags.includes(c))) return false;
+      }
       if (q && !`${l.name} ${l.description || ""} ${l.town || ""} ${l.area || ""} ${l.county || ""}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [listings, filterCounty, filterTown, filterGroup, filterCategory, query]);
+  }, [listings, filterCounty, filterTown, filterCategories, query]);
 
   // ── LIST VIEW ─────────────────────────────────────────────────────────────
   const listItems = useMemo(() => expandAndSortEvents(filteredListings, dateFrom, dateTo), [filteredListings, dateFrom, dateTo]);
@@ -267,25 +274,13 @@ export default function WhatsOn() {
           </SelectContent>
         </Select>
 
-        <Select value={filterGroup} onValueChange={v => { setFilterGroup(v === "__all__" ? "" : v); setFilterCategory(""); }}>
-          <SelectTrigger className="w-[170px] bg-card">
-            <SelectValue placeholder="All Groups" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">All Groups</SelectItem>
-            {allGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-          </SelectContent>
-        </Select>
-
-        <Select value={filterCategory} onValueChange={v => setFilterCategory(v === "__all__" ? "" : v)} disabled={!allCategories.length}>
-          <SelectTrigger className="w-[180px] bg-card">
-            <SelectValue placeholder={allCategories.length ? "All Categories" : "No categories"} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">All Categories</SelectItem>
-            {allCategories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <FilterMultiChipDropdown
+          label="Categories"
+          value={filterCategories}
+          options={categoryOptions}
+          onChange={setFilterCategories}
+          accent="#E2701B"
+        />
 
         {viewMode === "list" && (
           <>
@@ -307,8 +302,8 @@ export default function WhatsOn() {
           </>
         )}
 
-        {(filterCounty || filterTown || filterGroup || filterCategory) && (
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { setFilterCounty(""); setFilterTown(""); setFilterGroup(""); setFilterCategory(""); }}>
+        {(filterCounty || filterTown || filterCategories.length > 0) && (
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { setFilterCounty(""); setFilterTown(""); setFilterCategories([]); }}>
             Clear filters
           </Button>
         )}
