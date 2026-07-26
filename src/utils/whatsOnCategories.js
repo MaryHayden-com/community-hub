@@ -107,15 +107,23 @@ export function streamlineTag(raw) {
   return WHATSON_ALIASES[key] || raw.trim();
 }
 
+const toArray = (v) => {
+  if (Array.isArray(v)) return v;
+  if (v == null || v === "") return [];
+  return [v];
+};
+
 export function getListingTags(listing) {
   const tags = new Set();
-  (listing.subcategory_group || []).forEach((g) => {
+  toArray(listing.subcategory_group).forEach((g) => {
     const s = streamlineTag(g);
     if (s) tags.add(s);
   });
-  (listing.category || []).forEach((c) => {
+  toArray(listing.category).forEach((c) => {
     const s = streamlineTag(c);
     if (s) tags.add(s);
   });
   return [...tags];
 }
+
+export { toArray };
