@@ -46,21 +46,32 @@ function score(listing: any, terms: string[]): number {
   const subgroups = toArr(listing.subgroup).map((s) => s.toLowerCase());
   const categories = toArr(listing.category).map((s) => s.toLowerCase());
 
-  let best = 0;
+  // Tiered ranking: a single match in a high-tier field (name, category) must
+  // outrank any number of lower-tier (description) matches. Encoded as
+  // tier * 100000 + pts so the sort key is a single number and the existing
+  // desc-by-score sort keeps tiers strictly ordered above description hits
+  // (fixes alphabetical-on-description bug where "coffee" surfaced a toy shop
+  // ahead of real cafés).
+  let tier = -1;
+  let pts = 0;
+  const consider = (t: number, p: number) => {
+    if (t > tier) { tier = t; pts = p; }
+    else if (t === tier && p > pts) { pts = p; }
+  };
+
   for (const t of terms) {
     const tl = t.toLowerCase();
-    if (name === tl) best = Math.max(best, 100);
-    else if (name.startsWith(tl)) best = Math.max(best, 55);
-    else if (name.includes(tl)) best = Math.max(best, 28);
-    if (groups.some((g) => g.includes(tl)) || subgroups.some((s) => s.includes(tl)) || categories.some((c) => c.includes(tl)) || catText.includes(tl)) {
-      best = Math.max(best, 18);
-    }
-    if (type.includes(tl)) best = Math.max(best, 12);
-    if (town.includes(tl) || area.includes(tl) || nearest.includes(tl) || county.includes(tl)) best = Math.max(best, 6);
-    if (address.includes(tl)) best = Math.max(best, 5);
-    if (desc.includes(tl)) best = Math.max(best, 4);
+    if (name === tl) consider(5, 100);
+    else if (name.startsWith(tl)) consider(5, 70);
+    else if (name.includes(tl)) consider(5, 40);
+    if (groups.some((g) => g.includes(tl)) || subgroups.some((s) => s.includes(tl)) || categories.some((c) => c.includes(tl)) || catText.includes(tl)) consider(4, 30);
+    if (type.includes(tl)) consider(3, 20);
+    if (town.includes(tl) || area.includes(tl) || nearest.includes(tl) || county.includes(tl)) consider(2, 10);
+    if (address.includes(tl)) consider(1, 5);
+    if (desc.includes(tl)) consider(0, 1);
   }
-  return best;
+  if (tier < 0) return 0;
+  return tier * 100000 + pts;
 }
 
 Deno.serve(async (req) => {

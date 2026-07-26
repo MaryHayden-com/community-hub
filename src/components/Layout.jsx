@@ -218,12 +218,12 @@ export default function Layout() {
       </header>
 
       {/* ── Main Content ── */}
-      <main ref={mainRef} className="flex-1 pb-16 md:pb-0 page-transition">
+      <main ref={mainRef} className="flex-1 page-transition">
         <Outlet />
       </main>
 
-      {/* ── Footer (desktop only) ── */}
-      <footer className="hidden md:block border-t bg-card mt-12">
+      {/* ── Footer (mobile + desktop) ── */}
+      <footer className="block border-t bg-card mt-8 pb-24 md:mt-12 md:pb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <div className="mb-6 p-5 rounded-xl bg-primary/5 border border-primary/20">
             <p className="text-sm font-semibold mb-1" style={{ color: '#097275' }}>📬 Stay updated on local events & news</p>
@@ -237,7 +237,7 @@ export default function Layout() {
               {" · "}
               <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
               {" · "}
-              <a href="mailto:privacy@communityhub.ie" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
+              <a href="mailto:hello@hub4community.com" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
             </p>
             <p className="mt-2 text-xs">Built locally, for Bandon and beyond — your community, in one place.</p>
           </div>
