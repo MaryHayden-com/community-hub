@@ -84,7 +84,7 @@ export default function Layout() {
                 Back
               </button>
             ) : null}
-            <Link to="/about" className="flex items-center gap-2.5" title="About Your Community Hub">
+            <Link to="/" className="flex items-center gap-2.5" title="About Your Community Hub">
               <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
                 Your Community <span style={{ color: '#E2701B' }}>Hub</span>
@@ -131,10 +131,9 @@ export default function Layout() {
               Saved
             </Link>
             <Link
-              to="/about"
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
-                location.pathname === "/about" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              }`}
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted"
             >
               <Info className="w-3.5 h-3.5" />
               About
@@ -197,7 +196,7 @@ export default function Layout() {
               Saved
               <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
             </Link>
-            <Link to="/about" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
+            <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
               <Info className="w-4 h-4" style={{ color: '#097275' }} />
               About
               <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
@@ -250,7 +249,7 @@ export default function Layout() {
               {" · "}
               <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Browse by category</Link>
               {" · "}
-              <Link to="/about" className="hover:text-foreground underline underline-offset-2 transition-colors">About Community Hub</Link>
+              <Link to="/" className="hover:text-foreground underline underline-offset-2 transition-colors">About Community Hub</Link>
               {" · "}
               <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Add a listing</Link>
               {" · "}

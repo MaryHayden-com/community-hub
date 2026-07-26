@@ -40,7 +40,6 @@ const Billing = lazy(() => import('./pages/Billing'));
 const OwnerDashboard = lazy(() => import('./pages/OwnerDashboard'));
 const GroupAdminDashboard = lazy(() => import('./pages/GroupAdminDashboard'));
 const Survey = lazy(() => import('./pages/Survey'));
-const About = lazy(() => import('./pages/About'));
 const CommunityGuidelines = lazy(() => import('./pages/CommunityGuidelines'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
 const CalendarView = lazy(() => import('./pages/CalendarView'));
@@ -93,7 +92,6 @@ const AuthenticatedApp = () => {
           <Route path="/listing/:id" element={<ListingDetail />} />
           <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/about" element={<About />} />
           <Route path="/guidelines" element={<CommunityGuidelines />} />
           <Route path="/terms" element={<TermsOfUse />} />
           <Route path="/billing" element={<RequireAuth><Billing /></RequireAuth>} />
