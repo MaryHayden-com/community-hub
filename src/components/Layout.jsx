@@ -84,7 +84,18 @@ export default function Layout() {
                 Back
               </button>
             ) : null}
-            <Link to="/" className="flex items-center gap-2.5" title="About">
+            <Link
+              to="/"
+              onClick={() => {
+                if (location.pathname === "/" || location.pathname === "/directory") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                } else {
+                  navigate("/");
+                }
+              }}
+              className="flex items-center gap-2.5 cursor-pointer"
+              title="About"
+            >
               <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
                 About
