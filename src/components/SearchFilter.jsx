@@ -54,7 +54,8 @@ export default function SearchFilter({ search, setSearch, type, setType, typeCou
       </div>
 
       {/* Type chips — tapping a type selects it and opens its group tick-list */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+      <div className="flex gap-2 items-center pb-1 -mx-1 px-1">
+        <div className="flex gap-2 overflow-x-auto flex-1 min-w-0">
         {TYPE_CHIPS.map((c) => {
           const sel = c.value !== "" && selectedTypes.length === 1 && selectedTypes[0] === c.value;
           const panelOpen = sel && openType === c.value;
@@ -84,6 +85,10 @@ export default function SearchFilter({ search, setSearch, type, setType, typeCou
             </button>
           );
         })}
+        </div>
+        <div className="shrink-0">
+          <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown([]); } }} />
+        </div>
       </div>
 
       {/* Groups tick-list for the active type */}
@@ -130,16 +135,14 @@ export default function SearchFilter({ search, setSearch, type, setType, typeCou
         </div>
       )}
 
-      {/* Near Me + Clear */}
-      <div className="flex gap-2 flex-wrap items-center justify-end">
-        <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown([]); } }} />
-
-        {hasFilters && (
+      {/* Clear filters (only when something is active) */}
+      {hasFilters && (
+        <div className="flex gap-2 flex-wrap items-center justify-end">
           <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType([]); setGroup([]); setCategory([]); setCountry(""); setCounty(""); setTown([]); if (setNearbyCounties) setNearbyCounties(null); localStorage.removeItem("dir_country"); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Date range (What's On only) */}
       {isWhatsOn && setDateFrom && (
