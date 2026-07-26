@@ -1,5 +1,21 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// HTML-entity escape untrusted values before interpolating into email HTML.
+function esc(v) {
+  if (v == null) return '';
+  return String(v)
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
+    .replace(/'/g, '&#39;');
+}
+
+// Strip control chars to prevent header injection in email subjects/headers.
+function cleanForHeader(v) {
+  return String(v == null ? '' : v).replace(/[\r\n]/g, ' ').trim();
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -18,6 +34,7 @@ Deno.serve(async (req) => {
     const county = listing?.county || '';
     const createdBy = listing?.created_by || 'Unknown';
     const location = [town, county].filter(Boolean).join(', ');
+    const safeName = cleanForHeader(name);
 
     const link = 'https://hub4community.com/admin#pending';
     const html = `
@@ -29,10 +46,10 @@ Deno.serve(async (req) => {
         <div style="background:#f9fafb;padding:24px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
           <p style="margin-top:0;">A new listing has been submitted and is awaiting your approval:</p>
           <table style="width:100%;font-size:14px;border-collapse:collapse;margin:6px 0 16px;">
-            <tr><td style="padding:4px 0;color:#6b7280;width:130px;">Name</td><td style="font-weight:600;">${name}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Type</td><td>${type}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Location</td><td>${location}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Submitted by</td><td>${createdBy}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;width:130px;">Name</td><td style="font-weight:600;">${esc(name)}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;">Type</td><td>${esc(type)}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;">Location</td><td>${esc(location)}</td></tr>
+            <tr><td style="padding:4px 0;color:#6b7280;">Submitted by</td><td>${esc(createdBy)}</td></tr>
           </table>
           <a href="${link}" style="display:inline-block;background:#E2701B;color:#fff;padding:13px 26px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Review & approve &rarr;</a>
           <p style="margin-top:16px;font-size:12px;color:#9ca3af;">This opens the Pending Approval tab in your admin panel.</p>
@@ -43,7 +60,7 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: 'communitywhatson@gmail.com',
       from_name: 'Hub4Community',
-      subject: `New listing awaiting approval: ${name}`,
+      subject: `New listing awaiting approval: ${safeName}`,
       body: html,
     });
 
