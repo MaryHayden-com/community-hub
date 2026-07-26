@@ -106,15 +106,19 @@ export default function Directory() {
     setCounty(urlCounty);
     setTown(urlTown);
     setCountry(localStorage.getItem("dir_country") || "");
-    // When a category link (e.g. "Clubs & Groups") is clicked from the header,
-    // scroll down to the search fields so users land where they expect.
+  }, [location.search]);
+
+  // Scroll to the search results for a category link, or back to the top for the Directory landing.
+  // Wait until browse data has loaded so the scroll target actually exists (matters on a fresh mount
+  // from another page, e.g. coming from "What's On").
+  useEffect(() => {
+    if (loading) return;
     if (params.get("type")) {
       requestAnimationFrame(() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     } else {
-      // Returning to the Directory/Dashboard landing (no category) — jump back to top
       requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
     }
-  }, [location.search]);
+  }, [loading, location.search]);
 
   // ── Server-side search (debounced, ≥2 chars) ────────────────────────────────
   useEffect(() => {
