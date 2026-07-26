@@ -1,9 +1,23 @@
 import { Search, X, CalendarRange } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
+
+function Chip({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-full px-3 h-11 text-xs font-bold border flex items-center transition-colors"
+      style={active
+        ? { background: "#097275", color: "#fff", borderColor: "#097275" }
+        : { background: "hsl(var(--card))", color: "#097275", borderColor: "rgba(9,114,117,0.35)" }}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countries, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const isWhatsOn = type === "What's On";
@@ -21,66 +35,64 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         />
       </div>
 
-      {/* Country filter (hierarchy above county) */}
-      <Select value={country || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCountry(val); setCounty(""); setTown(""); localStorage.setItem("dir_country", val); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}>
-        <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
-          <SelectValue placeholder="All Countries" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Countries</SelectItem>
-          {countries.map((c) => (
-            <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Row 1: County + Town */}
-      <div className="grid grid-cols-2 gap-2">
-        <Select value={county || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCounty(val); setTown(""); localStorage.setItem("dir_county", val); localStorage.removeItem("dir_town"); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Counties" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Counties</SelectItem>
-            {[...counties].sort().map((c) => (
-              <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={town || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setTown(val); localStorage.setItem("dir_town", val); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Towns" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns & Villages</SelectItem>
-            {townGroups ? (
-              <>
-                {townGroups.towns.length > 0 && (
-                  <SelectGroup>
-                    <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Towns</SelectLabel>
-                    {townGroups.towns.map((t) => (
-                      <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                )}
-                {townGroups.villages.length > 0 && (
-                  <SelectGroup>
-                    <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Villages</SelectLabel>
-                    {townGroups.villages.map((t) => (
-                      <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                )}
-              </>
-            ) : (
-              [...towns].sort().map((t) => (
-                <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
+      {/* Country — chips */}
+      <div className="flex gap-2 flex-wrap items-center">
+        <Chip
+          active={!country}
+          onClick={() => { setCountry(""); setCounty(""); setTown(""); localStorage.removeItem("dir_country"); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}
+        >
+          All Countries
+        </Chip>
+        {countries.map((c) => (
+          <Chip
+            key={c}
+            active={country === c}
+            onClick={() => { setCountry(c); setCounty(""); setTown(""); localStorage.setItem("dir_country", c); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}
+          >
+            {c}
+          </Chip>
+        ))}
       </div>
+
+      {/* County — chips */}
+      <div className="flex gap-2 flex-wrap items-center">
+        <Chip
+          active={!county}
+          onClick={() => { setCounty(""); setTown(""); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}
+        >
+          All Counties
+        </Chip>
+        {[...counties].sort().map((c) => (
+          <Chip
+            key={c}
+            active={county === c}
+            onClick={() => { setCounty(c); setTown(""); localStorage.setItem("dir_county", c); localStorage.removeItem("dir_town"); }}
+          >
+            {c}
+          </Chip>
+        ))}
+      </div>
+
+      {/* Town / Village — chips (shown once a county is chosen) */}
+      {(county || town) && (
+        <div className="flex gap-2 flex-wrap items-center">
+          <Chip
+            active={!town}
+            onClick={() => { setTown(""); localStorage.removeItem("dir_town"); }}
+          >
+            All Towns & Villages
+          </Chip>
+          {(townGroups ? [...townGroups.towns, ...townGroups.villages] : [...towns].sort()).map((t) => (
+            <Chip
+              key={t}
+              active={town === t}
+              onClick={() => { setTown(t); localStorage.setItem("dir_town", t); }}
+            >
+              {t}
+            </Chip>
+          ))}
+        </div>
+      )}
 
       {/* Row 2: Browse by type — chips list the 5 groups at a glance (drill-down happens on tap) */}
       <div className="flex gap-2 flex-wrap items-center">
@@ -94,17 +106,13 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         ].map((opt) => {
           const active = (opt.value ? type === opt.value : !type);
           return (
-            <button
+            <Chip
               key={opt.value || "all"}
-              type="button"
+              active={active}
               onClick={() => { setType(opt.value); setGroup([]); setCategory([]); }}
-              className="rounded-full px-4 h-11 text-xs font-bold border flex items-center transition-colors"
-              style={active
-                ? { background: "#097275", color: "#fff", borderColor: "#097275" }
-                : { background: "hsl(var(--card))", color: "#097275", borderColor: "rgba(9,114,117,0.35)" }}
             >
               {opt.label}
-            </button>
+            </Chip>
           );
         })}
       </div>
