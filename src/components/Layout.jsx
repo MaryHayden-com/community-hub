@@ -18,7 +18,6 @@ const navItems = [
   { to: "/directory?type=Community+Services", label: "Community Services", icon: HeartHandshake },
   { to: "/directory?type=Education", label: "Education & Training", icon: GraduationCap },
   { to: "/whats-on", label: "What's On", icon: Calendar },
-  { to: "/about", label: "About", icon: Sparkles },
 ];
 
 // Root paths that show the app title (no back button)

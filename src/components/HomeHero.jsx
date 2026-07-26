@@ -26,14 +26,14 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
           {/* ── Header ── belonging-led, place-first ── */}
           <div className="text-center">
             <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-2">
-              <span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span>
+              <span style={{ color: "#D67D3E" }}>Hub4</span><span style={{ color: "#2A7373" }}>Community</span>
             </p>
             <h1 id="home-brand" className="font-display text-2xl sm:text-4xl font-bold tracking-tight leading-tight mb-3" style={{ color: "#097275" }}>
               Your local community, all in one place.
             </h1>
             <p className="text-sm sm:text-base leading-relaxed max-w-xl mx-auto" style={{ color: "#333333" }}>
               Find local businesses, clubs, events and community services near you.{" "}
-              <span style={{ fontWeight: 700 }}><span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span></span>{" "}
+              <span style={{ fontWeight: 700 }}><span style={{ color: "#D67D3E" }}>Hub4</span><span style={{ color: "#2A7373" }}>Community</span></span>{" "}
               helps people discover what is happening locally and helps organisations become easier to find across Ireland, with a strong local starting point in Bandon and West Cork.
             </p>
           </div>
