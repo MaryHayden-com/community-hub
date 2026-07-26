@@ -94,6 +94,29 @@ const WHATSON_ALIASES = {
   "demonstration": "Education & Learning", "course": "Education & Learning",
   "seminar & conference": "Education & Learning", "webinar": "Education & Learning",
   "talk & lecture": "Education & Learning",
+  // Additional sports
+  "cycling": "Sports & Recreation", "rowing": "Sports & Recreation",
+  "horse racing": "Sports & Recreation", "sports / gaa": "Sports & Recreation",
+  "sport & outdoor": "Sports & Recreation", "sports/youth": "Sports & Recreation",
+  "outdoor & walking": "Sports & Recreation",
+  // Additional community / faith
+  "roman catholic church": "Community", "church of ireland": "Community",
+  "hobbies / community": "Community", "community/business": "Community",
+  "community & social": "Community", "community / networking": "Community",
+  "networking / awards": "Community", "networking / social": "Community",
+  "garden & outdoor event": "Community", "nature / environment": "Heritage",
+  // Additional mixed combos
+  "charity/community": "Charity & Fundraising",
+  "networking / workshop": "Education & Learning",
+  "festival / community": "Festivals", "festival / maritime": "Festivals",
+  "music festival": "Music", "concert/music": "Music", "sports/concert": "Music",
+  "festival / arts": "Arts & Culture", "arts & literature": "Arts & Culture",
+  "theatre & performance": "Theatre & Drama",
+  "wellness / meditation": "Health & Wellbeing", "martial arts / fitness": "Health & Fitness",
+  "sport & fitness": "Health & Fitness",
+  "entertainment / dining": "Food & Drink",
+  "family / outdoor": "Family & Kids",
+  "tour & experience": "Heritage",
   // Entertainment / catch-all
   "entertainment": "Entertainment", "competitions": "Entertainment", "business": "Entertainment",
 };
