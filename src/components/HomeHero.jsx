@@ -153,13 +153,6 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
           </div>
         </div>
       </div>
-
-      {/* ── Why this exists ── the heart, said plainly ── */}
-      <div className="mt-4 rounded-2xl bg-card border border-border p-5 sm:p-6 max-w-3xl mx-auto text-center">
-        <p className="font-display text-base sm:text-lg leading-relaxed" style={{ color: "#333333" }}>
-          Great local businesses, clubs and events shouldn't be hard to find — and finding your feet in a new place shouldn't feel lonely. We put the right people in front of the right things, and help everything local get seen. That's how communities come together.
-        </p>
-      </div>
     </section>
   );
 }
