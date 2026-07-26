@@ -257,6 +257,20 @@ export default function Directory() {
     return Object.entries(m).sort((a, b) => a[0].localeCompare(b[0])).map(([value, count]) => ({ value, count }));
   }, [facetBase, country]);
 
+  // Counts per listing type, scoped by current location filters (for the type chips)
+  const typeCounts = useMemo(() => {
+    const base = browseListings.filter(l => {
+      if (l.status === "pending" || l.status === "rejected") return false;
+      if (country && l.country !== country) return false;
+      if (county && l.county !== county) return false;
+      if (town.length > 0 && !town.includes(l.town)) return false;
+      return true;
+    });
+    const counts = { __all: base.length };
+    base.forEach(l => { if (l.type) counts[l.type] = (counts[l.type] || 0) + 1; });
+    return counts;
+  }, [browseListings, country, county, town]);
+
   const townFacetBase = useMemo(() => facetBase.filter(l => (!country || l.country === country) && (!county || l.county === county)), [facetBase, country, county]);
 
   const townOptions = useMemo(() => {
@@ -409,6 +423,7 @@ export default function Directory() {
       <SearchFilter
         search={search} setSearch={setSearch}
         type={type} setType={setType}
+        typeCounts={typeCounts}
         group={subcategoryGroup} setGroup={setSubcategoryGroup}
         groups={groups}
         groupCounts={groupCounts}

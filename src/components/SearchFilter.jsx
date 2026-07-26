@@ -15,7 +15,7 @@ const TYPE_CHIPS = [
   { label: "What's On", value: "What's On" },
 ];
 
-export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countryOptions, county, setCounty, countyOptions, town, setTown, townOptions, villageOptions, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
+export default function SearchFilter({ search, setSearch, type, setType, typeCounts, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countryOptions, county, setCounty, countyOptions, town, setTown, townOptions, villageOptions, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const selectedTypes = Array.isArray(type) ? type : [];
   const isWhatsOn = selectedTypes.length === 1 && selectedTypes[0] === "What's On";
   const singleType = selectedTypes.length === 1 ? selectedTypes[0] : "";
@@ -58,6 +58,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         {TYPE_CHIPS.map((c) => {
           const sel = c.value !== "" && selectedTypes.length === 1 && selectedTypes[0] === c.value;
           const panelOpen = sel && openType === c.value;
+          const count = c.value === "" ? (typeCounts?.__all ?? 0) : (typeCounts?.[c.value] ?? 0);
           return (
             <button
               key={c.label}
@@ -67,10 +68,18 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
                 if (sel) { setOpenType(panelOpen ? "" : c.value); }
                 else { setType([c.value]); setGroup([]); setCategory([]); setOpenType(c.value); }
               }}
-              className={`flex items-center gap-1 rounded-full px-3 py-2 min-h-[40px] text-xs font-bold whitespace-nowrap border transition-colors ${sel ? "text-white" : "bg-card border-border hover:border-primary"}`}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 min-h-[40px] text-xs font-bold whitespace-nowrap border transition-colors ${sel ? "text-white" : "bg-card border-border hover:border-primary"}`}
               style={sel ? { background: "#097275", borderColor: "#097275" } : {}}
             >
               {c.label}
+              <span
+                className="text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none"
+                style={sel
+                  ? { background: "rgba(255,255,255,0.2)", color: "#fff" }
+                  : { background: "rgba(9,114,117,0.1)", color: "#097275" }}
+              >
+                {count}
+              </span>
               {c.value !== "" && <ChevronDown className={`w-3.5 h-3.5 transition-transform ${panelOpen ? "rotate-180" : ""}`} />}
             </button>
           );
