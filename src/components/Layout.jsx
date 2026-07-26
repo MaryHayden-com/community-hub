@@ -124,14 +124,14 @@ export default function Layout() {
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }
                   }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 border-b-2"
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border-b-2"
                   style={{
-                    color: isActive ? "#2A7373" : "#5f6b6b",
+                    color: isActive ? "#2A7373" : "#2A7373",
                     borderColor: isActive ? "#D67D3E" : "transparent",
                     background: isActive ? "rgba(42,115,115,0.08)" : "transparent",
                   }}
                   onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.borderColor = "#D67D3E"; e.currentTarget.style.color = "#2A7373"; } }}
-                  onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.color = "#5f6b6b"; } }}
+                  onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.color = "#2A7373"; } }}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {item.label}
@@ -140,14 +140,14 @@ export default function Layout() {
             })}
             <Link
               to="/saved"
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 border-b-2"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border-b-2"
               style={{
-                color: location.pathname === "/saved" ? "#2A7373" : "#5f6b6b",
+                color: location.pathname === "/saved" ? "#2A7373" : "#2A7373",
                 borderColor: location.pathname === "/saved" ? "#D67D3E" : "transparent",
                 background: location.pathname === "/saved" ? "rgba(42,115,115,0.08)" : "transparent",
               }}
               onMouseEnter={(e) => { if (location.pathname !== "/saved") { e.currentTarget.style.borderColor = "#D67D3E"; e.currentTarget.style.color = "#2A7373"; } }}
-              onMouseLeave={(e) => { if (location.pathname !== "/saved") { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.color = "#5f6b6b"; } }}
+              onMouseLeave={(e) => { if (location.pathname !== "/saved") { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.color = "#2A7373"; } }}
             >
               <Heart className="w-3.5 h-3.5" />
               Saved
