@@ -5,7 +5,14 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const base44 = createClientFromRequest(req);
 
-    const messageIds = body.data?.new_message_ids ?? [];
+    // Trust-boundary check: only the Gmail connector automation should reach
+    // here. Validate incoming message IDs so an unauthenticated caller can't
+    // trigger arbitrary Gmail fetches / AI extraction with garbage input.
+    // Gmail message IDs are short hex-like strings.
+    const rawIds = Array.isArray(body.data?.new_message_ids) ? body.data.new_message_ids : [];
+    const messageIds = rawIds
+      .filter((id) => typeof id === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(id))
+      .slice(0, 10);
     console.log(`Processing ${messageIds.length} new message(s)`);
 
     if (messageIds.length === 0) {
@@ -153,6 +160,30 @@ Return ONLY valid JSON, no explanation.`;
         continue;
       }
 
+      // Trust-boundary / idempotency: a fabricated payload can only replay real
+      // message IDs. Don't create a duplicate listing if one already exists for
+      // the same name + date + town + organiser email (same source email).
+      const ownerEmail = from.match(/[\w.+-]+@[\w-]+\.[a-z]+/i)?.[0] || null;
+      const dedupDate = extracted.event_date || null;
+      const dedupTown = extracted.town || 'Bandon';
+      let duplicate = null;
+      try {
+        const matches = await base44.asServiceRole.entities.CommunityListing.filter({
+          name: extracted.name,
+          event_date: dedupDate,
+          town: dedupTown,
+        });
+        duplicate = matches.find(
+          (m) => (m.owner_email || null) === ownerEmail
+        );
+      } catch (e) {
+        duplicate = null;
+      }
+      if (duplicate) {
+        console.log(`Duplicate listing already exists for "${extracted.name}", skipping message ${messageId}`);
+        continue;
+      }
+
       // Create the listing as a What's On event (pending verification)
       const listingData = {
         type: "What's On",
@@ -177,7 +208,7 @@ Return ONLY valid JSON, no explanation.`;
         image_url: imageUrls[0] || null,
         is_verified: false,
         is_featured: false,
-        owner_email: from.match(/[\w.+-]+@[\w-]+\.[a-z]+/i)?.[0] || null,
+        owner_email: ownerEmail,
         subcategory_group: [],
         category: [],
         plan: 'basic',

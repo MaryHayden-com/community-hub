@@ -14,9 +14,26 @@ Deno.serve(async (req) => {
       return Response.json({ ok: true, skipped: true });
     }
 
+    // Trust-boundary check: only append events that correspond to a real,
+    // newly-created DB record. Reject fabricated/arbitrary payloads so an
+    // unauthenticated caller cannot pollute the master sheet; append the
+    // verified record (not the untrusted request body).
+    if (!data.id) {
+      return Response.json({ ok: true, skipped: 'no_id' });
+    }
+    let record = null;
+    try {
+      record = await base44.asServiceRole.entities.CommunityListing.get(data.id);
+    } catch {
+      record = null;
+    }
+    if (!record) {
+      return Response.json({ ok: true, skipped: 'unverified_event' });
+    }
+
     // Auto-imports (daily national importer etc.) run as the service account.
     // Keep the approvals sheet focused on human submissions — skip those.
-    const createdBy = String(data.created_by_id || '');
+    const createdBy = String(record.created_by_id || '');
     if (createdBy.startsWith('service_')) {
       return Response.json({ ok: true, skipped: 'auto_import' });
     }
@@ -28,7 +45,7 @@ Deno.serve(async (req) => {
     const res = await fetch(url, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [listingToRow(data)] }),
+      body: JSON.stringify({ values: [listingToRow(record)] }),
     });
     const j = await res.json();
     if (!res.ok) {
