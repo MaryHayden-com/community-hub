@@ -285,10 +285,14 @@ export default function Directory() {
       <HomeHero
         onAddListing={() => setShowSubmitForm(true)}
         onSuggestBusiness={() => setShowSuggestForm(true)}
-        onSearch={() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        onSearch={() => {
+          const el = searchSectionRef.current;
+          requestAnimationFrame(() => el?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }}
         onSearchWhatsOn={() => {
           setType("What's On");
-          searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          const el = searchSectionRef.current;
+          requestAnimationFrame(() => el?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }}
       />
 
