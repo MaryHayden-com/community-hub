@@ -38,6 +38,79 @@ function extractHandle(url, platform) {
   return cleaned;
 }
 
+const ORIGIN = "https://hub4community.com";
+
+function arrayOrNull(arr) {
+  const filtered = (arr || []).filter(Boolean);
+  return filtered.length > 0 ? filtered : undefined;
+}
+
+function buildListingSchema(listing, id) {
+  if (!listing || !id) return null;
+  const pageUrl = `${ORIGIN}/listing/${encodeURIComponent(id)}`;
+  const addressLocality = listing.town || listing.nearest_town || listing.area || "";
+  const postalAddress = {
+    "@type": "PostalAddress",
+    streetAddress: listing.address || "",
+    addressLocality,
+    addressRegion: listing.county || "",
+    addressCountry: listing.country || "Ireland",
+  };
+  const fullAddress = listing.address
+    ? `${listing.address}, ${addressLocality}, Co. ${listing.county || ""}, ${listing.country || "Ireland"}`
+    : `${addressLocality}, Co. ${listing.county || ""}`.trim();
+  const sameAs = arrayOrNull([listing.facebook_url, listing.instagram_url, listing.linkedin_url]);
+  const image = listing.image_url ? [listing.image_url] : undefined;
+
+  if (listing.type === "What's On") {
+    const startISO = listing.event_date
+      ? `${listing.event_date}${listing.event_time ? `T${listing.event_time}:00` : ""}`
+      : undefined;
+    const endISO = listing.event_date_end
+      ? `${listing.event_date_end}${listing.event_time ? `T${listing.event_time}:00` : ""}`
+      : undefined;
+    return {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: listing.name,
+      description: (listing.description || "").slice(0, 5000) || undefined,
+      image,
+      startDate: startISO,
+      endDate: endISO,
+      url: pageUrl,
+      eventStatus: "https://schema.org/EventScheduled",
+      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      location: { "@type": "Place", name: listing.name, address: fullAddress },
+      organizer: listing.owner_email || listing.email
+        ? { "@type": "Organization", name: listing.name, email: listing.email || undefined }
+        : undefined,
+    };
+  }
+
+  const orgType =
+    listing.type === "Education" ? "EducationalOrganization"
+    : listing.type === "Club & Group" ? "Organization"
+    : "LocalBusiness";
+
+  const base = {
+    "@context": "https://schema.org",
+    "@type": orgType,
+    name: listing.name,
+    description: (listing.description || "").slice(0, 5000) || undefined,
+    image,
+    telephone: listing.phone || undefined,
+    email: listing.email || undefined,
+    url: listing.website || pageUrl,
+    address: postalAddress,
+    sameAs,
+  };
+  // LocalBusiness-rich-result fields only make sense for businesses
+  if (orgType !== "LocalBusiness") {
+    delete base.telephone;
+  }
+  return base;
+}
+
 function DetailRow({ icon: Icon, label, value, href }) {
   if (!value) return null;
   const content = (
@@ -65,7 +138,13 @@ export default function ListingDetail() {
   const location = useLocation();
   const { user, navigateToLogin } = useAuth();
   const [listing, setListing] = useState(null);
-  usePageTitle(listing?.name);
+  const listingPath = `/listing/${encodeURIComponent(id)}`;
+  const seoDescription = listing
+    ? (listing.description || `${listing.name} — ${listing.type} in ${listing.nearest_town || listing.town || ""}, Co. ${listing.county || ""}`.replace(/\s+/g, " ").trim()).slice(0, 160)
+    : undefined;
+  const seoImage = listing?.image_url || undefined;
+  const seoSchema = buildListingSchema(listing, id);
+  usePageTitle(listing?.name, { description: seoDescription, image: seoImage, path: listingPath, schema: seoSchema });
   const [loading, setLoading] = useState(true);
   const [showClaim, setShowClaim] = useState(false);
   const [showRemoval, setShowRemoval] = useState(false);

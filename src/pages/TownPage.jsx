@@ -25,8 +25,25 @@ export default function TownPage() {
   const { county, town } = useParams();
   const decodedCounty = decodeURIComponent(county);
   const decodedTown = decodeURIComponent(town);
+  const townPath = `/town/${encodeURIComponent(decodedCounty)}/${encodeURIComponent(decodedTown)}`;
   usePageTitle(`${decodedTown}, Co. ${decodedCounty}`, {
     description: `Everything happening in ${decodedTown}, Co. ${decodedCounty}: local businesses, clubs, events and community resources, all in one place.`,
+    path: townPath,
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://hub4community.com/" },
+        { "@type": "ListItem", position: 2, name: "Directory", item: "https://hub4community.com/directory" },
+        { "@type": "ListItem", position: 3, name: `Co. ${decodedCounty}`, item: `https://hub4community.com/county/${encodeURIComponent(decodedCounty)}` },
+        { "@type": "ListItem", position: 4, name: decodedTown, item: `https://hub4community.com${townPath}` },
+        {
+          "@type": "ListItem",
+          position: 5,
+          name: `Local businesses, clubs & events in ${decodedTown}, Co. ${decodedCounty}`,
+        },
+      ],
+    },
   });
 
   const [listings, setListings] = useState([]);

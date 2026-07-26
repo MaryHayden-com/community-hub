@@ -30,8 +30,24 @@ const PAGE_SIZE = 24;
 export default function CountyPage() {
   const { county } = useParams();
   const decodedCounty = decodeURIComponent(county);
+  const countyPath = `/county/${encodeURIComponent(decodedCounty)}`;
   usePageTitle(`Co. ${decodedCounty}`, {
     description: `Discover businesses, clubs, events and community services across County ${decodedCounty}. Browse by town or search the ${decodedCounty} directory.`,
+    path: countyPath,
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://hub4community.com/" },
+        { "@type": "ListItem", position: 2, name: "Directory", item: "https://hub4community.com/directory" },
+        { "@type": "ListItem", position: 3, name: `Co. ${decodedCounty}`, item: `https://hub4community.com${countyPath}` },
+        {
+          "@type": "ListItem",
+          position: 4,
+          name: `Local businesses, clubs & events in County ${decodedCounty}`,
+        },
+      ],
+    },
   });
 
   const [listings, setListings] = useState([]);

@@ -31,6 +31,7 @@ function readParam(params, key) { return params.get(key) || ""; }
 export default function Directory() {
   usePageTitle("Directory", {
     description: "Find local businesses, clubs, events and resources across Ireland. Browse by county, town or category on Community Hub.",
+    path: "/directory",
   });
   const location = useLocation();
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);

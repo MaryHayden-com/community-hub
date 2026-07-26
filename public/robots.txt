@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /group-dashboard
+Disallow: /billing
+Disallow: /survey
+
+# Dynamic sitemap (lists every approved listing + main pages + county pages)
+Sitemap: https://hub4community.com/functions/generateSitemap

@@ -67,7 +67,10 @@ function getListingDatesInRange(listing, rangeStart, rangeEnd) {
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function WhatsOn() {
-  usePageTitle("What's On");
+  usePageTitle("What's On", {
+    description: "What's on near you in Ireland — browse upcoming community events, classes and activities by county or town, or add your own event free.",
+    path: "/whats-on",
+  });
   const location = useLocation();
   const { user } = useAuth();
   const { data: listings = [], isLoading: loading, isError: loadError } = useQuery({

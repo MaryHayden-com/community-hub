@@ -12,6 +12,7 @@ const POINTS = [
 export default function About() {
   usePageTitle("About", {
     description: "Why Your Community Hub exists — putting the right people in front of the right things, and helping everything local get seen.",
+    path: "/about",
   });
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
