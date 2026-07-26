@@ -6,7 +6,7 @@ import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ListingListRow from "../components/ListingListRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
 import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
-import { getTownBlurb } from "../utils/townBlurbs";
+import { getTownBlurb, getTownWelcome } from "../utils/townBlurbs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,23 +141,29 @@ export default function TownPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Co. {decodedCounty}
       </Link>
 
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold flex items-center gap-2" style={{ color: '#097275' }}>
-          <MapPin className="w-7 h-7" style={{ color: '#097275' }} />
+      <section
+        className="mb-8 rounded-xl border border-border p-5 sm:p-6"
+        style={{ background: "linear-gradient(135deg, hsl(182 55% 97%), hsl(27 55% 97%))" }}
+      >
+        <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: "#097275" }}>
+          Welcome to your local area
+        </p>
+        <h1 className="font-display text-3xl font-bold flex items-center gap-2" style={{ color: "#097275" }}>
+          <MapPin className="w-7 h-7" style={{ color: "#097275" }} />
           {decodedTown}
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm">
           Co. {decodedCounty} · {query ? `${filtered.length} of ${listings.length}` : listings.length} listing{listings.length !== 1 ? "s" : ""}
         </p>
         <p className="text-sm mt-3 leading-relaxed max-w-2xl" style={{ color: "#333333" }}>
-          {getTownBlurb(decodedTown, decodedCounty)}
+          {getTownWelcome(decodedTown, decodedCounty)}
         </p>
         {liveCountsLine && (
           <p className="text-xs mt-2 font-semibold" style={{ color: "#097275" }}>
             {liveCountsLine}
           </p>
         )}
-        </div>
+      </section>
 
         {/* Keyword search */}
         <div className="relative mb-4">

@@ -26,3 +26,12 @@ export function getTownBlurb(town, county) {
   if (TOWN_BLURBS[town]) return TOWN_BLURBS[town];
   return `${town} is a town in Co. ${county}, with its own local businesses, clubs and community events — all gathered here in one place.`;
 }
+
+// Short, warm per-area welcome shown at the top of each TownPage.
+// Curated towns get a personalised line; every other area gets a friendly
+// templated welcome so no town is left without an intro.
+export function getTownWelcome(town, county) {
+  const blurb = TOWN_BLURBS[town];
+  if (blurb) return `Welcome to ${town} — ${blurb}`;
+  return `Welcome to ${town}, a local area in Co. ${county}. Here you'll find local businesses, clubs, community services, schools and events all gathered together in one place.`;
+}
