@@ -232,12 +232,22 @@ export default function Layout() {
           </div>
           <div className="text-center text-sm text-muted-foreground">
             <p>© {new Date().getFullYear()} Your Community Hub. Connecting communities across Ireland.</p>
-            <p className="mt-2">
-              <Link to="/about" className="hover:text-foreground underline underline-offset-2 transition-colors">About</Link>
+            <p className="mt-2 leading-relaxed">
+              <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Browse by county</Link>
               {" · "}
-              <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
+              <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Browse by category</Link>
+              {" · "}
+              <Link to="/about" className="hover:text-foreground underline underline-offset-2 transition-colors">About Community Hub</Link>
+              {" · "}
+              <Link to="/directory" className="hover:text-foreground underline underline-offset-2 transition-colors">Add a listing</Link>
               {" · "}
               <a href="mailto:communitywhatson@gmail.com" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
+              {" · "}
+              <Link to="/guidelines" className="hover:text-foreground underline underline-offset-2 transition-colors">Community guidelines</Link>
+              {" · "}
+              <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy policy</Link>
+              {" · "}
+              <Link to="/terms" className="hover:text-foreground underline underline-offset-2 transition-colors">Terms of use</Link>
             </p>
             <p className="mt-2 text-xs">Built locally, for Bandon and beyond — your community, in one place.</p>
           </div>

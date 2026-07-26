@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { Search, Store, Users, GraduationCap, Calendar, Compass, PlusCircle, Heart, HeartHandshake } from "lucide-react";
 
 const TILES = [
-  { key: "Business", label: "Business", icon: Store, path: "/directory?type=Business" },
-  { key: "Club & Group", label: "Clubs", icon: Users, path: "/directory?type=Club%20%26%20Group" },
-  { key: "Community Services", label: "Community", icon: HeartHandshake, path: "/directory?type=Community%20Services" },
+  { key: "What's On", label: "Find events near you", icon: Calendar, path: "/directory?type=What's%20On" },
+  { key: "Business", label: "Browse local businesses", icon: Store, path: "/directory?type=Business" },
+  { key: "Club & Group", label: "Discover clubs and groups", icon: Users, path: "/directory?type=Club%20%26%20Group" },
+  { key: "Community Services", label: "Find community services", icon: HeartHandshake, path: "/directory?type=Community%20Services" },
   { key: "Education", label: "Education", icon: GraduationCap, path: "/directory?type=Education" },
-  { key: "What's On", label: "What's On", icon: Calendar, path: "/directory?type=What's%20On" },
 ];
 
 const STEPS = [
@@ -29,10 +29,10 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               <span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span>
             </p>
             <h1 id="home-brand" className="font-display text-2xl sm:text-4xl font-bold tracking-tight leading-tight mb-3" style={{ color: "#097275" }}>
-              Everything happening in your community, in one place.
+              Your local community, all in one place.
             </h1>
             <p className="text-sm sm:text-base leading-relaxed max-w-xl mx-auto" style={{ color: "#333333" }}>
-              New here or lifelong local — find the shops, clubs, classes and events that make this place ours. Free to explore, free to be part of.
+              Find local businesses, clubs, events and community services near you. Community Hub helps people discover what is happening locally and helps organisations become easier to find across Ireland, with a strong local starting point in Bandon and West Cork.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 className="w-full rounded-lg px-3 py-2.5 text-white text-sm font-bold min-h-[44px]"
                 style={{ background: "#097275" }}
               >
-                Explore your community
+                Explore your area
               </button>
             </div>
 
@@ -72,7 +72,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 className="w-full rounded-lg px-3 py-2.5 text-white text-sm font-bold min-h-[44px]"
                 style={{ background: "#E2701B" }}
               >
-                Add your business or group — free
+                Add your listing
               </button>
             </div>
           </div>
@@ -112,8 +112,16 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
             </button>
           </div>
 
+          {/* ── Quick links: Explore what matters locally ── */}
+          <div className="mt-6 text-center">
+            <h2 className="font-display text-lg sm:text-xl font-bold" style={{ color: "#097275" }}>Explore what matters locally</h2>
+            <p className="text-xs sm:text-sm mt-1 max-w-xl mx-auto" style={{ color: "#555555" }}>
+              Browse by county, town or category to find the people, places and services that matter most in your area.
+            </p>
+          </div>
+
           {/* ── 2×2 category tiles ── */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-4">
             {TILES.map(({ key, label, icon: Icon, path }) => (
               <button
                 key={key}

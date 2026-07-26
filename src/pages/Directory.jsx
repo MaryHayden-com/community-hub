@@ -18,6 +18,7 @@ import NewsletterPopup from "../components/NewsletterPopup";
 import SuggestBusinessForm from "../components/SuggestBusinessForm";
 import usePageTitle from "@/hooks/usePageTitle";
 import HomeHero from "@/components/HomeHero";
+import HomeContent from "@/components/HomeContent";
 import LocalProofBand from "@/components/LocalProofBand";
 
 
@@ -372,6 +373,13 @@ export default function Directory() {
         }}
       />
 
+      {/* What's happening near you + local proof band */}
+      <div className="mb-3">
+        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>What's happening near you</h2>
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Community Hub brings local life into one simple place — featured events, local organisations and recently added listings worth discovering now.
+        </p>
+      </div>
       {/* Local proof band — live count + featured + next event + recent */}
       <LocalProofBand
         listings={browseListings}
@@ -485,6 +493,8 @@ export default function Directory() {
           </Button>
         </div>
       )}
+
+      <HomeContent onAddListing={() => setShowSubmitForm(true)} />
 
       {viewMode === "list" && !hasMore && filtered.length > 0 && (
         <>

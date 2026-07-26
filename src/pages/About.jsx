@@ -60,7 +60,10 @@ export default function About() {
       <div className="mt-10 p-5 rounded-xl bg-primary/5 border border-primary/20">
         <h2 className="font-bold text-sm mb-1" style={{ color: "#097275" }}>A note from the founder — Mary Hayden</h2>
         <p className="text-sm" style={{ color: "#555555" }}>
-          I'm Mary Hayden — I run my own business, maryhayden.com, but most importantly I'm a mother of four. We recently relocated to Bandon, West Cork, and have thrown ourselves into local community groups and schools, meeting some truly fabulous people along the way.
+          I'm Mary Hayden — mother of four and the founder behind Community Hub. We recently relocated to Bandon, West Cork, and have thrown ourselves into local community groups and schools, meeting some truly fabulous people along the way.
+        </p>
+        <p className="text-sm mt-2" style={{ color: "#555555" }}>
+          I work independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, how they communicate it and how they grow it. With a background in finance, operations and digital transformation, I bring practical outside perspective without the jargon, helping good ideas become clearer, stronger and easier to deliver.
         </p>
         <p className="text-sm mt-2" style={{ color: "#555555" }}>
           Not everyone has kids to be dropped into the deep end of a new place, so I built this app to take the pain out of getting the right people in front of the right Product, Service or Event — and to help others navigate a new community. I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
