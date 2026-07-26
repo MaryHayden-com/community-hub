@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { ChevronDown, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -16,7 +16,7 @@ function useIsMobile() {
 }
 
 /**
- * A tappable filter chip that opens a PORTALED multi-select list with tick boxes + counts.
+ * A tappable filter chip that opens a PORTALED multi-select grid with a search box + tick boxes + counts.
  * Portaling avoids the list being clipped by the horizontally-scrollable chip row.
  * - value: array of selected values
  * - options: [{ value, count }]
@@ -24,6 +24,7 @@ function useIsMobile() {
  */
 export default function FilterMultiChipDropdown({ label, value = [], options, onChange, accent = "#097275" }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const isMobile = useIsMobile();
 
   const hasOptions = Array.isArray(options) && options.length > 0;
@@ -31,6 +32,13 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
   const selCount = hasOptions ? options.filter((o) => selected.includes(o.value)).length : 0;
   const isActive = selCount > 0;
   const total = hasOptions ? options.reduce((s, o) => s + (o.count || 0), 0) : 0;
+
+  const filtered = useMemo(() => {
+    if (!hasOptions) return [];
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((o) => o.value.toLowerCase().includes(q));
+  }, [options, query, hasOptions]);
 
   const toggle = (val) => {
     if (selected.includes(val)) onChange(selected.filter((v) => v !== val));
@@ -59,48 +67,76 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
 
   if (!hasOptions) return trigger;
 
-  const optionsList = (
-    <div className="overflow-y-auto max-h-72 py-1">
-      <div
-        onClick={clearAll}
-        className="flex items-center gap-2 px-4 py-3 text-sm cursor-pointer hover:bg-accent transition-colors"
-      >
-        <div className="w-5 h-5 rounded border flex items-center justify-center shrink-0" style={{ borderColor: accent }} />
-        <span className="flex-1">All {label}</span>
-        <span className="text-xs text-muted-foreground">{total}</span>
-      </div>
-      {options.map((o) => {
-        const isSel = selected.includes(o.value);
-        return (
-          <div
-            key={o.value}
-            onClick={() => toggle(o.value)}
-            className="flex items-center gap-2 px-4 py-3 text-sm cursor-pointer hover:bg-accent transition-colors"
-          >
-            <div
-              className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors", !isSel && "border-input")}
-              style={isSel ? { background: accent, borderColor: accent } : {}}
-            >
-              {isSel && <Check className="w-3 h-3 text-white" />}
-            </div>
-            <span className="flex-1">{o.value}</span>
-            {o.count != null && <span className="text-xs text-muted-foreground">{o.count}</span>}
-          </div>
-        );
-      })}
+  const searchBox = (
+    <div className="relative px-3 pt-3 pb-2 sticky top-0 bg-popover z-10">
+      <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <input
+        autoFocus
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={`Find a ${label.toLowerCase().replace(/s$/, "")}…`}
+        className="w-full h-9 pl-8 pr-2 rounded-md border border-input bg-background text-sm outline-none focus:border-primary"
+      />
+    </div>
+  );
+
+  const allRow = (
+    <button
+      type="button"
+      onClick={clearAll}
+      className="flex items-center gap-2 px-3 py-2.5 text-sm w-full text-left hover:bg-accent transition-colors min-h-[44px]"
+    >
+      <div className="w-5 h-5 rounded border flex items-center justify-center shrink-0" style={{ borderColor: accent }} />
+      <span className="flex-1 font-semibold">All {label}</span>
+      <span className="text-xs text-muted-foreground">{total}</span>
+    </button>
+  );
+
+  const grid = (
+    <div className="px-3 pb-3">
+      {filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground py-6 text-center">No matches for "{query}"</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-h-64 overflow-y-auto">
+          {filtered.map((o) => {
+            const isSel = selected.includes(o.value);
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => toggle(o.value)}
+                className="flex items-center gap-2 px-2 py-2.5 text-sm rounded-md hover:bg-accent text-left min-h-[44px]"
+              >
+                <div
+                  className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", !isSel && "border-input")}
+                  style={isSel ? { background: accent, borderColor: accent } : {}}
+                >
+                  {isSel && <Check className="w-3 h-3 text-white" />}
+                </div>
+                <span className="flex-1 truncate">
+                  {o.value.length > 18 ? o.value.slice(0, 17) + "…" : o.value}
+                </span>
+                {o.count != null && <span className="text-[10px] text-muted-foreground shrink-0">{o.count}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery(""); }}>
         <DrawerTrigger asChild>{trigger}</DrawerTrigger>
         <DrawerContent>
-          <DrawerHeader>
+          <DrawerHeader className="pb-1">
             <DrawerTitle>{label}</DrawerTitle>
           </DrawerHeader>
-          {optionsList}
-          <div className="px-4 pb-6 pt-2">
+          {searchBox}
+          <div className="px-3">{allRow}</div>
+          {grid}
+          <div className="px-4 pb-6 pt-2 sticky bottom-0 bg-popover">
             <button
               onClick={() => setOpen(false)}
               className="w-full h-11 rounded-lg text-white text-sm font-semibold"
@@ -115,10 +151,12 @@ export default function FilterMultiChipDropdown({ label, value = [], options, on
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery(""); }}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent align="start" className="w-56 p-0">
-        {optionsList}
+      <PopoverContent align="start" className="w-80 p-0">
+        {searchBox}
+        {allRow}
+        {grid}
       </PopoverContent>
     </Popover>
   );
