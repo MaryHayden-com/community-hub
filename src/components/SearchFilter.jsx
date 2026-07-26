@@ -82,28 +82,35 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         </Select>
       </div>
 
-      {/* Row 2: Type + Near Me + Clear */}
+      {/* Row 2: Browse by type — chips list the 5 groups at a glance (drill-down happens on tap) */}
       <div className="flex gap-2 flex-wrap items-center">
-        <Select value={type || "all"} onValueChange={(v) => { setType(v === "all" ? "" : v); setGroup([]); setCategory([]); }}>
-          <SelectTrigger className="h-11 bg-card font-bold flex-1 min-w-[130px]" style={{ color: '#097275' }}>
-            <SelectValue placeholder="All Listing Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Listing Categories</SelectItem>
-            <SelectGroup>
-              <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Listings</SelectLabel>
-              <SelectItem value="Business" className="font-bold" style={{ color: '#097275' }}>Business & Retail</SelectItem>
-              <SelectItem value="Club & Group" className="font-bold" style={{ color: '#097275' }}>Clubs & Groups</SelectItem>
-              <SelectItem value="Community Services" className="font-bold" style={{ color: '#097275' }}>Community Services</SelectItem>
-              <SelectItem value="Education" className="font-bold" style={{ color: '#097275' }}>Education & Training</SelectItem>
-            </SelectGroup>
-            <SelectGroup>
-              <SelectLabel className="text-xs font-semibold text-muted-foreground px-2 py-1">Events</SelectLabel>
-              <SelectItem value="What's On" className="font-bold" style={{ color: '#097275' }}>What's On</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        {[
+          { value: "", label: "All" },
+          { value: "Business", label: "Business" },
+          { value: "Club & Group", label: "Clubs" },
+          { value: "Community Services", label: "Community" },
+          { value: "Education", label: "Education" },
+          { value: "What's On", label: "What's On" },
+        ].map((opt) => {
+          const active = (opt.value ? type === opt.value : !type);
+          return (
+            <button
+              key={opt.value || "all"}
+              type="button"
+              onClick={() => { setType(opt.value); setGroup([]); setCategory([]); }}
+              className="rounded-full px-4 h-11 text-xs font-bold border flex items-center transition-colors"
+              style={active
+                ? { background: "#097275", color: "#fff", borderColor: "#097275" }
+                : { background: "hsl(var(--card))", color: "#097275", borderColor: "rgba(9,114,117,0.35)" }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
 
+      {/* Row 2b: Near Me + Clear */}
+      <div className="flex gap-2 flex-wrap items-center justify-end">
         <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
 
         {hasFilters && (
