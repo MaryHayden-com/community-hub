@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { Search, Store, Users, GraduationCap, Calendar } from "lucide-react";
 
 const TILES = [
-  { key: "Business", label: "Business", icon: Store, bg: "#fdf5e1", path: "/directory?type=Business" },
-  { key: "Club & Group", label: "Clubs", icon: Users, bg: "#e1f1fb", path: "/directory?type=Club%20%26%20Group" },
-  { key: "Education", label: "Education", icon: GraduationCap, bg: "#e4f4e2", path: "/directory?type=Education" },
-  { key: "What's On", label: "What's On", icon: Calendar, bg: "#fbe1e1", path: "/directory?type=What's%20On" },
+  { key: "Business", label: "Business", icon: Store, path: "/directory?type=Business" },
+  { key: "Club & Group", label: "Clubs", icon: Users, path: "/directory?type=Club%20%26%20Group" },
+  { key: "Education", label: "Education", icon: GraduationCap, path: "/directory?type=Education" },
+  { key: "What's On", label: "What's On", icon: Calendar, path: "/directory?type=What's%20On" },
 ];
 
 export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSuggestBusiness }) {
@@ -43,13 +43,13 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
 
           {/* ── 2×2 category tiles ── */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-5">
-            {TILES.map(({ key, label, icon: Icon, bg, path }) => (
+            {TILES.map(({ key, label, icon: Icon, path }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => navigate(path)}
                 className="flex flex-col items-center justify-center gap-2 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow min-h-[88px]"
-                style={{ background: bg }}
+                style={{ background: "#F2F0F0", border: "2px solid #097275" }}
               >
                 <Icon className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: "#097275" }} />
                 <span className="text-sm sm:text-base font-semibold" style={{ color: "#111111" }}>{label}</span>
