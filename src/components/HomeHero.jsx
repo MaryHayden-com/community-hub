@@ -47,7 +47,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               <button
                 key={key}
                 type="button"
-                onClick={() => navigate(path)}
+                onClick={() => { navigate(path); onSearch?.(); }}
                 className="flex flex-col items-center justify-center gap-2 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow min-h-[88px]"
                 style={{ background: "rgba(226, 112, 27, 0.12)", border: "2px solid #E2701B" }}
               >
