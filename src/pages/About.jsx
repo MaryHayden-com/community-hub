@@ -30,6 +30,12 @@ export default function About() {
         help everything local get seen. That's how communities come together.
       </p>
 
+      <div className="mt-6 p-5 rounded-xl" style={{ background: "rgba(226, 112, 27, 0.10)", border: "1.5px solid #E2701B" }}>
+        <p className="text-sm sm:text-base leading-relaxed" style={{ color: "#333333" }}>
+          There are so many ways to find information these days — Facebook, WhatsApp groups, gym notice boards, a flyer in the shop window. But when it comes down to it, it's still hard to know what's on, where it's on, and what time. Too often we only hear about it after the fact. If we all keep this updated, we'll have everything local in one place — and no one misses out.
+        </p>
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-3 mt-6">
         {POINTS.map(({ icon: Icon, title, body }) => (
           <div key={title} className="rounded-xl p-4 border bg-card">
