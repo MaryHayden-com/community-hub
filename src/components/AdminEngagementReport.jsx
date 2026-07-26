@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Loader2, TrendingUp, Award, Calendar } from "lucide-react";
+import { Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Loader2, TrendingUp, Award, Calendar, ChevronRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
@@ -220,7 +221,7 @@ export default function AdminEngagementReport({ listings }) {
         </div>
         <div className="divide-y">
           {listingStats.map((l, idx) => (
-            <div key={l.id} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+            <Link key={l.id} to={`/listing/${l.id}`} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/20 transition-colors group cursor-pointer">
               {/* Rank */}
               <span className={`text-sm font-bold w-6 text-center shrink-0 ${idx === 0 ? "text-amber-500" : idx === 1 ? "text-slate-400" : idx === 2 ? "text-orange-400" : "text-muted-foreground"}`}>
                 {idx + 1}
@@ -254,7 +255,8 @@ export default function AdminEngagementReport({ listings }) {
                 <p className="text-sm font-bold text-primary">{l.total}</p>
                 <p className="text-xs text-muted-foreground">total</p>
               </div>
-            </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           ))}
         </div>
       </div>
