@@ -15,9 +15,15 @@ export default function About() {
   });
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3" style={{ color: "#097275" }}>
-        Why we built this
+      <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-2">
+        <span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span>
+      </p>
+      <h1 className="font-display text-3xl sm:text-4xl font-bold mb-1" style={{ color: "#097275" }}>
+        Your Community Hub
       </h1>
+      <h2 className="font-display text-xl sm:text-2xl font-semibold mb-3" style={{ color: "#333333" }}>
+        Why we built this
+      </h2>
       <p className="text-base sm:text-lg leading-relaxed" style={{ color: "#333333" }}>
         Great local businesses, clubs and events shouldn't be hard to find — and finding your feet
         in a new place shouldn't feel lonely. We put the right people in front of the right things, and

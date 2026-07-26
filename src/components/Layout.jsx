@@ -79,10 +79,10 @@ export default function Layout() {
                 Back
               </button>
             ) : null}
-            <Link to="/" className="flex items-center gap-2.5">
+            <Link to="/about" className="flex items-center gap-2.5" title="About Your Community Hub">
               <img src="https://media.base44.com/images/public/69d7dcee3ce725bf49f16135/e27af7809_generated_image.png" alt="Community Hub Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
-                Your Community Hub
+                Your Community <span style={{ color: '#E2701B' }}>Hub</span>
               </span>
             </Link>
           </div>
@@ -116,6 +116,15 @@ export default function Layout() {
             >
               <Heart className="w-3.5 h-3.5" />
               Saved
+            </Link>
+            <Link
+              to="/about"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                location.pathname === "/about" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              <Info className="w-3.5 h-3.5" />
+              About
             </Link>
             {isListingOwner && (
               <Link to="/dashboard" className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${location.pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
