@@ -18,6 +18,7 @@ import NewsletterPopup from "../components/NewsletterPopup";
 import SuggestBusinessForm from "../components/SuggestBusinessForm";
 import usePageTitle from "@/hooks/usePageTitle";
 import HomeHero from "@/components/HomeHero";
+import LocalProofBand from "@/components/LocalProofBand";
 
 
 
@@ -286,6 +287,15 @@ export default function Directory() {
         onSuggestBusiness={() => setShowSuggestForm(true)}
         onSearch={() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
         onSearchWhatsOn={() => {
+          setType("What's On");
+          searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+      />
+
+      {/* Local proof band — live count + featured + next event + recent */}
+      <LocalProofBand
+        listings={browseListings}
+        onSeeWhatsOn={() => {
           setType("What's On");
           searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
