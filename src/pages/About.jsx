@@ -66,7 +66,7 @@ export default function About() {
           I work independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, how they communicate it and how they grow it. With a background in finance, operations and digital transformation, I bring practical outside perspective without the jargon, helping good ideas become clearer, stronger and easier to deliver.
         </p>
         <p className="text-sm mt-2" style={{ color: "#555555" }}>
-          Now I want to translate that work for our local communities — the same clarity and structure I bring to businesses, applied to making it easier to find everything local, and easier for every local organisation to be seen. Streamlining communities, if you like. Not everyone has kids to be dropped into the deep end of a new place, so I built this app to take the pain out of getting the right people in front of the right Product, Service or Event — and to help others navigate a new community. I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
+          Now I want to translate that work for our local communities, by "Streamlining communities", if you like — taking the same clarity and structure I bring to businesses, and applying it to making everything local easier to find, and every local organisation easier to be seen. Not everyone has kids to be dropped into the deep end of a new place, so I built this app to take the pain out of getting the right people in front of the right Product, Service or Event — and to help others navigate a new community. I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
         </p>
       </div>
 
