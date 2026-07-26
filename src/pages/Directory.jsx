@@ -219,6 +219,44 @@ export default function Directory() {
     return [...new Set([...getTownsForCounty(county), ...browseListings.filter(l => l.county === county).map(l => l.town).filter(Boolean)])].sort();
   }, [browseListings, county]);
 
+  // ── Facet counts for location chip dropdowns ────────────────────────────────
+  const facetBase = useMemo(() => browseListings.filter(l => {
+    if (l.status === "pending" || l.status === "rejected") return false;
+    if (type.length > 0 && !type.includes(l.type)) return false;
+    if (subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
+    if (category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
+    return true;
+  }), [browseListings, type, subcategoryGroup, category]);
+
+  const countryOptions = useMemo(() => {
+    const m = {};
+    facetBase.forEach(l => { if (l.country) m[l.country] = (m[l.country] || 0) + 1; });
+    return Object.entries(m).sort((a, b) => a[0].localeCompare(b[0])).map(([value, count]) => ({ value, count }));
+  }, [facetBase]);
+
+  const countyOptions = useMemo(() => {
+    const base = country ? facetBase.filter(l => l.country === country) : facetBase;
+    const m = {};
+    base.forEach(l => { if (l.county) m[l.county] = (m[l.county] || 0) + 1; });
+    return Object.entries(m).sort((a, b) => a[0].localeCompare(b[0])).map(([value, count]) => ({ value, count }));
+  }, [facetBase, country]);
+
+  const townFacetBase = useMemo(() => facetBase.filter(l => (!country || l.country === country) && (!county || l.county === county)), [facetBase, country, county]);
+
+  const townOptions = useMemo(() => {
+    if (!townGroups) return [];
+    const m = {};
+    townFacetBase.forEach(l => { if (l.town) m[l.town] = (m[l.town] || 0) + 1; });
+    return townGroups.towns.map(t => ({ value: t, count: m[t] || 0 }));
+  }, [townFacetBase, townGroups]);
+
+  const villageOptions = useMemo(() => {
+    if (!townGroups) return [];
+    const m = {};
+    townFacetBase.forEach(l => { if (l.town) m[l.town] = (m[l.town] || 0) + 1; });
+    return townGroups.villages.map(v => ({ value: v, count: m[v] || 0 }));
+  }, [townFacetBase, townGroups]);
+
   // ── Reset page when any filter changes ───────────────────────────────────────
   useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo]);
 
@@ -361,10 +399,9 @@ export default function Directory() {
         category={category} setCategory={setCategory}
         categories={categories}
         categoryCounts={categoryCounts}
-        country={country} setCountry={setCountry} countries={countries}
-        county={county} setCounty={setCounty}
-        town={town} setTown={setTown}
-        counties={counties} towns={towns} townGroups={townGroups}
+        country={country} setCountry={setCountry} countryOptions={countryOptions}
+        county={county} setCounty={setCounty} countyOptions={countyOptions}
+        town={town} setTown={setTown} townOptions={townOptions} villageOptions={villageOptions}
         dateFrom={dateFrom} setDateFrom={setDateFrom}
         dateTo={dateTo} setDateTo={setDateTo}
         todayStr={getTodayStr()}

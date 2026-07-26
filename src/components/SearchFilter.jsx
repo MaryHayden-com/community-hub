@@ -1,17 +1,21 @@
 import { Search, X, CalendarRange } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
+import FilterChipDropdown from "@/components/FilterChipDropdown";
 
 const TYPE_OPTIONS = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
 
-export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countries, county, setCounty, town, setTown, counties, towns, townGroups, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
+export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countryOptions, county, setCounty, countyOptions, town, setTown, townOptions, villageOptions, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const selectedTypes = Array.isArray(type) ? type : [];
   const isWhatsOn = selectedTypes.length === 1 && selectedTypes[0] === "What's On";
   const singleType = selectedTypes.length === 1 ? selectedTypes[0] : "";
   const hasFilters = search || selectedTypes.length > 0 || (group && group.length > 0) || (category && category.length > 0) || country || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
+
+  const handleCountry = (v) => { setCountry(v); setCounty(""); setTown(""); localStorage.setItem("dir_country", v); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); };
+  const handleCounty = (v) => { setCounty(v); setTown(""); localStorage.setItem("dir_county", v); localStorage.removeItem("dir_town"); };
+  const handleTown = (v) => { setTown(v); localStorage.setItem("dir_town", v); };
 
   return (
     <div className="space-y-3">
@@ -26,7 +30,7 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         />
       </div>
 
-      {/* Type — multi-select dropdown (pick several types at once) */}
+      {/* Type — multi-select dropdown */}
       <MultiSelectDropdown
         options={TYPE_OPTIONS}
         selected={selectedTypes}
@@ -34,64 +38,12 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         placeholder="All Types"
       />
 
-      {/* Country / County / Town — three single-select dropdowns side by side */}
-      <div className="grid grid-cols-3 gap-2">
-        <Select value={country || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCountry(val); setCounty(""); setTown(""); localStorage.setItem("dir_country", val); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full text-xs px-2" style={{ color: '#097275' }}>
-            <SelectValue placeholder="Country" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Countries</SelectItem>
-            {countries.map((c) => (
-              <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={county || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setCounty(val); setTown(""); localStorage.setItem("dir_county", val); localStorage.removeItem("dir_town"); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full text-xs px-2" style={{ color: '#097275' }}>
-            <SelectValue placeholder="County" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Counties</SelectItem>
-            {[...counties].sort().map((c) => (
-              <SelectItem key={c} value={c} className="font-bold" style={{ color: '#097275' }}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={town || "all"} onValueChange={(v) => { const val = v === "all" ? "" : v; setTown(val); localStorage.setItem("dir_town", val); }}>
-          <SelectTrigger className="h-11 bg-card font-bold w-full text-xs px-2" style={{ color: '#097275' }}>
-            <SelectValue placeholder="Town" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="font-bold" style={{ color: '#097275' }}>All Towns & Villages</SelectItem>
-            {townGroups ? (
-              <>
-                {townGroups.towns.length > 0 && (
-                  <SelectGroup>
-                    <SelectLabel className="text-xs uppercase tracking-wide" style={{ color: '#E2701B' }}>Towns</SelectLabel>
-                    {townGroups.towns.map((t) => (
-                      <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                )}
-                {townGroups.villages.length > 0 && (
-                  <SelectGroup>
-                    <SelectLabel className="text-xs uppercase tracking-wide" style={{ color: '#E2701B' }}>Villages</SelectLabel>
-                    {townGroups.villages.map((v) => (
-                      <SelectItem key={v} value={v} className="font-bold" style={{ color: '#097275' }}>{v}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                )}
-              </>
-            ) : (
-              [...towns].sort().map((t) => (
-                <SelectItem key={t} value={t} className="font-bold" style={{ color: '#097275' }}>{t}</SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
+      {/* Location filter chips — Country / County / Town / Village */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <FilterChipDropdown label="Country" value={country} options={countryOptions} onChange={handleCountry} accent="#097275" />
+        <FilterChipDropdown label="County" value={county} options={countyOptions} onChange={handleCounty} accent="#097275" />
+        <FilterChipDropdown label="Town" value={town} options={townOptions} onChange={handleTown} accent="#097275" />
+        <FilterChipDropdown label="Village" value={town} options={villageOptions} onChange={handleTown} accent="#E2701B" />
       </div>
 
       {/* Near Me + Clear */}
