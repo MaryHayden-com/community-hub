@@ -1,4 +1,4 @@
-import { PlusCircle, MapPin, Sparkles, HeartHandshake, Store, CheckCircle2 } from "lucide-react";
+import { PlusCircle, MapPin, HeartHandshake, Store, CheckCircle2, Users, Calendar, GraduationCap } from "lucide-react";
 
 const WHY_BULLETS = [
   "Find trusted local businesses and services.",
@@ -6,11 +6,13 @@ const WHY_BULLETS = [
   "Help communities become more visible and better connected.",
 ];
 
-const TRUST_POINTS = [
-  { icon: MapPin, label: "Featured in Bandon and West Cork" },
-  { icon: Sparkles, label: "Recently added in your county" },
-  { icon: HeartHandshake, label: "Voices from the community" },
-  { icon: Store, label: "Local organisations using Community Hub" },
+const METRICS = [
+  { key: "businesses", label: "local businesses", icon: Store },
+  { key: "clubs", label: "clubs & groups", icon: Users },
+  { key: "services", label: "community services", icon: HeartHandshake },
+  { key: "education", label: "education & training", icon: GraduationCap },
+  { key: "eventsThisWeek", label: "events this week", icon: Calendar },
+  { key: "towns", label: "towns covered", icon: MapPin },
 ];
 
 const STEPS = [
@@ -20,7 +22,9 @@ const STEPS = [
   "Add your organisation so more people can find you.",
 ];
 
-export default function HomeContent({ onAddListing }) {
+export default function HomeContent({ onAddListing, metrics = {} }) {
+  const metricTiles = METRICS.filter((m) => (metrics[m.key] || 0) > 0);
+
   return (
     <div className="mt-10 space-y-6">
       {/* Why people use Community Hub */}
@@ -55,20 +59,25 @@ export default function HomeContent({ onAddListing }) {
         </button>
       </section>
 
-      {/* Local trust */}
+      {/* Local trust + live metrics */}
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Built around real places and real communities</h2>
         <p className="text-sm mt-2 leading-relaxed" style={{ color: "#333333" }}>
           Community Hub is not just a directory. It is a practical way to help local communities become easier to explore, support and take part in. Starting in Ireland, with a strong local focus on Bandon and West Cork, the platform keeps a clear local identity that runs across every page.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
-          {TRUST_POINTS.map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-2 rounded-lg p-3 border" style={{ borderColor: "hsl(var(--border))" }}>
-              <Icon className="w-4 h-4 shrink-0" style={{ color: "#E2701B" }} />
-              <span className="text-sm" style={{ color: "#333333" }}>{label}</span>
-            </div>
-          ))}
-        </div>
+        {metricTiles.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+            {metricTiles.map(({ key, label, icon: Icon }) => (
+              <div key={key} className="rounded-xl p-4 border text-center" style={{ borderColor: "hsl(var(--border))" }}>
+                <Icon className="w-5 h-5 mx-auto mb-1" style={{ color: "#E2701B" }} />
+                <p className="font-display text-2xl font-bold leading-none" style={{ color: "#097275" }}>
+                  {(metrics[key] || 0).toLocaleString()}
+                </p>
+                <p className="text-xs mt-1" style={{ color: "#333333" }}>{label}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* How it works */}

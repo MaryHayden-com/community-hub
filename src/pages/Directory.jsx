@@ -30,8 +30,8 @@ const getTodayStr = () => new Date().toISOString().slice(0, 10);
 function readParam(params, key) { return params.get(key) || ""; }
 
 export default function Directory() {
-  usePageTitle("Directory", {
-    description: "Find local businesses, clubs, events and resources across Ireland. Browse by county, town or category on Community Hub.",
+  usePageTitle("Local Events, Businesses & Community Groups in Ireland", {
+    description: "Find local events, businesses, clubs, classes and community groups across Ireland. Discover what's happening in your town — starting in Bandon and West Cork.",
     path: "/directory",
   });
   const location = useLocation();
@@ -328,6 +328,26 @@ export default function Directory() {
   const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = pagedItems.length < filtered.length;
 
+  // ── Live platform metrics for the "Local trust" section (real numbers) ────────
+  const metrics = useMemo(() => {
+    const approved = browseListings.filter(l => l.status !== "pending" && l.status !== "rejected");
+    const byType = (t) => approved.filter(l => l.type === t).length;
+    const towns = new Set(approved.map(l => l.town).filter(Boolean)).size;
+    const events = approved.filter(l => l.type === "What's On");
+    const weekFrom = getTodayStr();
+    const d = new Date(); d.setDate(d.getDate() + 7);
+    const weekTo = d.toISOString().slice(0, 10);
+    const eventsThisWeek = expandAndSortEvents(events, weekFrom, weekTo).length;
+    return {
+      businesses: byType("Business"),
+      clubs: byType("Club & Group"),
+      services: byType("Community Services"),
+      education: byType("Education"),
+      eventsThisWeek,
+      towns,
+    };
+  }, [browseListings]);
+
   // ── Render ───────────────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -494,7 +514,7 @@ export default function Directory() {
         </div>
       )}
 
-      <HomeContent onAddListing={() => setShowSubmitForm(true)} />
+      <HomeContent onAddListing={() => setShowSubmitForm(true)} metrics={metrics} />
 
       {viewMode === "list" && !hasMore && filtered.length > 0 && (
         <>
