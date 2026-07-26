@@ -33,9 +33,9 @@ const CARDS = [
 ];
 
 const STEPS = [
-  { label: "Discover", text: "Browse local businesses, clubs, classes and what's on near you." },
-  { label: "Connect", text: "Save your favourites and get involved in what's happening." },
-  { label: "Belong", text: "Add your own business, group or event and help the community grow." },
+  { label: "Discover", icon: Compass, text: "Browse local businesses, clubs, classes and what's on near you." },
+  { label: "Connect", icon: Heart, text: "Save your favourites and get involved in what's happening." },
+  { label: "Belong", icon: PlusCircle, text: "Add your own business, group or event and help the community grow." },
 ];
 
 export default function About() {
@@ -84,14 +84,22 @@ export default function About() {
 
       {/* How it works */}
       <section>
-        <h2 className="font-display text-2xl font-bold" style={{ color: TEAL }}>How it works</h2>
-        <ul className="mt-3 space-y-2">
-          {STEPS.map(({ label, text }) => (
-            <li key={label} className="text-sm sm:text-base" style={{ color: "#333333" }}>
-              <span className="font-bold" style={{ color: "#222222" }}>{label}</span> — {text}
-            </li>
+        <h2 className="font-display text-2xl font-bold text-center" style={{ color: TEAL }}>How it works</h2>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {STEPS.map(({ label, icon: Icon, text }) => (
+            <div
+              key={label}
+              className="rounded-xl p-4 text-center"
+              style={{ background: "#F2F5F5" }}
+            >
+              <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                <Icon className="w-4 h-4" style={{ color: ORANGE_BTN }} />
+                <span className="font-bold text-sm sm:text-base" style={{ color: TEAL }}>{label}</span>
+              </div>
+              <p className="text-xs sm:text-sm leading-snug" style={{ color: "#333333" }}>{text}</p>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
 
       {/* A note from the founder */}
