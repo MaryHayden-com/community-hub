@@ -143,7 +143,7 @@ export default function GroupAdminDashboard() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold">My Area</h1>
-        <p className="text-muted-foreground mt-1">Action stream for your assigned area.</p>
+        <p className="text-muted-foreground mt-1">Your action stream — keeping the listings in your area up to date and supported.</p>
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {tags.map((t) => (
@@ -189,7 +189,7 @@ export default function GroupAdminDashboard() {
       <div className="bg-card border rounded-xl overflow-hidden divide-y">
         {filtered.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground text-sm">
-            {listings.length === 0 ? "No listings match your assigned tags yet." : "No listings match your filters."}
+            {listings.length === 0 ? "No listings match your assigned tags yet — once organisers in your area add listings, they'll appear here." : "No listings match your filters."}
           </div>
         ) : filtered.map((listing) => {
           const cfg = typeConfig[listing.type] || typeConfig["Business"];

@@ -6,6 +6,7 @@ import WhatsOnEventRow from "../components/WhatsOnEventRow";
 import ListingListRow from "../components/ListingListRow";
 import { sortByTypeOrder } from "../utils/typeOrder";
 import { expandAndSortEvents, toArr } from "../utils/recurringEvents";
+import { getTownBlurb } from "../utils/townBlurbs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +28,7 @@ export default function TownPage() {
   const decodedTown = decodeURIComponent(town);
   const townPath = `/town/${encodeURIComponent(decodedCounty)}/${encodeURIComponent(decodedTown)}`;
   usePageTitle(`${decodedTown}, Co. ${decodedCounty}`, {
-    description: `Everything happening in ${decodedTown}, Co. ${decodedCounty}: local businesses, clubs, events and community resources, all in one place.`,
+    description: `${getTownBlurb(decodedTown, decodedCounty)} Local businesses, clubs, community services, schools and events in ${decodedTown}, Co. ${decodedCounty}, all in one place.`,
     path: townPath,
     schema: {
       "@context": "https://schema.org",
@@ -89,6 +90,24 @@ export default function TownPage() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [matched]);
 
+  // Real counts across ALL listings in this town (not affected by keyword search)
+  const townCounts = useMemo(() => {
+    const c = { Business: 0, "Club & Group": 0, "Community Services": 0, Education: 0, "What's On": 0 };
+    listings.forEach((l) => { if (c[l.type] !== undefined) c[l.type]++; });
+    return c;
+  }, [listings]);
+
+  const liveCountsLine = useMemo(() => {
+    const parts = [];
+    if (townCounts.Business) parts.push(`${townCounts.Business} businesse${townCounts.Business !== 1 ? "s" : ""}`);
+    if (townCounts["Club & Group"]) parts.push(`${townCounts["Club & Group"]} club${townCounts["Club & Group"] !== 1 ? "s" : ""}`);
+    if (townCounts.Education) parts.push(`${townCounts.Education} education provider${townCounts.Education !== 1 ? "s" : ""}`);
+    if (townCounts["Community Services"]) parts.push(`${townCounts["Community Services"]} service${townCounts["Community Services"] !== 1 ? "s" : ""}`);
+    if (townCounts["What's On"]) parts.push(`${townCounts["What's On"]} event${townCounts["What's On"] !== 1 ? "s" : ""}`);
+    if (parts.length === 0) return "";
+    return `Here so far: ${parts.join(", ")} — and growing.`;
+  }, [townCounts]);
+
   const filtered = useMemo(() => {
     const base = !activeType ? matched : matched.filter((l) => l.type === activeType);
     // What's On sorts by next upcoming occurrence (handled by shared helper);
@@ -130,6 +149,14 @@ export default function TownPage() {
         <p className="text-muted-foreground mt-1">
           Co. {decodedCounty} · {query ? `${filtered.length} of ${listings.length}` : listings.length} listing{listings.length !== 1 ? "s" : ""}
         </p>
+        <p className="text-sm mt-3 leading-relaxed max-w-2xl" style={{ color: "#333333" }}>
+          {getTownBlurb(decodedTown, decodedCounty)}
+        </p>
+        {liveCountsLine && (
+          <p className="text-xs mt-2 font-semibold" style={{ color: "#097275" }}>
+            {liveCountsLine}
+          </p>
+        )}
         </div>
 
         {/* Keyword search */}

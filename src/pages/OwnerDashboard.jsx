@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle, Users, Share2, ExternalLink } from "lucide-react";
+import { Loader2, Eye, Phone, Globe, Mail, Facebook, Instagram, Linkedin, Plus, Pencil, Trash2, Crown, Lock, AlertTriangle, Users, Share2, ExternalLink, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NoticeForm from "../components/NoticeForm";
@@ -164,12 +164,21 @@ export default function OwnerDashboard() {
 
   if (myListings.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <Crown className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <h1 className="text-xl font-semibold">No claimed listings</h1>
-        <p className="text-muted-foreground mt-2">You haven't claimed any listings yet. Browse the directory and claim your listing to access the owner dashboard.</p>
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4" style={{ background: "rgba(9,114,117,0.10)" }}>
+          <Crown className="w-7 h-7" style={{ color: "#097275" }} />
+        </div>
+        <h1 className="font-display text-2xl font-bold" style={{ color: "#097275" }}>Welcome — let's get you listed</h1>
+        <p className="text-sm mt-3 leading-relaxed" style={{ color: "#333333" }}>
+          Claiming your listing is free. Once it's yours, you'll see how many people are finding you, post notices — volunteers wanted, jobs, events — and keep your details up to date, all in one place.
+        </p>
+        <ul className="mt-4 text-sm space-y-1.5 text-left mx-auto max-w-md" style={{ color: "#333333" }}>
+          <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#E2701B" }} /> Be found by people searching for what you do, right in your town.</li>
+          <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#E2701B" }} /> Free forever — upgrade only if you want more.</li>
+          <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#E2701B" }} /> Every listing helps your whole community get more visible.</li>
+        </ul>
         <Link to="/directory">
-          <Button className="mt-4">Browse Directory</Button>
+          <Button className="mt-5 text-white" style={{ background: "#E2701B" }}>Find & claim my listing</Button>
         </Link>
       </div>
     );
@@ -179,7 +188,7 @@ export default function OwnerDashboard() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold">Owner Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Track engagement and manage your listing's notice board.</p>
+        <p className="text-muted-foreground mt-1">Everything you need to keep your listing noticed — how it's doing, what to post next, and how to keep it current.</p>
       </div>
 
       {/* Listing Selector */}
@@ -303,7 +312,7 @@ export default function OwnerDashboard() {
               </div>
             ) : notices.length === 0 ? (
               <div className="border border-dashed rounded-xl p-8 text-center text-muted-foreground">
-                <p className="text-sm">No notices yet. Add your first notice to engage with your community.</p>
+                <p className="text-sm">No notices yet. Share what's happening — volunteers wanted, a new class, an upcoming event — straight onto your listing.</p>
               </div>
 
             ) : (

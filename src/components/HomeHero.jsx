@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Search, Store, Users, GraduationCap, Calendar, Compass, PlusCircle, Heart, HeartHandshake } from "lucide-react";
+import LiveActivityBand from "./LiveActivityBand";
 
 const TILES = [
   { key: "What's On", label: "Find events near you", icon: Calendar, path: "/directory?type=What's%20On" },
@@ -22,6 +23,8 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
     <section className="mb-6" aria-labelledby="home-brand">
       <div className="relative rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
         <div className="px-5 sm:px-8 py-7 sm:py-10 max-w-3xl mx-auto">
+
+          <LiveActivityBand />
 
           {/* ── Header ── belonging-led, place-first ── */}
           <div className="text-center">

@@ -109,6 +109,17 @@ export default function Billing() {
         </Button>
       </div>
 
+      {/* Why list on Hub4Community */}
+      <section className="mb-6 rounded-2xl p-5 sm:p-6" style={{ background: "#097275" }}>
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-white">Why list on Hub4Community</h2>
+        <ul className="mt-3 space-y-1.5 text-sm text-white/90">
+          <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-white" />Be found by people searching for what you do, right in your town.</li>
+          <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-white" />Free forever — Basic costs nothing; Standard and Premium add notice boards, deeper analytics and more.</li>
+          <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-white" />Every listing you add helps your whole community get more visible.</li>
+        </ul>
+        <p className="mt-3 text-xs text-white/75">Upgrading takes a minute. Cancel anytime.</p>
+      </section>
+
       {success && (
         <div className="flex items-center gap-3 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 mb-6">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
@@ -129,10 +140,10 @@ export default function Billing() {
       {listings.length === 0 ? (
         <div className="text-center py-16 border rounded-xl bg-muted/20">
           <CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-          <p className="font-medium">No claimed listings</p>
-          <p className="text-sm text-muted-foreground mt-1">Claim a listing first to manage its plan.</p>
+          <p className="font-medium">You haven't claimed a listing yet</p>
+          <p className="text-sm text-muted-foreground mt-1">Claim a listing to manage its plan — Basic is free forever, and you only upgrade if you want more.</p>
           <Link to="/directory">
-            <Button variant="outline" className="mt-4">Browse Directory</Button>
+            <Button variant="outline" className="mt-4">Find & claim my listing</Button>
           </Link>
         </div>
       ) : (
