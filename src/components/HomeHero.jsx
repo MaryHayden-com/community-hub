@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Search, Store, Users, GraduationCap, Calendar } from "lucide-react";
+import { Search, Store, Users, GraduationCap, Calendar, Compass, PlusCircle, ArrowRight, ShieldCheck } from "lucide-react";
 
 const TILES = [
   { key: "Business", label: "Business", icon: Store, path: "/directory?type=Business" },
@@ -16,21 +16,38 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
       <div className="relative rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
         <div className="px-5 sm:px-8 py-7 sm:py-10 max-w-3xl mx-auto">
 
-          {/* ── Header ── */}
+          {/* ── Header ── benefit-led, place-first ── */}
           <div className="text-center">
-            <p className="text-sm sm:text-base mb-2">
-              Your <span className="font-semibold" style={{ color: "#E2701B" }}>free</span> community directory
-            </p>
-            <h1 id="home-brand" className="font-display text-3xl sm:text-4xl font-bold tracking-tight leading-none mb-2">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-2">
               <span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span>
+            </p>
+            <h1 id="home-brand" className="font-display text-2xl sm:text-4xl font-bold tracking-tight leading-tight mb-2" style={{ color: "#097275" }}>
+              Everything happening in your community, in one place.
             </h1>
             <p className="text-sm sm:text-base leading-relaxed" style={{ color: "#333333" }}>
-              Find local businesses, clubs and events — or list your own. Free, and always yours to manage.
+              Find local businesses, clubs, classes and events near you — or list your own. Free, and always yours to manage.
             </p>
           </div>
 
+          {/* ── How it works strip ── */}
+          <div className="mt-5 flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm font-semibold flex-wrap">
+            <span style={{ color: "#097275" }}>Browse</span>
+            <ArrowRight className="w-3.5 h-3.5" style={{ color: "#E2701B" }} />
+            <span style={{ color: "#097275" }}>Save</span>
+            <ArrowRight className="w-3.5 h-3.5" style={{ color: "#E2701B" }} />
+            <span style={{ color: "#097275" }}>Get involved</span>
+          </div>
+
+          {/* ── No account needed badge ── */}
+          <div className="mt-3 flex items-center justify-center">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full" style={{ background: "rgba(9, 114, 117, 0.10)", color: "#097275" }}>
+              <ShieldCheck className="w-3.5 h-3.5" />
+              No account needed to browse
+            </span>
+          </div>
+
           {/* ── Search bar (scrolls to the real directory search filter) ── */}
-          <div className="mt-6 rounded-xl p-2" style={{ background: "rgba(226, 112, 27, 0.12)" }}>
+          <div className="mt-5 rounded-xl p-2" style={{ background: "rgba(226, 112, 27, 0.12)" }}>
             <button
               type="button"
               onClick={onSearch}
@@ -57,26 +74,41 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
             ))}
           </div>
 
-          {/* ── Primary action buttons ── */}
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            <button
-              type="button"
-              onClick={onSearch}
-              className="flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-3 text-white min-h-[64px]"
-              style={{ background: "#097275" }}
-            >
-              <span className="text-sm font-bold leading-tight text-center">I'm looking for something local</span>
-              <span className="text-xs opacity-90">(Explore the Hub)</span>
-            </button>
-            <button
-              type="button"
-              onClick={onAddListing}
-              className="flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-3 text-white min-h-[64px]"
-              style={{ background: "#097275" }}
-            >
-              <span className="text-sm font-bold leading-tight text-center">I run a business or group</span>
-              <span className="text-xs opacity-90">(Set Up My Listing)</span>
-            </button>
+          {/* ── Two clear paths (browsers vs contributors) ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+            {/* Browser path — teal */}
+            <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: "rgba(9, 114, 117, 0.08)", border: "1.5px solid #097275" }}>
+              <div className="flex items-center gap-2">
+                <Compass className="w-5 h-5 shrink-0" style={{ color: "#097275" }} />
+                <h2 className="text-sm sm:text-base font-bold leading-tight" style={{ color: "#097275" }}>Looking for something local?</h2>
+              </div>
+              <p className="text-xs sm:text-sm" style={{ color: "#333333" }}>Browse businesses, clubs, classes and events near you.</p>
+              <button
+                type="button"
+                onClick={onSearch}
+                className="w-full rounded-lg px-3 py-2.5 text-white text-sm font-bold min-h-[44px]"
+                style={{ background: "#097275" }}
+              >
+                Explore the directory
+              </button>
+            </div>
+
+            {/* Contributor path — orange */}
+            <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: "rgba(226, 112, 27, 0.12)", border: "1.5px solid #E2701B" }}>
+              <div className="flex items-center gap-2">
+                <PlusCircle className="w-5 h-5 shrink-0" style={{ color: "#E2701B" }} />
+                <h2 className="text-sm sm:text-base font-bold leading-tight" style={{ color: "#911B1B" }}>Run a business, club or event?</h2>
+              </div>
+              <p className="text-xs sm:text-sm" style={{ color: "#333333" }}>Reach your community — add and manage your listing for free.</p>
+              <button
+                type="button"
+                onClick={onAddListing}
+                className="w-full rounded-lg px-3 py-2.5 text-white text-sm font-bold min-h-[44px]"
+                style={{ background: "#E2701B" }}
+              >
+                Add your listing
+              </button>
+            </div>
           </div>
 
           {/* ── Secondary action buttons ── */}
@@ -96,18 +128,6 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               style={{ background: "#E2701B" }}
             >
               Suggest one
-            </button>
-          </div>
-
-          {/* ── Footer link ── */}
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={onAddListing}
-              className="text-sm font-semibold underline underline-offset-2"
-              style={{ color: "#097275" }}
-            >
-              + Add Listing
             </button>
           </div>
         </div>
