@@ -1,11 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <rect width="64" height="64" rx="14" fill="#ffffff"/>
   <g transform="translate(32 32)">
-    <ellipse rx="22" ry="9" fill="none" stroke="#2C6A66" stroke-width="3.2" transform="rotate(90)"/>
-    <ellipse rx="22" ry="9" fill="none" stroke="#CC8554" stroke-width="3.2" transform="rotate(0)"/>
-    <ellipse rx="22" ry="9" fill="none" stroke="#3875D6" stroke-width="3.2" transform="rotate(60)"/>
-    <circle cx="0" cy="-22" r="3.5" fill="#3875D6"/>
-    <circle cx="22" cy="0" r="3.5" fill="#CC8554"/>
-    <circle cx="0" cy="0" r="5" fill="#2C6A66"/>
+    <!-- Horizontal orbit — Atoll -->
+    <ellipse rx="26" ry="10" fill="none" stroke="#097275" stroke-width="3.5"/>
+    <!-- Diagonal orbit 60° — Zest -->
+    <ellipse rx="26" ry="10" fill="none" stroke="#E2701B" stroke-width="3.5" transform="rotate(60)"/>
+    <!-- Diagonal orbit 120° — Brick -->
+    <ellipse rx="26" ry="10" fill="none" stroke="#911B1B" stroke-width="3.5" transform="rotate(120)"/>
+    <!-- Nucleus — Atoll -->
+    <circle r="5" fill="#097275"/>
   </g>
 </svg>
