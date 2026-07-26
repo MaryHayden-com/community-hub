@@ -85,12 +85,10 @@ export default function Layout() {
               </button>
             ) : null}
             <Link
-              to="/"
+              to="/#about"
               onClick={() => {
-                if (location.pathname === "/" || location.pathname === "/directory") {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                } else {
-                  navigate("/");
+                if ((location.pathname === "/" || location.pathname === "/directory") && location.hash !== "#about") {
+                  requestAnimationFrame(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" }));
                 }
               }}
               className="flex items-center gap-2.5 cursor-pointer"

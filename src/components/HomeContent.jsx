@@ -26,7 +26,7 @@ export default function HomeContent({ onAddListing, metrics = {} }) {
   const metricTiles = METRICS.filter((m) => (metrics[m.key] || 0) > 0);
 
   return (
-    <div className="mt-10 space-y-6">
+    <div id="about" className="mt-10 space-y-6 scroll-mt-20">
       {/* Why people use Community Hub */}
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why people use Community Hub</h2>
