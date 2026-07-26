@@ -1,91 +1,126 @@
 import { Link } from "react-router-dom";
-import { PlusCircle, HeartHandshake, MapPin, Users, Calendar, Sparkles } from "lucide-react";
+import { Handshake, Store, Heart, Compass, PlusCircle, Compass as ExploreIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import usePageTitle from "@/hooks/usePageTitle";
 
+const TEAL = "#006767";
+const ORANGE = "#e68a35";
+const ORANGE_BTN = "#e67e22";
+const PEACH = "#f5e6d9";
+const MINT = "#eef5f5";
+
+const CARDS = [
+  {
+    icon: Handshake,
+    title: "Welcome newcomers",
+    text: "New to the area? Everything local, in one friendly place — find your people and your next thing to do.",
+  },
+  {
+    icon: Store,
+    title: "Shop local",
+    text: "Keep the community thriving by finding and supporting the businesses on your doorstep.",
+  },
+  {
+    icon: Heart,
+    title: "A platform for local business",
+    text: "Be found by the people looking for you — your business, club or event, in front of your local community, for free.",
+  },
+  {
+    icon: Compass,
+    title: "Less friction, for everyone",
+    text: "No account needed to browse. Adding your listing takes a minute. Finding what you need takes less.",
+  },
+];
+
+const STEPS = [
+  { label: "Discover", text: "Browse local businesses, clubs, classes and what's on near you." },
+  { label: "Connect", text: "Save your favourites and get involved in what's happening." },
+  { label: "Belong", text: "Add your own business, group or event and help the community grow." },
+];
+
 export default function About() {
   usePageTitle("About Community Hub", {
-    description: "Community Hub is a free local directory for Ireland, starting in Bandon and West Cork — built by Mary Hayden to make local life easier to find, share and take part in.",
+    description: "Why we built Community Hub — a free, locally-focused directory for Bandon and West Cork, founded by Mary Hayden.",
     path: "/about",
   });
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
-      {/* Hero */}
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8" style={{ background: "#fcfcfc" }}>
+      {/* Header / Intro */}
       <header className="text-center">
-        <h1 className="font-display text-3xl sm:text-4xl font-bold" style={{ color: "#097275" }}>
-          About Community Hub
+        <p className="text-xs font-bold tracking-[0.25em] uppercase" style={{ color: TEAL }}>HUB4COMMUNITY</p>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3" style={{ color: TEAL }}>
+          Your Community Hub
         </h1>
-        <p className="mt-3 text-base leading-relaxed" style={{ color: "#333333" }}>
-          Community Hub is a free, locally-focused directory that brings the businesses, clubs, services, schools and events of a place together in one simple, trusted space.
+        <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#333333" }}>Why we built this</h2>
+        <p className="mt-3 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto" style={{ color: "#333333" }}>
+          Great local businesses, clubs and events shouldn't be hard to find — and finding your feet in a new place shouldn't feel lonely or be so complicated. We put the right people in front of the right business, service, event or community group, and help everything local get seen. That's how communities come together.
         </p>
       </header>
 
-      {/* Why it was set up */}
-      <section className="rounded-2xl border bg-card p-5 sm:p-6">
-        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Why it was set up</h2>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed" style={{ color: "#333333" }}>
-          <p>
-            Local information is often scattered. A club posts on Facebook, a business relies on a website no one visits, an event is shared in a Whatsapp group, and a community service is buried in a PDF somewhere. The result is simple: people miss what is right on their doorstep.
-          </p>
-          <p>
-            Community Hub was set up to fix that for one place at a time. Starting in Bandon and across West Cork, it gathers trusted local listings into a single, easy-to-search directory — so a neighbour can find a plumber, a parent can find a toddler group, a visitor can find what's on this weekend, and a small club can finally be discovered.
-          </p>
-          <p>
-            The goal is not to be the biggest. It is to be the most genuinely local — a directory that reflects the real fabric of a community and helps it stay connected.
-          </p>
-        </div>
+      {/* Highlighted info box */}
+      <section
+        className="rounded-lg p-5 sm:p-6 text-sm sm:text-base leading-relaxed"
+        style={{ background: PEACH, border: `1px solid ${ORANGE}` }}
+      >
+        <p style={{ color: "#333333" }}>
+          There are so many ways to find information these days — Facebook, WhatsApp groups, notice boards, a flyer in the shop window. But when it comes down to it, it's still hard to know what's on, where it's on, and what time. Too often we only hear about it after the fact. If we all keep this site updated, we'll have everything local in one place — and no one misses out.
+        </p>
       </section>
 
-      {/* What Community Hub does */}
-      <section className="rounded-2xl p-5 sm:p-6" style={{ background: "#097275" }}>
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-white">What Community Hub does</h2>
+      {/* Four-card grid */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {CARDS.map(({ icon: Icon, title, text }) => (
+          <div key={title} className="rounded-xl border bg-white p-5" style={{ borderColor: "#e5e5e5" }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: "rgba(230,138,53,0.12)" }}>
+              <Icon className="w-5 h-5" style={{ color: ORANGE }} />
+            </div>
+            <h3 className="font-bold text-base" style={{ color: TEAL }}>{title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "#333333" }}>{text}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* How it works */}
+      <section>
+        <h2 className="font-display text-2xl font-bold" style={{ color: TEAL }}>How it works</h2>
         <ul className="mt-3 space-y-2">
-          {[
-            { icon: MapPin, text: "Brings businesses, clubs, services and events together in one place." },
-            { icon: Users, text: "Helps small, volunteer-run groups become visible and easier to join." },
-            { icon: Calendar, text: "Shows what's on locally — one-off events, regular meet-ups and everything between." },
-            { icon: HeartHandshake, text: "Keeps community services and trusted local providers easy to find." },
-          ].map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-start gap-3 text-sm leading-relaxed text-white/90">
-              <Icon className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>{text}</span>
+          {STEPS.map(({ label, text }) => (
+            <li key={label} className="text-sm sm:text-base" style={{ color: "#333333" }}>
+              <span className="font-bold" style={{ color: "#222222" }}>{label}</span> — {text}
             </li>
           ))}
         </ul>
       </section>
 
-      {/* Meet Mary Hayden */}
-      <section className="rounded-2xl border p-5 sm:p-6" style={{ background: "rgba(226, 112, 27, 0.08)", borderColor: "#E2701B" }}>
-        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>Meet Mary Hayden</h2>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed" style={{ color: "#333333" }}>
+      {/* A note from the founder */}
+      <section className="rounded-xl p-5 sm:p-6" style={{ background: MINT, border: `1px solid ${TEAL}` }}>
+        <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: TEAL }}>A note from the founder — Mary Hayden</h2>
+        <div className="mt-3 space-y-3 text-sm sm:text-base leading-relaxed" style={{ color: "#333333" }}>
           <p>
-            Community Hub was created by Mary Hayden. With a background in finance, operations and digital transformation, Mary works independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, how they communicate it and how they grow it.
+            I'm Mary Hayden — mother of four and the founder behind Community Hub. I moved to Bandon in West Cork a few years ago, and like so many people who arrive somewhere new, I quickly found that the hardest part wasn't settling in — it was simply finding out what was going on.
           </p>
           <p>
-            Mary set up Community Hub because she kept seeing the same gap on her own doorstep in Bandon and West Cork: good local organisations struggling to be found, and good local people struggling to find them. Community Hub is her practical answer — a clear, locally-owned directory that helps communities become more visible and better connected.
+            Local life here is rich and busy: clubs, classes, markets, gigs, community groups, small businesses doing brilliant things. But that information is scattered across Facebook, WhatsApp groups, notice boards and word of mouth. You only seemed to hear about an event after it had happened. I kept thinking — there must be a simpler way.
           </p>
-          <p className="italic" style={{ color: "#097275" }}>
-            Independent strategic partner helping community-focused organisations and SMEs make ideas clearer, more visible and easier to deliver.
+          <p>
+            With a background in finance, operations and digital transformation, I work with founders and community-focused organisations to help them bring clarity to what they're building. Community Hub is me turning that same instinct on my own doorstep — one place where everything local gets seen, kept up to date by the people who run it, and free for anyone to browse.
+          </p>
+          <p>
+            I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
           </p>
         </div>
       </section>
 
-      {/* Get involved */}
-      <section className="text-center rounded-2xl border bg-card p-6 sm:p-8">
-        <Sparkles className="w-6 h-6 mx-auto" style={{ color: "#E2701B" }} />
-        <h2 className="font-display text-xl sm:text-2xl font-bold mt-2" style={{ color: "#097275" }}>Keep this site useful</h2>
-        <p className="mt-2 text-sm leading-relaxed" style={{ color: "#333333" }}>
-          Community Hub is built by the community, for the community. If your business, club, service or event is missing, add it — it's free and only takes a minute.
-        </p>
-        <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
-          <Button asChild style={{ background: "#E2701B", border: "none" }}>
-            <Link to="/directory"><PlusCircle className="w-4 h-4" /> Add your listing</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to="/whats-on"><Calendar className="w-4 h-4" /> See what's on</Link>
-          </Button>
-        </div>
+      {/* Buttons row */}
+      <section className="flex flex-col sm:flex-row items-center gap-4 justify-center pt-2">
+        <Button asChild className="h-11 px-6 text-white" style={{ background: TEAL, border: "none" }}>
+          <Link to="/directory"><ExploreIcon className="w-4 h-4 mr-2" /> Explore the directory</Link>
+        </Button>
+        <Button asChild className="h-11 px-6 text-white" style={{ background: ORANGE_BTN, border: "none" }}>
+          <Link to="/directory"><PlusCircle className="w-4 h-4 mr-2" /> Add your listing</Link>
+        </Button>
+        <Link to="/privacy" className="text-sm underline underline-offset-4" style={{ color: TEAL }}>Privacy policy</Link>
       </section>
     </div>
   );
