@@ -26,8 +26,9 @@ export default function About() {
       </h2>
       <p className="text-base sm:text-lg leading-relaxed" style={{ color: "#333333" }}>
         Great local businesses, clubs and events shouldn't be hard to find — and finding your feet
-        in a new place shouldn't feel lonely. We put the right people in front of the right things, and
-        help everything local get seen. That's how communities come together.
+        in a new place shouldn't feel lonely or be so complicated. We put the right people in front of
+        the right business, service, event or community group, and help everything local get seen.
+        That's how communities come together.
       </p>
 
       <div className="mt-6 p-5 rounded-xl" style={{ background: "rgba(226, 112, 27, 0.10)", border: "1.5px solid #E2701B" }}>
