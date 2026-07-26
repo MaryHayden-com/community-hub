@@ -90,15 +90,14 @@ export default function Layout() {
             ) : null}
             <button
               onClick={() => {
-                if (location.pathname === "/") {
+                if (location.pathname === "/about") {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 } else {
-                  navigate("/");
-                  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+                  navigate("/about");
                 }
               }}
               className="flex items-center gap-2.5 cursor-pointer"
-              title="Community Hub – home"
+              title="About Community Hub"
             >
               <CommunityHubLogo className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
               <span className="font-display font-bold tracking-tight text-base sm:text-xl" style={{ color: '#097275' }}>
