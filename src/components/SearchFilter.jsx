@@ -2,7 +2,7 @@ import { Search, X, CalendarRange } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NearMeButton from "@/components/NearMeButton";
-import MultiSelectDropdown from "@/components/MultiSelectDropdown";
+import FilterMultiChipDropdown from "@/components/FilterMultiChipDropdown";
 import FilterChipDropdown from "@/components/FilterChipDropdown";
 
 const TYPE_CHIPS = [
@@ -24,10 +24,8 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
   const handleCounty = (v) => { setCounty(v); setTown([]); localStorage.setItem("dir_county", v); localStorage.removeItem("dir_town"); };
   const handleTowns = (arr) => { setTown(arr || []); localStorage.setItem("dir_town", (arr || []).join(",")); };
 
-  const townList = (townOptions || []).map(o => o.value);
-  const townCounts = Object.fromEntries((townOptions || []).map(o => [o.value, o.count]));
-  const villageList = (villageOptions || []).map(o => o.value);
-  const villageCounts = Object.fromEntries((villageOptions || []).map(o => [o.value, o.count]));
+  const groupOptions = (groups || []).map(g => ({ value: g, count: groupCounts?.[g] || 0 }));
+  const categoryOptions = (categories || []).map(c => ({ value: c, count: categoryCounts?.[c] || 0 }));
 
   return (
     <div className="space-y-3">
@@ -46,12 +44,8 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         <FilterChipDropdown label="Country" value={country} options={countryOptions} onChange={handleCountry} accent="#097275" />
         <FilterChipDropdown label="County" value={county} options={countyOptions} onChange={handleCounty} accent="#097275" />
-        <div className="min-w-[130px]">
-          <MultiSelectDropdown options={townList} selected={Array.isArray(town) ? town : []} onChange={handleTowns} placeholder="Towns" counts={townCounts} />
-        </div>
-        <div className="min-w-[130px]">
-          <MultiSelectDropdown options={villageList} selected={Array.isArray(town) ? town : []} onChange={handleTowns} placeholder="Villages" counts={villageCounts} />
-        </div>
+        <FilterMultiChipDropdown label="Towns" value={Array.isArray(town) ? town : []} options={townOptions || []} onChange={handleTowns} accent="#097275" />
+        <FilterMultiChipDropdown label="Villages" value={Array.isArray(town) ? town : []} options={villageOptions || []} onChange={handleTowns} accent="#E2701B" />
       </div>
 
       {/* Type — tappable single-select chips */}
@@ -85,26 +79,10 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
       {/* Group / Category (only when exactly one type is chosen) */}
       {singleType && groups && groups.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          <div className="flex-1 min-w-[150px]">
-            <MultiSelectDropdown
-              options={groups}
-              selected={group || []}
-              onChange={(v) => { setGroup(v); setCategory([]); }}
-              placeholder="All Groups"
-              counts={groupCounts}
-            />
-          </div>
+        <div className="flex gap-2 flex-wrap items-center">
+          <FilterMultiChipDropdown label="Groups" value={group || []} options={groupOptions} onChange={(v) => { setGroup(v || []); setCategory([]); }} accent="#097275" />
           {group && group.length > 0 && categories && categories.length > 0 && (
-            <div className="flex-1 min-w-[150px]">
-              <MultiSelectDropdown
-                options={categories}
-                selected={category || []}
-                onChange={setCategory}
-                placeholder="All Categories"
-                counts={categoryCounts}
-              />
-            </div>
+            <FilterMultiChipDropdown label="Categories" value={category || []} options={categoryOptions} onChange={setCategory} accent="#097275" />
           )}
         </div>
       )}
