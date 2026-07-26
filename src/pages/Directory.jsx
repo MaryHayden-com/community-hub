@@ -43,7 +43,10 @@ export default function Directory() {
 
   // ── Filters ─────────────────────────────────────────────────────────────────
   const [search, setSearch] = useState("");
-  const [type, setType] = useState(() => readParam(params, "type"));
+  const [type, setType] = useState(() => {
+    const t = readParam(params, "type");
+    return t ? [t] : [];
+  });
   const [subcategoryGroup, setSubcategoryGroup] = useState(() => params.get("group") ? [params.get("group")] : []);
   const [category, setCategory] = useState(() => params.get("category") ? [params.get("category")] : []);
   const [county, setCounty] = useState(() => readParam(params, "county") || localStorage.getItem("dir_county") || "");
@@ -88,7 +91,8 @@ export default function Directory() {
 
   // ── Sync URL params → filter state ──────────────────────────────────────────
   useEffect(() => {
-    setType(readParam(params, "type"));
+    const t = readParam(params, "type");
+    setType(t ? [t] : []);
     setSubcategoryGroup(params.get("group") ? [params.get("group")] : []);
     setCategory(params.get("category") ? [params.get("category")] : []);
     const urlCounty = readParam(params, "county") || localStorage.getItem("dir_county") || "";
@@ -160,41 +164,44 @@ export default function Directory() {
     return IRELAND_COUNTIES.map(c => c.county).sort();
   }, [browseListings, country]);
 
+  // Group/category drill-down only makes sense for a single selected type
+  const activeType = type.length === 1 ? type[0] : "";
+
   const groups = useMemo(() => {
-    if (!type) return [];
+    if (!activeType) return [];
     return [...new Set(
-      browseListings.filter(l => l.type === type).flatMap(l => toArr(l.subcategory_group)).filter(Boolean)
+      browseListings.filter(l => l.type === activeType).flatMap(l => toArr(l.subcategory_group)).filter(Boolean)
     )].sort();
-  }, [browseListings, type]);
+  }, [browseListings, activeType]);
 
   const categories = useMemo(() => {
-    if (!type || subcategoryGroup.length === 0) return [];
+    if (!activeType || subcategoryGroup.length === 0) return [];
     return [...new Set(
       browseListings
-        .filter(l => l.type === type && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
+        .filter(l => l.type === activeType && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
         .flatMap(l => toArr(l.category)).filter(Boolean)
     )].sort();
-  }, [browseListings, type, subcategoryGroup]);
+  }, [browseListings, activeType, subcategoryGroup]);
 
   const groupCounts = useMemo(() => {
-    if (!type) return {};
+    if (!activeType) return {};
     const counts = {};
-    browseListings.filter(l => l.type === type).forEach(l => {
+    browseListings.filter(l => l.type === activeType).forEach(l => {
       toArr(l.subcategory_group).filter(Boolean).forEach(g => { counts[g] = (counts[g] || 0) + 1; });
     });
     return counts;
-  }, [browseListings, type]);
+  }, [browseListings, activeType]);
 
   const categoryCounts = useMemo(() => {
-    if (!type || subcategoryGroup.length === 0) return {};
+    if (!activeType || subcategoryGroup.length === 0) return {};
     const counts = {};
     browseListings
-      .filter(l => l.type === type && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
+      .filter(l => l.type === activeType && toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g)))
       .forEach(l => {
         toArr(l.category).filter(Boolean).forEach(c => { counts[c] = (counts[c] || 0) + 1; });
       });
     return counts;
-  }, [browseListings, type, subcategoryGroup]);
+  }, [browseListings, activeType, subcategoryGroup]);
 
   const townGroups = useMemo(() => {
     if (!county) return null;
@@ -221,13 +228,13 @@ export default function Directory() {
   // ── Filtered + sorted result set ─────────────────────────────────────────────
   const filtered = useMemo(() => {
     const isSearch = search.trim().length >= 2;
-    const isWhatsOn = type === "What's On";
+    const isWhatsOn = type.length === 1 && type[0] === "What's On";
 
     const base = activeListings.filter(l => {
       if (l.status === "pending" || l.status === "rejected") return false;
       // In search mode the server already filtered by text — only apply geo/type if set
       if (!isSearch) {
-        if (type && l.type !== type) return false;
+        if (type.length > 0 && !type.includes(l.type)) return false;
         if (subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
         if (category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
         if (nearbyCounties) {
@@ -290,7 +297,7 @@ export default function Directory() {
           requestAnimationFrame(() => el?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }}
         onSearchWhatsOn={() => {
-          setType("What's On");
+          setType(["What's On"]);
           const el = searchSectionRef.current;
           requestAnimationFrame(() => el?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }}
@@ -300,7 +307,7 @@ export default function Directory() {
       <LocalProofBand
         listings={browseListings}
         onSeeWhatsOn={() => {
-          setType("What's On");
+          setType(["What's On"]);
           searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
       />
@@ -367,7 +374,7 @@ export default function Directory() {
       {/* Results */}
       {viewMode === "map" ? (
         <div className="mt-4">
-          <DirectoryMapView listings={type === "What's On" ? filtered.map(e => e.listing || e) : filtered} />
+          <DirectoryMapView listings={(type.length === 1 && type[0] === "What's On") ? filtered.map(e => e.listing || e) : filtered} />
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
@@ -377,7 +384,7 @@ export default function Directory() {
             <PlusCircle className="w-4 h-4" /> Add Your Business or Group
           </Button>
         </div>
-      ) : type === "What's On" ? (
+      ) : (type.length === 1 && type[0] === "What's On") ? (
         <div className="flex flex-col gap-3 mt-6">
           {pagedItems.map((entry, i) => {
             const prevKey = i > 0 ? pagedItems[i - 1].sortKey : null;
