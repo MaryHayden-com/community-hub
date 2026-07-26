@@ -237,7 +237,7 @@ export default function Layout() {
               {" · "}
               <Link to="/privacy" className="hover:text-foreground underline underline-offset-2 transition-colors">Privacy Policy</Link>
               {" · "}
-              <a href="mailto:hello@hub4community.com" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
+              <a href="mailto:communitywhatson@gmail.com" className="hover:text-foreground underline underline-offset-2 transition-colors">Contact</a>
             </p>
             <p className="mt-2 text-xs">Built locally, for Bandon and beyond — your community, in one place.</p>
           </div>
