@@ -254,8 +254,15 @@ export default function WhatsOn() {
             className="h-9 w-full sm:w-64 rounded-md border border-input bg-card pl-9 pr-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
+        <FilterMultiChipDropdown
+          label="Categories"
+          value={filterCategories}
+          options={categoryOptions}
+          onChange={setFilterCategories}
+          accent="#E2701B"
+        />
         <NearMeButton listings={listings} type="whatson" />
-        
+
         <Select value={filterCounty} onValueChange={v => { setFilterCounty(v === "__all__" ? "" : v); setFilterTown(""); }}>
           <SelectTrigger className="w-[150px] bg-card"><SelectValue placeholder="All Counties" /></SelectTrigger>
           <SelectContent>
@@ -273,14 +280,6 @@ export default function WhatsOn() {
             {allTowns.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
           </SelectContent>
         </Select>
-
-        <FilterMultiChipDropdown
-          label="Categories"
-          value={filterCategories}
-          options={categoryOptions}
-          onChange={setFilterCategories}
-          accent="#E2701B"
-        />
 
         {viewMode === "list" && (
           <>
