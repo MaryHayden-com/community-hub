@@ -50,7 +50,10 @@ export default function Directory() {
   const [subcategoryGroup, setSubcategoryGroup] = useState(() => params.get("group") ? [params.get("group")] : []);
   const [category, setCategory] = useState(() => params.get("category") ? [params.get("category")] : []);
   const [county, setCounty] = useState(() => readParam(params, "county") || localStorage.getItem("dir_county") || "");
-  const [town, setTown] = useState(() => readParam(params, "town") || localStorage.getItem("dir_town") || "");
+  const [town, setTown] = useState(() => {
+    const raw = readParam(params, "town") || localStorage.getItem("dir_town") || "";
+    return raw ? raw.split(",").map(s => s.trim()).filter(Boolean) : [];
+  });
   const [country, setCountry] = useState(() => localStorage.getItem("dir_country") || "");
   const [dateFrom, setDateFrom] = useState(getTodayStr);
   const [dateTo, setDateTo] = useState("");
@@ -96,7 +99,8 @@ export default function Directory() {
     setSubcategoryGroup(params.get("group") ? [params.get("group")] : []);
     setCategory(params.get("category") ? [params.get("category")] : []);
     const urlCounty = readParam(params, "county") || localStorage.getItem("dir_county") || "";
-    const urlTown = readParam(params, "town") || localStorage.getItem("dir_town") || "";
+    const rawTown = readParam(params, "town") || localStorage.getItem("dir_town") || "";
+    const urlTown = rawTown ? rawTown.split(",").map(s => s.trim()).filter(Boolean) : [];
     setCounty(urlCounty);
     setTown(urlTown);
     setCountry(localStorage.getItem("dir_country") || "");
@@ -282,7 +286,7 @@ export default function Directory() {
         } else {
           if (country && l.country !== country) return false;
           if (county && l.county !== county) return false;
-          if (town && l.town !== town) return false;
+          if (town.length > 0 && !town.includes(l.town)) return false;
         }
       }
       return true;

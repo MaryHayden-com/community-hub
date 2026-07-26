@@ -18,11 +18,16 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
   const selectedTypes = Array.isArray(type) ? type : [];
   const isWhatsOn = selectedTypes.length === 1 && selectedTypes[0] === "What's On";
   const singleType = selectedTypes.length === 1 ? selectedTypes[0] : "";
-  const hasFilters = search || selectedTypes.length > 0 || (group && group.length > 0) || (category && category.length > 0) || country || county || town || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
+  const hasFilters = search || selectedTypes.length > 0 || (group && group.length > 0) || (category && category.length > 0) || country || county || (town && town.length > 0) || nearbyCounties || (dateFrom && dateFrom !== todayStr) || dateTo;
 
-  const handleCountry = (v) => { setCountry(v); setCounty(""); setTown(""); localStorage.setItem("dir_country", v); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); };
-  const handleCounty = (v) => { setCounty(v); setTown(""); localStorage.setItem("dir_county", v); localStorage.removeItem("dir_town"); };
-  const handleTown = (v) => { setTown(v); localStorage.setItem("dir_town", v); };
+  const handleCountry = (v) => { setCountry(v); setCounty(""); setTown([]); localStorage.setItem("dir_country", v); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); };
+  const handleCounty = (v) => { setCounty(v); setTown([]); localStorage.setItem("dir_county", v); localStorage.removeItem("dir_town"); };
+  const handleTowns = (arr) => { setTown(arr || []); localStorage.setItem("dir_town", (arr || []).join(",")); };
+
+  const townList = (townOptions || []).map(o => o.value);
+  const townCounts = Object.fromEntries((townOptions || []).map(o => [o.value, o.count]));
+  const villageList = (villageOptions || []).map(o => o.value);
+  const villageCounts = Object.fromEntries((villageOptions || []).map(o => [o.value, o.count]));
 
   return (
     <div className="space-y-3">
@@ -41,8 +46,12 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         <FilterChipDropdown label="Country" value={country} options={countryOptions} onChange={handleCountry} accent="#097275" />
         <FilterChipDropdown label="County" value={county} options={countyOptions} onChange={handleCounty} accent="#097275" />
-        <FilterChipDropdown label="Town" value={town} options={townOptions} onChange={handleTown} accent="#097275" />
-        <FilterChipDropdown label="Village" value={town} options={villageOptions} onChange={handleTown} accent="#E2701B" />
+        <div className="min-w-[130px]">
+          <MultiSelectDropdown options={townList} selected={Array.isArray(town) ? town : []} onChange={handleTowns} placeholder="Towns" counts={townCounts} />
+        </div>
+        <div className="min-w-[130px]">
+          <MultiSelectDropdown options={villageList} selected={Array.isArray(town) ? town : []} onChange={handleTowns} placeholder="Villages" counts={villageCounts} />
+        </div>
       </div>
 
       {/* Type — single-select chips */}
@@ -65,10 +74,10 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
 
       {/* Near Me + Clear */}
       <div className="flex gap-2 flex-wrap items-center justify-end">
-        <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown(""); } }} />
+        <NearMeButton nearbyCounties={nearbyCounties} onNearbyChange={(v) => { setNearbyCounties(v); if (v) { setCounty(""); setTown([]); } }} />
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType([]); setGroup([]); setCategory([]); setCountry(""); setCounty(""); setTown(""); if (setNearbyCounties) setNearbyCounties(null); localStorage.removeItem("dir_country"); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
+          <Button variant="ghost" size="sm" className="h-11 text-muted-foreground shrink-0" onClick={() => { setSearch(""); setType([]); setGroup([]); setCategory([]); setCountry(""); setCounty(""); setTown([]); if (setNearbyCounties) setNearbyCounties(null); localStorage.removeItem("dir_country"); localStorage.removeItem("dir_county"); localStorage.removeItem("dir_town"); if (setDateFrom) { setDateFrom(todayStr); setDateTo(""); } }}>
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}
