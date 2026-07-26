@@ -1,4 +1,5 @@
-import { Search, X, CalendarRange } from "lucide-react";
+import { useState } from "react";
+import { Search, X, CalendarRange, ChevronDown, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NearMeButton from "@/components/NearMeButton";
@@ -24,8 +25,12 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
   const handleCounty = (v) => { setCounty(v); setTown([]); localStorage.setItem("dir_county", v); localStorage.removeItem("dir_town"); };
   const handleTowns = (arr) => { setTown(arr || []); localStorage.setItem("dir_town", (arr || []).join(",")); };
 
-  const groupOptions = (groups || []).map(g => ({ value: g, count: groupCounts?.[g] || 0 }));
-  const categoryOptions = (categories || []).map(c => ({ value: c, count: categoryCounts?.[c] || 0 }));
+  const [openType, setOpenType] = useState("");
+  const toggleIn = (arr, setter, val) => {
+    const a = Array.isArray(arr) ? arr : [];
+    if (a.includes(val)) setter(a.filter((x) => x !== val));
+    else setter([...a, val]);
+  };
 
   return (
     <div className="space-y-3">
@@ -48,23 +53,73 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         <FilterMultiChipDropdown label="Villages" value={Array.isArray(town) ? town : []} options={villageOptions || []} onChange={handleTowns} accent="#E2701B" />
       </div>
 
-      {/* Type — tappable single-select chips */}
+      {/* Type chips — tapping a type selects it and opens its group tick-list */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         {TYPE_CHIPS.map((c) => {
-          const active = c.value === "" ? selectedTypes.length === 0 : selectedTypes.length === 1 && selectedTypes[0] === c.value;
+          const sel = c.value !== "" && selectedTypes.length === 1 && selectedTypes[0] === c.value;
+          const panelOpen = sel && openType === c.value;
           return (
             <button
               key={c.label}
               type="button"
-              onClick={() => { setType(c.value ? [c.value] : []); setGroup([]); setCategory([]); }}
-              className={`flex items-center rounded-full px-3 py-2 min-h-[40px] text-xs font-bold whitespace-nowrap border transition-colors ${active ? "text-white" : "bg-card border-border hover:border-primary"}`}
-              style={active ? { background: "#097275", borderColor: "#097275" } : {}}
+              onClick={() => {
+                if (c.value === "") { setType([]); setGroup([]); setCategory([]); setOpenType(""); return; }
+                if (sel) { setOpenType(panelOpen ? "" : c.value); }
+                else { setType([c.value]); setGroup([]); setCategory([]); setOpenType(c.value); }
+              }}
+              className={`flex items-center gap-1 rounded-full px-3 py-2 min-h-[40px] text-xs font-bold whitespace-nowrap border transition-colors ${sel ? "text-white" : "bg-card border-border hover:border-primary"}`}
+              style={sel ? { background: "#097275", borderColor: "#097275" } : {}}
             >
               {c.label}
+              {c.value !== "" && <ChevronDown className={`w-3.5 h-3.5 transition-transform ${panelOpen ? "rotate-180" : ""}`} />}
             </button>
           );
         })}
       </div>
+
+      {/* Groups tick-list for the active type */}
+      {singleType && openType === singleType && groups && groups.length > 0 && (
+        <div className="rounded-lg border bg-card p-3 shadow-sm">
+          <p className="text-xs font-semibold mb-2" style={{ color: "#097275" }}>Groups in {singleType}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-h-56 overflow-y-auto">
+            {groups.map((g) => {
+              const isSel = (group || []).includes(g);
+              return (
+                <button key={g} type="button" onClick={() => { toggleIn(group, setGroup, g); setCategory([]); }}
+                  className="flex items-center gap-2 px-2 py-2 text-sm rounded-md hover:bg-accent text-left min-h-[44px]">
+                  <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${isSel ? "" : "border-input"}`} style={isSel ? { background: "#097275", borderColor: "#097275" } : {}}>
+                    {isSel && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                  <span className="flex-1">{g}</span>
+                  <span className="text-xs text-muted-foreground">{groupCounts?.[g] || 0}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Categories tick-list (after groups chosen) */}
+      {singleType && (group || []).length > 0 && categories && categories.length > 0 && (
+        <div className="rounded-lg border bg-card p-3 shadow-sm">
+          <p className="text-xs font-semibold mb-2" style={{ color: "#097275" }}>Categories</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 max-h-56 overflow-y-auto">
+            {categories.map((cat) => {
+              const isSel = (category || []).includes(cat);
+              return (
+                <button key={cat} type="button" onClick={() => toggleIn(category, setCategory, cat)}
+                  className="flex items-center gap-2 px-2 py-2 text-sm rounded-md hover:bg-accent text-left min-h-[44px]">
+                  <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${isSel ? "" : "border-input"}`} style={isSel ? { background: "#097275", borderColor: "#097275" } : {}}>
+                    {isSel && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                  <span className="flex-1">{cat}</span>
+                  <span className="text-xs text-muted-foreground">{categoryCounts?.[cat] || 0}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Near Me + Clear */}
       <div className="flex gap-2 flex-wrap items-center justify-end">
@@ -76,16 +131,6 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
           </Button>
         )}
       </div>
-
-      {/* Group / Category (only when exactly one type is chosen) */}
-      {singleType && groups && groups.length > 0 && (
-        <div className="flex gap-2 flex-wrap items-center">
-          <FilterMultiChipDropdown label="Groups" value={group || []} options={groupOptions} onChange={(v) => { setGroup(v || []); setCategory([]); }} accent="#097275" />
-          {group && group.length > 0 && categories && categories.length > 0 && (
-            <FilterMultiChipDropdown label="Categories" value={category || []} options={categoryOptions} onChange={setCategory} accent="#097275" />
-          )}
-        </div>
-      )}
 
       {/* Date range (What's On only) */}
       {isWhatsOn && setDateFrom && (
