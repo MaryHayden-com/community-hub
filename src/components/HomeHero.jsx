@@ -45,7 +45,7 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
                 <h2 className="text-sm sm:text-base font-bold leading-tight" style={{ color: "#097275" }}>Looking for something local?</h2>
               </div>
               <p className="text-xs sm:text-sm" style={{ color: "#333333" }}>
-                New to the area? Start here. Everything local, in one friendly place — find your people, your favourites and your next thing to do.
+                Everything local, in one friendly place — find your people, your favourites and your next thing to do.
               </p>
               <button
                 type="button"
