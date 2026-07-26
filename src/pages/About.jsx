@@ -48,11 +48,11 @@ export default function About() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8" style={{ background: "#fcfcfc" }}>
       {/* Header / Intro */}
       <header className="text-center">
-        <p className="text-xs font-bold tracking-[0.25em] uppercase" style={{ color: TEAL }}>
-          HUB4COMMUNITY
+        <p className="text-xs font-bold tracking-[0.25em] uppercase" style={{ letterSpacing: "0.15em" }}>
+          <span style={{ color: "#D67D3E" }}>HUB4</span><span style={{ color: "#2A7373" }}>COMMUNITY</span>
         </p>
-        <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3" style={{ color: TEAL }}>
-          Your Community Hub
+        <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3">
+          <span style={{ color: "#D67D3E" }}>Hub4</span><span style={{ color: "#2A7373" }}>Community</span>
         </h1>
         <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#333333" }}>Why we built this</h2>
         <p className="mt-3 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto" style={{ color: "#333333" }}>
