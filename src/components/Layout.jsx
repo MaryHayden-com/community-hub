@@ -51,6 +51,11 @@ export default function Layout() {
     return () => mq.removeEventListener("change", apply);
   }, []);
 
+  // Scroll to top whenever we navigate to a different page (desktop header links etc.)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [location.pathname]);
+
   const isAdmin = user?.role === "admin";
   const isGroupAdmin = user?.role === "group_admin";
   const isListingOwner = user?.role === "listing_owner";
@@ -99,6 +104,14 @@ export default function Layout() {
                 <Link
                   key={item.to}
                   to={item.to}
+                  onClick={() => {
+                    const dest = item.to.split("?")[0];
+                    if (dest === "/") {
+                      if (location.pathname === "/" || location.pathname === "/directory") window.scrollTo({ top: 0, behavior: "smooth" });
+                    } else if (location.pathname === dest) {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                     isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
