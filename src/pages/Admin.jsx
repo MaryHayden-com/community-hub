@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap, ImagePlus, Clock, CalendarDays, MoreHorizontal, SlidersHorizontal } from "lucide-react";
+import { Shield, Loader2, Plus, Trash2, Edit, Search, LayoutGrid, List, CheckSquare, RefreshCw, Columns3, X, ShieldCheck, ShieldOff, Inbox, Users, Zap, ImagePlus, Clock, CalendarDays, MoreHorizontal, SlidersHorizontal, Copy } from "lucide-react";
 import AdminActionStream from "../components/AdminActionStream";
 import AdminAnalyticsDashboard from "../components/AdminAnalyticsDashboard";
 import AdminClaimRequests from "../components/AdminClaimRequests";
@@ -19,6 +19,7 @@ import AdminWhatsOnTab from "../components/AdminWhatsOnTab";
 import AdminSurveyResults from "../components/AdminSurveyResults";
 import AdminEngagementReport from "../components/AdminEngagementReport";
 import AdminPendingTab from "../components/AdminPendingTab";
+import AdminDuplicatesTab from "../components/AdminDuplicatesTab";
 import usePageTitle from "@/hooks/usePageTitle";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -54,7 +55,7 @@ export default function Admin() {
   const [expandingRecurring, setExpandingRecurring] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.replace("#", "");
-    const valid = ["overview","pending","listings","whatson","claims","stream","users","engagement","analytics","survey"];
+    const valid = ["overview","pending","listings","whatson","claims","stream","users","engagement","analytics","survey","duplicates"];
     return valid.includes(hash) ? hash : "overview";
   });
   const [triggerImport, setTriggerImport] = useState(false);
@@ -406,6 +407,7 @@ export default function Admin() {
           { key: "engagement", label: "📈 Engagement" },
           { key: "analytics", label: "📊 Analytics" },
           { key: "survey", label: "📋 Survey Results" },
+          { key: "duplicates", label: "Duplicates", icon: <Copy className="w-4 h-4" /> },
         ].map(({ key, label, icon, badge, badgeColor }) => (
           <button
             key={key}
@@ -460,6 +462,7 @@ export default function Admin() {
                 { key: "engagement", label: "Engagement" },
                 { key: "analytics", label: "Analytics" },
                 { key: "survey", label: "Survey Results" },
+                { key: "duplicates", label: "Duplicates" },
               ].map(({ key, label, badge }) => (
                 <button key={key} onClick={() => { setActiveTab(key); setShowMoreMenu(false); }}
                   className="flex items-center justify-between px-4 py-3 rounded-xl border bg-card text-sm font-medium hover:bg-muted transition-colors">
@@ -514,6 +517,7 @@ export default function Admin() {
       {activeTab === "engagement" && <AdminEngagementReport listings={listings} />}
       {activeTab === "analytics" && <AdminAnalyticsDashboard />}
       {activeTab === "survey" && <AdminSurveyResults />}
+      {activeTab === "duplicates" && <AdminDuplicatesTab />}
       {activeTab === "claims" && <AdminClaimRequests />}
       {activeTab === "users" && <AdminUsersTab />}
       {activeTab === "stream" && (

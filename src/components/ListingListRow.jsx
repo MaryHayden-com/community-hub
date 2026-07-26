@@ -92,11 +92,10 @@ export default function ListingListRow({ listing }) {
       </div>
 
       {(() => {
-        // Contact details and socials are only shown for claimed listings, and only
-        // if the owner hasn't hidden them. Website is always public.
-        const isClaimed = !!listing.owner_email;
+        // Contact details and socials are public; the owner can hide individual
+        // fields via hidden_fields. Website is always public.
         const hidden = listing.hidden_fields || [];
-        const canShow = (f) => !hidden.includes(f) && (isClaimed || !["phone", "email", "facebook_url", "instagram_url", "linkedin_url"].includes(f));
+        const canShow = (f) => !hidden.includes(f);
         const any = (canShow("phone") && listing.phone) || (canShow("email") && listing.email) || listing.website || (canShow("facebook_url") && listing.facebook_url) || (canShow("instagram_url") && listing.instagram_url) || (canShow("linkedin_url") && listing.linkedin_url);
         if (!any) return null;
         return (

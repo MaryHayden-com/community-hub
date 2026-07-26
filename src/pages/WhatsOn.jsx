@@ -86,8 +86,11 @@ export default function WhatsOn() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
   const [viewMode, setViewMode] = useState("calendar"); // "list" | "calendar"
-  const [filterCounty, setFilterCounty] = useState("");
-  const [filterTown, setFilterTown] = useState("");
+  const [filterCounty, setFilterCounty] = useState(() => localStorage.getItem("dir_county") || "Cork");
+  const [filterTown, setFilterTown] = useState(() => {
+    const raw = localStorage.getItem("dir_town");
+    return raw ? raw.split(",")[0].trim() : "";
+  });
   const [query, setQuery] = useState("");
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [userIsPaid, setUserIsPaid] = useState(false);
@@ -188,7 +191,7 @@ export default function WhatsOn() {
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>What's On</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">Upcoming events and activities across Ireland</p>
+          <p className="text-muted-foreground mt-0.5 text-sm">Upcoming events and activities in your area</p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
