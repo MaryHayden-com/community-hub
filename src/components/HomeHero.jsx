@@ -9,9 +9,9 @@ const TILES = [
 ];
 
 const STEPS = [
-  { title: "Discover", icon: Compass, desc: "Browse local businesses, clubs, classes and what's on near you." },
-  { title: "Connect", icon: Heart, desc: "Save your favourites and get involved in what's happening." },
-  { title: "Belong", icon: PlusCircle, desc: "Add your own business, group or event and help the community grow." },
+  { title: "Discover", icon: Compass, desc: "Browse local businesses, clubs, classes and what's on near you.", action: "browse" },
+  { title: "Connect", icon: Heart, desc: "Save your favourites and get involved in what's happening.", action: "saved" },
+  { title: "Belong", icon: PlusCircle, desc: "Add your own business, group or event and help the community grow.", action: "add" },
 ];
 
 export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSuggestBusiness }) {
@@ -78,14 +78,24 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
 
           {/* ── How it works strip ── Discover / Connect / Belong ── */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
-            {STEPS.map(({ title, icon: Icon, desc }) => (
-              <div key={title} className="rounded-xl p-3 text-center" style={{ background: "rgba(9, 114, 117, 0.06)" }}>
+            {STEPS.map(({ title, icon: Icon, desc, action }) => (
+              <button
+                key={title}
+                type="button"
+                onClick={() => {
+                  if (action === "browse") onSearch?.();
+                  else if (action === "saved") navigate("/saved");
+                  else if (action === "add") onAddListing?.();
+                }}
+                className="rounded-xl p-3 text-center hover:shadow-md transition-shadow min-h-[44px]"
+                style={{ background: "rgba(9, 114, 117, 0.06)" }}
+              >
                 <div className="flex items-center justify-center gap-1.5 mb-1">
                   <Icon className="w-4 h-4" style={{ color: "#E2701B" }} />
                   <span className="font-bold text-sm" style={{ color: "#097275" }}>{title}</span>
                 </div>
                 <p className="text-xs leading-snug" style={{ color: "#555555" }}>{desc}</p>
-              </div>
+              </button>
             ))}
           </div>
 
