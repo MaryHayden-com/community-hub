@@ -406,9 +406,9 @@ export default function Directory() {
       />
 
       {/* What's happening near you + local proof band */}
-      <div className="mb-3">
+      <div className="mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-0">
         <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: "#097275" }}>What's happening near you</h2>
-        <p className="text-sm text-muted-foreground max-w-2xl">
+        <p className="text-sm text-muted-foreground">
           Community Hub brings local life into one simple place — featured events, local organisations and recently added listings worth discovering now.
         </p>
       </div>
