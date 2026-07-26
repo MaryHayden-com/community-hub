@@ -90,10 +90,11 @@ export default function Layout() {
             ) : null}
             <button
               onClick={() => {
-                if (location.pathname === "/" || location.pathname === "/directory") {
+                if (location.pathname === "/") {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 } else {
                   navigate("/");
+                  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
                 }
               }}
               className="flex items-center gap-2.5 cursor-pointer"
