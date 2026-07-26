@@ -5,7 +5,14 @@ import NearMeButton from "@/components/NearMeButton";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 import FilterChipDropdown from "@/components/FilterChipDropdown";
 
-const TYPE_OPTIONS = ["Business", "Club & Group", "Community Services", "Education", "What's On"];
+const TYPE_CHIPS = [
+  { label: "All", value: "" },
+  { label: "Business", value: "Business" },
+  { label: "Clubs", value: "Club & Group" },
+  { label: "Community", value: "Community Services" },
+  { label: "Education", value: "Education" },
+  { label: "What's On", value: "What's On" },
+];
 
 export default function SearchFilter({ search, setSearch, type, setType, group, setGroup, groups, groupCounts, category, setCategory, categories, categoryCounts, country, setCountry, countryOptions, county, setCounty, countyOptions, town, setTown, townOptions, villageOptions, dateFrom, setDateFrom, dateTo, setDateTo, todayStr, nearbyCounties, setNearbyCounties }) {
   const selectedTypes = Array.isArray(type) ? type : [];
@@ -30,20 +37,30 @@ export default function SearchFilter({ search, setSearch, type, setType, group, 
         />
       </div>
 
-      {/* Type — multi-select dropdown */}
-      <MultiSelectDropdown
-        options={TYPE_OPTIONS}
-        selected={selectedTypes}
-        onChange={(v) => { setType(v); setGroup([]); setCategory([]); }}
-        placeholder="All Types"
-      />
-
       {/* Location filter chips — Country / County / Town / Village */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         <FilterChipDropdown label="Country" value={country} options={countryOptions} onChange={handleCountry} accent="#097275" />
         <FilterChipDropdown label="County" value={county} options={countyOptions} onChange={handleCounty} accent="#097275" />
         <FilterChipDropdown label="Town" value={town} options={townOptions} onChange={handleTown} accent="#097275" />
         <FilterChipDropdown label="Village" value={town} options={villageOptions} onChange={handleTown} accent="#E2701B" />
+      </div>
+
+      {/* Type — single-select chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        {TYPE_CHIPS.map((c) => {
+          const active = c.value === "" ? selectedTypes.length === 0 : selectedTypes.length === 1 && selectedTypes[0] === c.value;
+          return (
+            <button
+              key={c.label}
+              type="button"
+              onClick={() => { setType(c.value ? [c.value] : []); setGroup([]); setCategory([]); }}
+              className={`flex items-center rounded-full px-3 py-2 min-h-[40px] text-xs font-bold whitespace-nowrap border transition-colors ${active ? "text-white" : "bg-card border-border hover:border-primary"}`}
+              style={active ? { background: "#097275", borderColor: "#097275" } : {}}
+            >
+              {c.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Near Me + Clear */}
