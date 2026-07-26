@@ -179,3 +179,8 @@ export function getTownsAndVillagesForCounty(county) {
     villages: [...(found.villages || [])].sort()
   };
 }
+
+// Global town/village name sets (across all counties) so we can classify a
+// listing's town even when no county filter is selected.
+export const ALL_TOWN_NAMES = new Set(IRELAND_COUNTIES.flatMap(c => c.towns || []));
+export const ALL_VILLAGE_NAMES = new Set(IRELAND_COUNTIES.flatMap(c => c.villages || []));

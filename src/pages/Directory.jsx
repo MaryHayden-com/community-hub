@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { IRELAND_COUNTIES, getTownsForCounty, getTownsAndVillagesForCounty } from "../utils/irelandData";
+import { IRELAND_COUNTIES, getTownsForCounty, getTownsAndVillagesForCounty, ALL_TOWN_NAMES, ALL_VILLAGE_NAMES } from "../utils/irelandData";
 import SearchFilter from "../components/SearchFilter";
 import { Loader2, PlusCircle, List, Map } from "lucide-react";
 import { haversineKm, COUNTY_CENTROIDS } from "../utils/countyCoordinates";
@@ -208,12 +208,24 @@ export default function Directory() {
   }, [browseListings, activeType, subcategoryGroup]);
 
   const townGroups = useMemo(() => {
-    if (!county) return null;
-    const { towns: staticTowns, villages: staticVillages } = getTownsAndVillagesForCounty(county);
-    const listingTowns = browseListings.filter(l => l.county === county).map(l => l.town).filter(Boolean);
-    const allTowns = new Set(staticTowns);
-    const allVillages = new Set(staticVillages);
-    listingTowns.forEach(t => { if (!allTowns.has(t) && !allVillages.has(t)) allVillages.add(t); });
+    if (county) {
+      const { towns: staticTowns, villages: staticVillages } = getTownsAndVillagesForCounty(county);
+      const listingTowns = browseListings.filter(l => l.county === county).map(l => l.town).filter(Boolean);
+      const allTowns = new Set(staticTowns);
+      const allVillages = new Set(staticVillages);
+      listingTowns.forEach(t => { if (!allTowns.has(t) && !allVillages.has(t)) allVillages.add(t); });
+      return { towns: [...allTowns].sort(), villages: [...allVillages].sort() };
+    }
+    // No county selected — classify listing towns globally so the chips aren't empty
+    const allTowns = new Set();
+    const allVillages = new Set();
+    browseListings.forEach(l => {
+      const t = l.town;
+      if (!t) return;
+      if (ALL_TOWN_NAMES.has(t)) allTowns.add(t);
+      else if (ALL_VILLAGE_NAMES.has(t)) allVillages.add(t);
+      else allVillages.add(t); // unknowns → villages (consistent with county behaviour)
+    });
     return { towns: [...allTowns].sort(), villages: [...allVillages].sort() };
   }, [browseListings, county]);
 
