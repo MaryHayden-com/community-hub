@@ -110,6 +110,9 @@ export default function Directory() {
     // scroll down to the search fields so users land where they expect.
     if (params.get("type")) {
       requestAnimationFrame(() => searchSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    } else {
+      // Returning to the Directory/Dashboard landing (no category) — jump back to top
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
     }
   }, [location.search]);
 
