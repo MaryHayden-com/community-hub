@@ -109,10 +109,11 @@ export default function About() {
             I'm Mary Hayden — mother of four and the founder behind Hub4Community. We recently relocated to Bandon, West Cork, and have thrown ourselves into local community groups and schools, meeting some truly fabulous people along the way.
           </p>
           <p>
-            I work independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, how they communicate it and how they grow it. With a background in finance, operations and digital transformation, I bring practical outside perspective without the jargon, helping good ideas become clearer, stronger and easier to deliver.
+            I work independently with founders, SME leaders and community-focused organisations to help them bring more clarity to what they are building, streamline their operations to help them grow. With a background in finance, operations and digital transformation, I bring practical outside perspective without the jargon, helping good ideas become clearer, stronger and easier to deliver.
           </p>
           <p>
-            Now I want to translate that work for our local communities, by "Streamlining communities", if you like — taking the same clarity and structure I bring to businesses, and applying it to making everything local easier to find, and every local organisation easier to be seen. Not everyone has kids to help them integrate to a new place, so I built this app to take the pain out of getting the right people in front of the right Product, Service or Event — and to help others navigate a new community. I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
+            Now I want to translate my work for our local communities, by "Streamlining communities", taking the same clarity and structure I bring to businesses, and making everything local easier to find, and every local organisation easier to be seen. Not everyone easily integrates to a new place, so I built this app to take the pain out of getting the right people in front of the right Product, Service or Event — and to help you navigate a new community. 
+            I hope you like it; please spread the word. The more people who join in, the better it works for all of us.
           </p>
         </div>
       </section>
