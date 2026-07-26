@@ -289,7 +289,7 @@ export default function Admin() {
           </h1>
           <p className="text-muted-foreground mt-1">{listings.length} total listings</p>
         </div>
-        <div className="flex items-center gap-2 flex-nowrap overflow-x-auto sm:flex-wrap justify-start sm:justify-end pb-1 -mb-1">
+        <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end pb-1 -mb-1">
           {/* Always-visible utility buttons */}
           <Button
             variant="outline"
@@ -395,7 +395,7 @@ export default function Admin() {
       )}
 
       {/* Tab Navigation — desktop only */}
-      <div className="hidden sm:flex gap-1 border-b mb-6 overflow-x-auto">
+      <div className="hidden sm:flex flex-wrap gap-1 border-b mb-6">
         {[
           { key: "overview", label: "Overview" },
           { key: "pending", label: "Pending Approval", badge: pendingListingsCount, badgeColor: "bg-amber-500 text-white" },
