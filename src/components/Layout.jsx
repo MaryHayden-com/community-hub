@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import {
   MapPin, Building2, Users, GraduationCap, Calendar,
-  Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard,
+  Shield, Menu, X, ChevronRight, CreditCard, LayoutDashboard, Info,
   Tag, ChevronLeft, HeartHandshake, Heart, User, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -152,6 +152,20 @@ export default function Layout() {
               <Heart className="w-3.5 h-3.5" />
               Saved
             </Link>
+            <Link
+              to="/about"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border-b-2"
+              style={{
+                color: '#2A7373',
+                borderColor: location.pathname === '/about' ? '#D67D3E' : 'transparent',
+                background: location.pathname === '/about' ? 'rgba(42,115,115,0.08)' : 'transparent',
+              }}
+              onMouseEnter={(e) => { if (location.pathname !== '/about') { e.currentTarget.style.borderColor = '#D67D3E'; } }}
+              onMouseLeave={(e) => { if (location.pathname !== '/about') { e.currentTarget.style.borderColor = 'transparent'; } }}
+            >
+              <Info className="w-3.5 h-3.5" />
+              About
+            </Link>
 
             {isListingOwner && (
               <Link to="/dashboard" className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${location.pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
@@ -209,6 +223,11 @@ export default function Layout() {
             <Link to="/saved" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
               <Heart className="w-4 h-4" style={{ color: '#097275' }} />
               Saved
+              <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
+            </Link>
+            <Link to="/about" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold hover:bg-muted transition-colors uppercase tracking-wide" style={{ color: '#097275' }}>
+              <Info className="w-4 h-4" style={{ color: '#097275' }} />
+              About
               <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
             </Link>
 
