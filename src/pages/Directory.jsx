@@ -435,7 +435,7 @@ export default function Directory() {
       <div className="mb-5">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>Directory</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold" style={{ color: '#097275' }}>Explore what's happening locally</h2>
             <p className="text-muted-foreground mt-0.5 text-sm sm:text-base hidden sm:block">
               Discover the businesses, clubs, schools and events that bring your community together.
             </p>

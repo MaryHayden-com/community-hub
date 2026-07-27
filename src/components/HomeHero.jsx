@@ -1,14 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Search, Store, Users, GraduationCap, Calendar, Compass, PlusCircle, Heart, HeartHandshake } from "lucide-react";
+import { Search, Compass, PlusCircle, Heart } from "lucide-react";
 import LiveActivityBand from "./LiveActivityBand";
-
-const TILES = [
-  { key: "What's On", label: "Find events near you", icon: Calendar, path: "/directory?type=What's%20On" },
-  { key: "Business", label: "Browse local businesses", icon: Store, path: "/directory?type=Business" },
-  { key: "Club & Group", label: "Discover clubs and groups", icon: Users, path: "/directory?type=Club%20%26%20Group" },
-  { key: "Community Services", label: "Find community services", icon: HeartHandshake, path: "/directory?type=Community%20Services" },
-  { key: "Education", label: "Education", icon: GraduationCap, path: "/directory?type=Education" },
-];
 
 const STEPS = [
   { title: "Discover", icon: Compass, desc: "Browse local businesses, clubs, classes and what's on near you.", action: "browse" },
@@ -115,30 +107,6 @@ export default function HomeHero({ onAddListing, onSearch, onSearchWhatsOn, onSu
               <Search className="w-5 h-5 shrink-0" style={{ color: "#E2701B" }} />
               <span className="text-sm" style={{ color: "#999999" }}>Search the directory...</span>
             </button>
-          </div>
-
-          {/* ── Quick links: Explore what matters locally ── */}
-          <div className="mt-6 text-center">
-            <h2 className="font-display text-lg sm:text-xl font-bold" style={{ color: "#097275" }}>Explore what matters locally</h2>
-            <p className="text-xs sm:text-sm mt-1 max-w-xl mx-auto" style={{ color: "#555555" }}>
-              Browse by county, town or category to find the people, places and services that matter most in your area.
-            </p>
-          </div>
-
-          {/* ── 2×2 category tiles ── */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-4">
-            {TILES.map(({ key, label, icon: Icon, path }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => { navigate(path); onSearch?.(); }}
-                className="flex flex-col items-center justify-center gap-2 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow min-h-[88px]"
-                style={{ background: "rgba(226, 112, 27, 0.12)", border: "2px solid #E2701B" }}
-              >
-                <Icon className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: "#097275" }} />
-                <span className="text-sm sm:text-base font-semibold" style={{ color: "#111111" }}>{label}</span>
-              </button>
-            ))}
           </div>
 
           {/* ── Sharing / suggestion nudge ── */}
