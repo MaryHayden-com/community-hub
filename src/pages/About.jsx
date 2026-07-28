@@ -3,11 +3,11 @@ import { Store, Heart, Leaf, Compass, PlusCircle, Compass as ExploreIcon } from 
 import { Button } from "@/components/ui/button";
 import usePageTitle from "@/hooks/usePageTitle";
 
-const TEAL = "#006767";
-const ORANGE = "#e68a35";
-const ORANGE_BTN = "#e67e22";
-const PEACH = "#f5e6d9";
-const MINT = "#eef5f5";
+const TEAL = "#097275";
+const ORANGE = "#E2701B";
+const ORANGE_BTN = "#E2701B";
+const PEACH = "rgba(226,112,27,0.10)";
+const MINT = "rgba(9,114,117,0.08)";
 
 const CARDS = [
   {
@@ -49,12 +49,12 @@ export default function About() {
       {/* Header / Intro */}
       <header className="text-center">
         <h1 className="font-display text-3xl sm:text-4xl font-bold mt-3">
-          <span style={{ color: "#D67D3E" }}>Hub4</span><span style={{ color: "#2A7373" }}>Community</span>
+          <span style={{ color: "#E2701B" }}>Hub4</span><span style={{ color: "#097275" }}>Community</span>
         </h1>
-        <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#2A7373" }}>Why we built this</h2>
-        <p className="mt-3 text-base sm:text-lg font-bold leading-relaxed max-w-2xl mx-auto" style={{ color: "#2A7373" }}>
+        <h2 className="mt-3 text-base sm:text-lg font-bold" style={{ color: "#097275" }}>Why we built this</h2>
+        <p className="mt-3 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto" style={{ color: "#333333" }}>
           Great local businesses, clubs and events shouldn't be hard to find — and finding your feet in a new place shouldn't feel lonely or be so complicated. We put the right people in front of the right business, service, event or community group, and help everything local get seen.
-          <span className="block mt-2" style={{ color: "#D67D3E" }}>That's how communities come together.</span>
+          <span className="block mt-2 font-bold" style={{ color: "#E2701B" }}>That's how communities come together.</span>
         </p>
       </header>
 
@@ -72,7 +72,7 @@ export default function About() {
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {CARDS.map(({ icon: Icon, title, text }) => (
           <div key={title} className="rounded-xl border bg-white p-5" style={{ borderColor: "#e5e5e5" }}>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: "rgba(230,138,53,0.12)" }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: "rgba(226,112,27,0.12)" }}>
               <Icon className="w-5 h-5" style={{ color: ORANGE }} />
             </div>
             <h3 className="font-bold text-base" style={{ color: TEAL }}>{title}</h3>
@@ -124,7 +124,7 @@ export default function About() {
           <Link to="/directory"><ExploreIcon className="w-4 h-4 mr-2" /> Explore the directory</Link>
         </Button>
         <Button asChild className="h-11 px-6 text-white" style={{ background: ORANGE_BTN, border: "none" }}>
-          <Link to="/directory"><PlusCircle className="w-4 h-4 mr-2" /> Add your listing</Link>
+          <Link to="/directory?add=1"><PlusCircle className="w-4 h-4 mr-2" /> Add your listing</Link>
         </Button>
         <Link to="/privacy" className="text-sm underline underline-offset-4" style={{ color: TEAL }}>Privacy policy</Link>
       </section>

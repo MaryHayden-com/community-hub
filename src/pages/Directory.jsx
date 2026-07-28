@@ -106,6 +106,7 @@ export default function Directory() {
     setCounty(urlCounty);
     setTown(urlTown);
     setCountry(localStorage.getItem("dir_country") || "");
+    if (params.get("add") === "1") setShowSubmitForm(true);
   }, [location.search]);
 
   // Scroll to the search results for a category link, or back to the top for the Directory landing.
