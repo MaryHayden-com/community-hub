@@ -97,8 +97,10 @@ Deno.serve(async (req) => {
       orClauses.push({ subgroup: { $elemMatch: r } });
     });
 
+    // Public search must only surface approved listings — never pending
+    // (unreviewed) submissions, which `$ne: "rejected"` would have leaked.
     const candidates = await base44.asServiceRole.entities.CommunityListing.filter(
-      { status: { $ne: "rejected" }, $or: orClauses },
+      { status: "approved", $or: orClauses },
       "-created_date",
       Math.min(Math.max(limit * 3, 50), 500)
     );

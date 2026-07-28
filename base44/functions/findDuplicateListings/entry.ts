@@ -16,6 +16,13 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
+    // Admin-only: duplicate-review clusters expose private owner/contact data
+    // across all listings, so callers must be authenticated and authorised.
+    const user = await base44.auth.me().catch(() => null);
+    if (!user || user.role !== "admin") {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const all = await base44.asServiceRole.entities.CommunityListing.filter(
       { status: { $ne: "rejected" } },
       "name",
