@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, PlusCircle, Clock } from "lucide-react";
 import { ALL_COUNTIES } from "@/utils/irelandData";
@@ -18,7 +19,10 @@ export default function SubmitListingForm({ open, onClose }) {
   const [step, setStep] = useState(1); // 1 = details, 2 = success
   const [form, setForm] = useState({
     name: "", type: "", county: "", town: "", description: "",
-    phone: "", email: "", website: "", contact_name: "", category: []
+    phone: "", email: "", website: "", contact_name: "", category: [],
+    newcomer_status: "", beginner_friendly: false, welcome_note: "",
+    volunteer_needed: false, volunteer_summary: "",
+    facility_available: false, facility_details: "",
   });
   const [plan, setPlan] = useState(null);
 
@@ -38,7 +42,7 @@ export default function SubmitListingForm({ open, onClose }) {
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleClose = () => {
-    setForm({ name: "", type: "", county: "", town: "", description: "", phone: "", email: "", website: "", contact_name: "", category: [] });
+    setForm({ name: "", type: "", county: "", town: "", description: "", phone: "", email: "", website: "", contact_name: "", category: [], newcomer_status: "", beginner_friendly: false, welcome_note: "", volunteer_needed: false, volunteer_summary: "", facility_available: false, facility_details: "" });
     setStep(1);
     setPlan(null);
     setSaving(false);
@@ -217,6 +221,59 @@ export default function SubmitListingForm({ open, onClose }) {
                 </div>
               </div>
             </div>
+
+            {form.type && form.type !== "Business" && (
+              <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+                <div>
+                  <p className="text-sm font-semibold">Open to newcomers</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Help outsiders know if they can just turn up — and what you need a hand with. You can change this any time from your dashboard.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label>Can newcomers just turn up?</Label>
+                    <Select value={form.newcomer_status} onValueChange={(v) => update("newcomer_status", v)}>
+                      <SelectTrigger><SelectValue placeholder="Choose…" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="just_turn_up">Just turn up</SelectItem>
+                        <SelectItem value="come_and_try">Come & try</SelectItem>
+                        <SelectItem value="contact_first">Contact first</SelectItem>
+                        <SelectItem value="members_only">Members only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-3 sm:pt-7">
+                    <Switch checked={!!form.beginner_friendly} onCheckedChange={(v) => update("beginner_friendly", v)} />
+                    <Label className="cursor-pointer">Beginner friendly</Label>
+                  </div>
+                </div>
+                <div>
+                  <Label>Welcome note (one line for outsiders)</Label>
+                  <Input value={form.welcome_note} onChange={(e) => update("welcome_note", e.target.value)} placeholder="e.g. No experience needed, boots not required, first session free." />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Switch checked={!!form.volunteer_needed} onCheckedChange={(v) => update("volunteer_needed", v)} />
+                  <Label className="cursor-pointer">We need volunteers right now</Label>
+                </div>
+                {form.volunteer_needed && (
+                  <div>
+                    <Label>What do you need help with?</Label>
+                    <Textarea value={form.volunteer_summary} onChange={(e) => update("volunteer_summary", e.target.value)} rows={2} placeholder="e.g. Two hours on the gate for the U12 blitz on 14 Sept." />
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <Switch checked={!!form.facility_available} onCheckedChange={(v) => update("facility_available", v)} />
+                  <Label className="cursor-pointer">We have space to hire</Label>
+                </div>
+                {form.facility_available && (
+                  <div>
+                    <Label>What space, and when?</Label>
+                    <Textarea value={form.facility_details} onChange={(e) => update("facility_details", e.target.value)} rows={2} placeholder="e.g. Hall available weekday mornings." />
+                  </div>
+                )}
+              </div>
+            )}
 
             {formError && <p className="text-sm text-destructive">{formError}</p>}
             <div className="flex justify-end gap-2 pt-1">

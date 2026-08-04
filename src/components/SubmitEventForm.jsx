@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, CalendarPlus } from "lucide-react";
 import { ALL_COUNTIES } from "@/utils/irelandData";
@@ -16,6 +17,9 @@ const EMPTY = {
   address: "", website: "", is_free: "",
   contact_name: "", email: "", phone: "",
   category: [],
+  newcomer_status: "", beginner_friendly: false, welcome_note: "",
+  volunteer_needed: false, volunteer_summary: "",
+  facility_available: false, facility_details: "",
 };
 
 export default function SubmitEventForm({ open, onClose, isPaidUser = false, isAdmin = false, ownerListing = null }) {
@@ -165,6 +169,48 @@ export default function SubmitEventForm({ open, onClose, isPaidUser = false, isA
             <div>
               <Label>Description</Label>
               <Textarea value={form.description} onChange={e => set("description", e.target.value)} placeholder="A short description of the event..." rows={3} />
+            </div>
+
+            {/* Openness — helps outsiders know if they can come / help */}
+            <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+              <div>
+                <p className="text-sm font-semibold">Can people just turn up? · Do you need help?</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Let outsiders know if this event is open to newcomers — and what you need a hand with. You can change this per event as needs change.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <Label>Can newcomers just turn up?</Label>
+                  <Select value={form.newcomer_status} onValueChange={v => set("newcomer_status", v)}>
+                    <SelectTrigger><SelectValue placeholder="Choose…" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="just_turn_up">Just turn up</SelectItem>
+                      <SelectItem value="come_and_try">Come & try</SelectItem>
+                      <SelectItem value="contact_first">Contact first</SelectItem>
+                      <SelectItem value="members_only">Members only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-3 sm:pt-7">
+                  <Switch checked={!!form.beginner_friendly} onCheckedChange={v => set("beginner_friendly", v)} />
+                  <Label className="cursor-pointer">Beginner friendly</Label>
+                </div>
+              </div>
+              <div>
+                <Label>Welcome note (one line for outsiders)</Label>
+                <Input value={form.welcome_note} onChange={e => set("welcome_note", e.target.value)} placeholder="e.g. No experience needed, first night free, all welcome." />
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch checked={!!form.volunteer_needed} onCheckedChange={v => set("volunteer_needed", v)} />
+                <Label className="cursor-pointer">We need volunteers for this event</Label>
+              </div>
+              {form.volunteer_needed && (
+                <div>
+                  <Label>What do you need help with?</Label>
+                  <Textarea value={form.volunteer_summary} onChange={e => set("volunteer_summary", e.target.value)} rows={2} placeholder="e.g. Two hours on the gate — Sat 12–2pm." />
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
