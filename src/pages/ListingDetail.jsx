@@ -19,6 +19,7 @@ import QRCodeModal from "../components/QRCodeModal";
 import ReviewModal from "../components/ReviewModal";
 import ReviewStars from "../components/ReviewStars";
 import CommunityContributionBanner from "../components/CommunityContributionBanner";
+import OpennessStrip from "@/components/OpennessStrip";
 import usePageTitle from "@/hooks/usePageTitle";
 
 const typeConfig = {
@@ -338,6 +339,8 @@ export default function ListingDetail() {
           {isVisible("description") && listing.description && (
             <p className="mt-6 text-muted-foreground leading-relaxed">{listing.description}</p>
           )}
+
+          <OpennessStrip listing={listing} />
 
           <div className="mt-8 space-y-1 divide-y">
             {listing.type === "What's On" && listing.event_date && (

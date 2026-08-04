@@ -81,6 +81,22 @@ export default function ListingListRow({ listing }) {
           <MapPin className="w-3 h-3 shrink-0" />
           <span>{listing.town}{listing.area && listing.area !== listing.town ? ` · ${listing.area}` : ""}, {listing.county}</span>
         </div>
+        {(listing.newcomer_status === "just_turn_up" || listing.newcomer_status === "come_and_try" || listing.beginner_friendly || listing.volunteer_needed || listing.facility_available) && (
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+            {(listing.newcomer_status === "just_turn_up" || listing.newcomer_status === "come_and_try") && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Open to newcomers</span>
+            )}
+            {listing.beginner_friendly && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">Beginners</span>
+            )}
+            {listing.volunteer_needed && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200">Volunteers</span>
+            )}
+            {listing.facility_available && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">Space to hire</span>
+            )}
+          </div>
+        )}
         {listing.description && (
           <p className="text-xs text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-2">{listing.description}</p>
         )}

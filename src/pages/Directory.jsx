@@ -59,6 +59,7 @@ export default function Directory() {
   const [country, setCountry] = useState(() => localStorage.getItem("dir_country") || "");
   const [dateFrom, setDateFrom] = useState(getTodayStr);
   const [dateTo, setDateTo] = useState("");
+  const [openness, setOpenness] = useState([]);
   const [nearbyCounties, setNearbyCounties] = useState(null);
 
   // ── UI State ─────────────────────────────────────────────────────────────────
@@ -313,7 +314,7 @@ export default function Directory() {
   }, [townFacetBase, townGroups]);
 
   // ── Reset page when any filter changes ───────────────────────────────────────
-  useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo]);
+  useEffect(() => { setPage(1); }, [search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo, openness]);
 
   // ── Active dataset: server search results OR browse set ──────────────────────
   const activeListings = search.trim().length >= 2 ? searchResults : browseListings;
@@ -330,6 +331,12 @@ export default function Directory() {
         if (type.length > 0 && !type.includes(l.type)) return false;
         if (subcategoryGroup.length > 0 && !toArr(l.subcategory_group).some(g => subcategoryGroup.includes(g))) return false;
         if (category.length > 0 && !toArr(l.category).some(c => category.includes(c))) return false;
+        if (openness.length > 0) {
+          if (openness.includes("newcomers") && !(l.newcomer_status === "just_turn_up" || l.newcomer_status === "come_and_try")) return false;
+          if (openness.includes("beginners") && l.beginner_friendly !== true) return false;
+          if (openness.includes("volunteers") && l.volunteer_needed !== true) return false;
+          if (openness.includes("facility") && l.facility_available !== true) return false;
+        }
         if (nearbyCounties) {
           const coords = TOWN_COORDINATES[l.town?.trim()] || TOWN_COORDINATES[l.area?.trim()] || TOWN_COORDINATES[l.nearest_town?.trim()] || COUNTY_CENTROIDS.find(c => c.county === l.county);
           if (!coords) return false;
@@ -346,7 +353,7 @@ export default function Directory() {
     if (!isWhatsOn) return sortByTypeOrder(base);
 
     return expandAndSortEvents(base, dateFrom, dateTo);
-  }, [activeListings, search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo]);
+  }, [activeListings, search, type, subcategoryGroup, category, country, county, town, nearbyCounties, dateFrom, dateTo, openness]);
 
   const pagedItems = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = pagedItems.length < filtered.length;
@@ -489,7 +496,39 @@ export default function Directory() {
         dateTo={dateTo} setDateTo={setDateTo}
         todayStr={getTodayStr()}
         nearbyCounties={nearbyCounties} setNearbyCounties={setNearbyCounties}
-      /></div>
+        /></div>
+
+        {/* Openness filter chips — surfaces clubs/groups that welcome outsiders */}
+        {!type.includes("Business") && (
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+         <span className="text-xs text-muted-foreground">Show:</span>
+         {[
+           { key: "newcomers", label: "Open to newcomers" },
+           { key: "beginners", label: "Beginners welcome" },
+           { key: "volunteers", label: "Volunteers needed" },
+           { key: "facility", label: "Space to hire" },
+         ].map((chip) => {
+           const active = openness.includes(chip.key);
+           return (
+             <button
+               key={chip.key}
+               onClick={() => setOpenness(prev => active ? prev.filter(k => k !== chip.key) : [...prev, chip.key])}
+               className="text-xs font-medium px-3 py-2 rounded-full border transition-colors min-h-[40px] flex items-center"
+               style={active
+                 ? { background: "#097275", color: "#fff", borderColor: "#097275" }
+                 : { background: "transparent", color: "#097275", borderColor: "rgba(9,114,117,0.3)" }}
+             >
+               {chip.label}
+             </button>
+           );
+         })}
+         {openness.length > 0 && (
+           <button onClick={() => setOpenness([])} className="text-xs text-muted-foreground underline underline-offset-2">
+             Clear
+           </button>
+         )}
+        </div>
+        )}
 
       {/* Results */}
       {viewMode === "map" ? (

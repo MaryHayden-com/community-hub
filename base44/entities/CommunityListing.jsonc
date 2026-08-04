@@ -134,6 +134,50 @@
       "type": "string",
       "title": "Meeting Info"
     },
+    "newcomer_status": {
+      "type": "string",
+      "title": "Open to Newcomers",
+      "enum": [
+        "just_turn_up",
+        "come_and_try",
+        "contact_first",
+        "members_only"
+      ],
+      "enumNames": [
+        "Just turn up",
+        "Come & try",
+        "Contact first",
+        "Members only"
+      ],
+      "description": "Can a newcomer simply turn up, or do they need to contact you first?"
+    },
+    "beginner_friendly": {
+      "type": "boolean",
+      "title": "Beginner Friendly"
+    },
+    "welcome_note": {
+      "type": "string",
+      "title": "Welcome Note",
+      "description": "One plain sentence for outsiders, e.g. 'No experience needed, boots not required.'"
+    },
+    "volunteer_needed": {
+      "type": "boolean",
+      "title": "Volunteers Needed"
+    },
+    "volunteer_summary": {
+      "type": "string",
+      "title": "Volunteer Summary",
+      "description": "The small, finite jobs you need help with right now."
+    },
+    "facility_available": {
+      "type": "boolean",
+      "title": "Facility Available to Hire"
+    },
+    "facility_details": {
+      "type": "string",
+      "title": "Facility Details",
+      "description": "What space is available (hall, room, pitch) and when."
+    },
     "event_date": {
       "type": "string",
       "title": "Event Start Date (YYYY-MM-DD)"

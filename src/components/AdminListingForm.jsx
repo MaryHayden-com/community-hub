@@ -197,6 +197,13 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
     is_featured: listing?.is_featured || false,
     image_url: listing?.image_url || "",
     hidden_fields: listing?.hidden_fields || [],
+    newcomer_status: listing?.newcomer_status || "",
+    beginner_friendly: listing?.beginner_friendly || false,
+    welcome_note: listing?.welcome_note || "",
+    volunteer_needed: listing?.volunteer_needed || false,
+    volunteer_summary: listing?.volunteer_summary || "",
+    facility_available: listing?.facility_available || false,
+    facility_details: listing?.facility_details || "",
   });
 
   const toggleHidden = (field) => {
@@ -502,6 +509,77 @@ export default function AdminListingForm({ listing, onClose, onSave }) {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          )}
+
+          {form.type !== "Business" && (
+            <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+              <div>
+                <p className="text-sm font-semibold">Open to newcomers</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Help outsiders know if they can just turn up — and what you need a hand with.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <Label>Can newcomers just turn up?</Label>
+                  <Select value={form.newcomer_status} onValueChange={(v) => update("newcomer_status", v)}>
+                    <SelectTrigger><SelectValue placeholder="Choose…" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="just_turn_up">Just turn up</SelectItem>
+                      <SelectItem value="come_and_try">Come & try</SelectItem>
+                      <SelectItem value="contact_first">Contact first</SelectItem>
+                      <SelectItem value="members_only">Members only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-3 sm:pt-7">
+                  <Switch checked={!!form.beginner_friendly} onCheckedChange={(v) => update("beginner_friendly", v)} />
+                  <Label className="cursor-pointer">Beginner friendly</Label>
+                </div>
+              </div>
+
+              <div>
+                <Label>Welcome note (one line for outsiders)</Label>
+                <Input
+                  value={form.welcome_note}
+                  onChange={(e) => update("welcome_note", e.target.value)}
+                  placeholder="e.g. No experience needed, boots not required, first session free."
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch checked={!!form.volunteer_needed} onCheckedChange={(v) => update("volunteer_needed", v)} />
+                <Label className="cursor-pointer">We need volunteers right now</Label>
+              </div>
+              {form.volunteer_needed && (
+                <div>
+                  <Label>What do you need help with?</Label>
+                  <Textarea
+                    value={form.volunteer_summary}
+                    onChange={(e) => update("volunteer_summary", e.target.value)}
+                    rows={2}
+                    placeholder="e.g. Two hours on the gate for the U12 blitz on 14 Sept. Someone to wash jerseys for a month."
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <Switch checked={!!form.facility_available} onCheckedChange={(v) => update("facility_available", v)} />
+                <Label className="cursor-pointer">We have space to hire</Label>
+              </div>
+              {form.facility_available && (
+                <div>
+                  <Label>What space, and when?</Label>
+                  <Textarea
+                    value={form.facility_details}
+                    onChange={(e) => update("facility_details", e.target.value)}
+                    rows={2}
+                    placeholder="e.g. Hall available weekday mornings; pitch free Mon–Thu evenings."
+                  />
+                </div>
+              )}
             </div>
           )}
 
